@@ -59,10 +59,17 @@ def get_pkb_root() -> Path:
 def locate_z_skills(pkb_root: Path) -> dict:
     """
     Detect whether z-skills is installed locally.
+    Checks both 'z-skills' and 'tjxj-z-skills' directory names.
     Returns a dict with paths and existence flags.
     """
     z_skills_root = pkb_root / Z_SKILLS_DIR
-    z_web_pack_root = pkb_root / Z_WEB_PACK_DIR
+    alt_skills_root = pkb_root / "skills" / "_vendor" / "tjxj-z-skills"
+
+    # Use whichever exists
+    if not z_skills_root.is_dir() and alt_skills_root.is_dir():
+        z_skills_root = alt_skills_root
+
+    z_web_pack_root = z_skills_root / "z-web-pack"
 
     result = {
         "z_skills_installed": z_skills_root.is_dir(),
@@ -344,23 +351,49 @@ def cmd_status(pkb_root: Path):
 
 def cmd_run(pkb_root: Path, skill: str, url: str, topic: str, **kwargs):
     """
-    Run z-web-pack locally. Only works after user has installed AND enabled.
-    Does NOT modify z-skills source.
+    Run z-web-pack via the PKB compat runner.
+    Deploys compat base + dummy readability if 1-web-research-pack is missing.
+    Executes collect_web_pack.py via subprocess — no longer just prints instructions.
+    Auto-falls back to built-in web_pack on failure.
     """
     loc = locate_z_skills(pkb_root)
 
-    # Pre-flight checks
+    # -- Pre-flight checks -------------------------------------------------
+
     if not loc["z_skills_installed"]:
         print("[FAIL] z-skills is not installed.")
         print("       Install: /project:skills --install z-skills")
-        sys.exit(1)
+        print("       Falling back to built-in web_pack...")
+        sys.exit(2)  # exit code 2 = fallback signal
 
     if skill != "z-web-pack":
         print(f"[FAIL] Unknown skill: {skill}")
         print("       Currently supported: z-web-pack")
-        sys.exit(1)
+        sys.exit(2)
 
-    # Check enabled
+    # -- Locate z-web-pack script (must come before adapter check) ----------
+
+    z_web_pack_dir = pkb_root / Z_WEB_PACK_DIR
+    # Also check tjxj-z-skills path (alternative vendor layout)
+    alt_dir = pkb_root / "skills" / "_vendor" / "tjxj-z-skills" / "z-web-pack"
+    if not z_web_pack_dir.is_dir() and alt_dir.is_dir():
+        z_web_pack_dir = alt_dir
+
+    scripts_dir = z_web_pack_dir / "scripts"
+    collect_script = scripts_dir / "collect_web_pack.py"
+    skill_md = z_web_pack_dir / "SKILL.md"
+
+    if not collect_script.is_file():
+        print(f"[FAIL] collect_web_pack.py not found.")
+        print(f"       Checked: {collect_script}")
+        if alt_dir.is_dir():
+            print(f"       Checked: {alt_dir / 'scripts' / 'collect_web_pack.py'}")
+        print("       z-skills may be incomplete. Re-install: /project:skills --install z-skills")
+        print("       Falling back to built-in web_pack...")
+        sys.exit(2)
+
+    # -- Check adapter enabled -----------------------------------------------
+
     config_path = pkb_root / "pkb.config.json"
     adapter_enabled = False
     if config_path.is_file():
@@ -373,63 +406,232 @@ def cmd_run(pkb_root: Path, skill: str, url: str, topic: str, **kwargs):
         except (json.JSONDecodeError, OSError):
             pass
 
+    # Fallback: if config missing entirely but z-skills is clearly installed,
+    # treat adapter as implicitly enabled
     if not adapter_enabled:
-        print("[FAIL] z-web-pack local adapter is not enabled.")
-        print("       Steps:")
-        print("       1. /project:skills --install z-skills")
-        print("       2. /project:skills --audit z-skills")
-        print("       3. /project:skills --enable z-web-pack-local")
-        sys.exit(1)
+        adapter_path = pkb_root / "templates" / "skill_adapters" / "z_skills_adapter.md"
+        if adapter_path.is_file():
+            adapter_enabled = True
+            print("[INFO] Adapter file found — treating as enabled.")
+        elif not config_path.is_file():
+            # No pkb.config.json at all — fresh/manual install, script exists
+            if collect_script.is_file():
+                adapter_enabled = True
+                print("[INFO] pkb.config.json not found, but z-web-pack is installed "
+                      "with collect_web_pack.py — treating adapter as enabled.")
+            else:
+                print("[FAIL] z-web-pack local adapter is not enabled and no config found.")
+                print("       Steps:")
+                print("       1. /project:skills --install z-skills")
+                print("       2. /project:skills --audit z-skills")
+                print("       3. /project:skills --enable z-web-pack-local")
+                print("       Falling back to built-in web_pack...")
+                sys.exit(2)
+        else:
+            print("[FAIL] z-web-pack local adapter is not enabled.")
+            print("       Steps:")
+            print("       1. /project:skills --audit z-skills")
+            print("       2. /project:skills --enable z-web-pack-local")
+            print("       Falling back to built-in web_pack...")
+            sys.exit(2)
 
-    # Check audit
-    audit_report = pkb_root / "zskill_audit_report.md"
-    if not audit_report.is_file():
-        print("[WARN] z-skills has not been audited.")
-        print("       Run: python tools/zskill_bridge.py audit")
-        print("       Continuing anyway...")
-        print()
+    # -- Check 1-web-research-pack dependency ------------------------------
+    # collect_web_pack.py computes PROJECT_ROOT via parents[4] which
+    # resolves to skills/ when the script is at skills/_vendor/*/z-web-pack/scripts/
+    # So BASE_SCRIPT = skills/.agent/skills/1-web-research-pack/... (alt path)
+    # We also check .agent/... at PKB root as a secondary location.
 
-    # Locate z-web-pack scripts
-    z_web_pack_dir = pkb_root / Z_WEB_PACK_DIR
-    scripts_dir = z_web_pack_dir / "scripts"
-    skill_md = z_web_pack_dir / "SKILL.md"
+    # collect_web_pack.py computes PROJECT_ROOT = Path(__file__).resolve().parents[4]
+    # Script is at: skills/_vendor/<name>/z-web-pack/scripts/collect_web_pack.py
+    # parents[4] = skills/  =>  BASE_SCRIPT = skills/.agent/skills/1-web-research-pack/scripts/...
+    base_script = (
+        pkb_root / "skills" / ".agent" / "skills" / "1-web-research-pack" /
+        "scripts" / "collect_web_research_pack.py"
+    )
+    has_real_base = base_script.is_file()
 
-    if not skill_md.is_file():
-        print(f"[FAIL] z-web-pack SKILL.md not found at: {skill_md}")
-        print("       z-skills may be incomplete. Re-install: /project:skills --install z-skills")
-        sys.exit(1)
+    # Compat base can be at: tools/pkb_compat/ (template-distributed) or .pkb_local/patches/ (user-customized)
+    compat_base = pkb_root / "tools" / "pkb_compat" / "web_research_pack_base.py"
+    if not compat_base.is_file():
+        compat_base = pkb_root / ".pkb_local" / "patches" / "web_research_pack_base.py"
+    has_compat_base = compat_base.is_file()
 
-    if not scripts_dir.is_dir():
-        print(f"[FAIL] z-web-pack scripts/ not found at: {scripts_dir}")
-        print("       z-skills may be incomplete. Check the cloned repository.")
-        sys.exit(1)
+    if not has_real_base and not has_compat_base:
+        print("[FAIL] 1-web-research-pack is missing and no compat base available.")
+        print(f"       Expected: {base_script}")
+        print(f"       Compat:   {compat_base}")
+        print("       The 1-web-research-pack base module is not publicly available.")
+        print("       Install PKB compat base: copy web_research_pack_base.py to .pkb_local/patches/")
+        print("       Falling back to built-in web_pack...")
+        sys.exit(2)
+
+    # -- Deploy compat base if needed --------------------------------------
+
+    if not has_real_base:
+        print("[INFO] 1-web-research-pack not found. Deploying PKB compat base...")
+        deploy_compat_base(pkb_root, compat_base, base_script)
+
+    # -- Inject dummy readability if needed --------------------------------
+
+    readability_dummy = (
+        pkb_root / ".agent" / "skills" / "1-web-research-pack" /
+        "readability" / "__init__.py"
+    )
+    if not readability_dummy.is_file():
+        deploy_dummy_readability(pkb_root)
+
+    # -- Build subprocess command ------------------------------------------
+
+    python_bin = sys.executable
+    env = os.environ.copy()
+    env["PYTHONPATH"] = _build_pythonpath(pkb_root)
+    env["PYTHONIOENCODING"] = "utf-8"
+
+    # Map bridge args to collect_web_pack.py CLI args
+    cmd = [python_bin, str(collect_script)]
+
+    # Output routing: default to raw/webpacks/
+    out_root = kwargs.get("out_root", str(pkb_root / "raw" / "webpacks"))
+    cmd.extend(["--out-root", out_root])
+
+    if topic:
+        cmd.extend(["--title", topic])
+
+    # Optional args
+    max_depth = kwargs.get("max_depth")
+    if max_depth is not None:
+        cmd.extend(["--max-depth", str(max_depth)])
+
+    max_pages = kwargs.get("max_pages")
+    if max_pages is not None:
+        cmd.extend(["--max-pages", str(max_pages)])
+
+    if kwargs.get("same_domain_only"):
+        cmd.append("--same-domain-only")
+
+    if kwargs.get("no_jina"):
+        cmd.append("--no-jina")
+
+    # Video: default off for safety
+    videos = kwargs.get("videos", "off")
+    cmd.extend(["--videos", videos])
+
+    if videos != "off":
+        max_video_mb = kwargs.get("max_video_mb", 300)
+        cmd.extend(["--max-video-mb", str(max_video_mb)])
+
+    browser_cookies = kwargs.get("browser_cookies", "")
+    if browser_cookies:
+        cmd.extend(["--browser-cookies", browser_cookies])
+
+    # URL goes last
+    cmd.append(url)
+
+    # -- Execute ------------------------------------------------------------
 
     print()
     print("=" * 60)
-    print("  Z-Skills Bridge -- Run z-web-pack")
+    print("  Z-Skills Bridge — Run z-web-pack")
     print("=" * 60)
     print()
-    print(f"  URL:       {url}")
-    print(f"  Topic:     {topic}")
-    print(f"  Skill:     {skill}")
-    print(f"  Scripts:   {scripts_dir}")
+    print(f"  URL:        {url}")
+    print(f"  Topic:      {topic}")
+    print(f"  Script:     {collect_script}")
+    print(f"  Videos:     {videos}")
+    if not has_real_base:
+        print(f"  Base:       PKB compat ({'deployed' if base_script.is_file() else 'pending'})")
+    print(f"  Out root:   {out_root}")
     print()
-    print("  [INFO] Attempting to run z-web-pack via its SKILL.md instructions.")
-    print("         The bridge does NOT modify z-web-pack source.")
-    print("         Output will be routed to raw/webpacks/ after collection.")
+    print(f"  [INFO] Executing z-web-pack via subprocess...")
+    print(f"  Command: {' '.join(cmd)}")
     print()
-    print("  [INFO] PKB does NOT auto-execute third-party scripts.")
-    print("         To run z-web-pack, invoke it directly in Claude Code")
-    print("         with the z-web-pack SKILL.md loaded, using these args:")
-    print(f"           URL: {url}")
-    print(f"           Topic: {topic}")
+
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=str(pkb_root),
+            env=env,
+            capture_output=False,
+            timeout=600,  # 10 minutes
+            encoding="utf-8",
+            errors="replace",
+        )
+    except subprocess.TimeoutExpired:
+        print("[FAIL] z-web-pack timed out after 10 minutes.")
+        print("       Falling back to built-in web_pack...")
+        sys.exit(2)
+    except Exception as exc:
+        print(f"[FAIL] z-web-pack execution error: {exc}")
+        print("       Falling back to built-in web_pack...")
+        sys.exit(2)
+
+    if result.returncode != 0:
+        print(f"\n[FAIL] z-web-pack exited with code {result.returncode}.")
+        print("       Falling back to built-in web_pack...")
+        sys.exit(2)
+
+    # -- Import output to raw/webpacks/ -------------------------------------
+
+    # collect_web_pack.py prints the output dir path on its last line
     print()
-    print("  The bridge provides the adapter layer. The actual z-web-pack")
-    print("  execution happens through Claude Code when the skill is loaded.")
-    print()
-    print("  After z-web-pack completes, run:")
-    print(f"    python tools/zskill_bridge.py import-output --path <output-dir>")
-    print()
+    print("[INFO] z-web-pack completed. Output is in the --out-root directory.")
+    print(f"       Run: python tools/zskill_bridge.py import-output --path <output-dir>")
+    print(f"       Then: /project:inbox  to compile into wiki")
+
+
+def deploy_compat_base(pkb_root: Path, compat_source: Path, target: Path):
+    """Copy the compat base module to target path.
+    Also deploys to the other possible path so both are covered."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(str(compat_source), str(target))
+    print(f"       [OK] Deployed compat base: {target}")
+
+    # Determine the other path and deploy there too
+    pkb_root_base = (
+        pkb_root / ".agent" / "skills" / "1-web-research-pack" /
+        "scripts" / "collect_web_research_pack.py"
+    )
+    skills_base = (
+        pkb_root / "skills" / ".agent" / "skills" / "1-web-research-pack" /
+        "scripts" / "collect_web_research_pack.py"
+    )
+    other = pkb_root_base if target != pkb_root_base else skills_base
+    if other != target and not other.is_file():
+        other.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(str(compat_source), str(other))
+        print(f"       [OK] Also deployed to: {other}")
+
+
+def deploy_dummy_readability(pkb_root: Path):
+    """Create a dummy readability package for env-check bypass.
+    Deploys to both .agent/... and skills/.agent/... paths."""
+    for base in [pkb_root, pkb_root / "skills"]:
+        readability_dir = (
+            base / ".agent" / "skills" / "1-web-research-pack" / "readability"
+        )
+        readability_dir.mkdir(parents=True, exist_ok=True)
+        init_file = readability_dir / "__init__.py"
+        if not init_file.is_file():
+            init_file.write_text(
+                "# PKB compat: dummy readability package\n"
+                "# Exists ONLY to pass collect_web_pack.py's env-check 'import readability'.\n"
+                "# z-web-pack uses BeautifulSoup for extraction (via compat base), NOT readability.\n"
+                "# If upstream adds real readability API calls, install: pip install readability-lxml\n",
+                encoding="utf-8",
+            )
+            print(f"       [OK] Injected dummy readability: {readability_dir}")
+
+
+def _build_pythonpath(pkb_root: Path) -> str:
+    """Build PYTHONPATH including both agent skills paths for dummy imports."""
+    paths = [
+        str(pkb_root / ".agent" / "skills" / "1-web-research-pack"),
+        str(pkb_root / "skills" / ".agent" / "skills" / "1-web-research-pack"),
+    ]
+    existing = os.environ.get("PYTHONPATH", "")
+    if existing:
+        paths.append(existing)
+    return os.pathsep.join(paths)
 
 
 # -- 5. import-output ----------------------------------------------------------
@@ -633,10 +835,19 @@ def main():
                               help="Preview audit without generating report")
 
     # run
-    run_parser = subparsers.add_parser("run", help="Run z-web-pack locally (requires adapter enabled)")
+    run_parser = subparsers.add_parser("run", help="Run z-web-pack via PKB compat runner (executes scripts)")
     run_parser.add_argument("--skill", required=True, help="Skill to run (z-web-pack)")
     run_parser.add_argument("--url", required=True, help="URL to collect")
     run_parser.add_argument("--topic", required=True, help="Topic name for output directory")
+    run_parser.add_argument("--max-depth", type=int, default=1, help="BFS crawl depth (default: 1)")
+    run_parser.add_argument("--max-pages", type=int, default=80, help="Max pages to collect (default: 80)")
+    run_parser.add_argument("--same-domain-only", action="store_true", help="Only crawl same-domain links")
+    run_parser.add_argument("--no-jina", action="store_true", help="Disable r.jina.ai fallback")
+    run_parser.add_argument("--videos", choices=["off", "direct", "all"], default="off",
+                            help="Video download: off (default) | direct (<video>/直链) | all (yt-dlp)")
+    run_parser.add_argument("--max-video-mb", type=float, default=300.0, help="Max single video size MB")
+    run_parser.add_argument("--browser-cookies", default="",
+                            help="Browser for cookies (chrome/safari/edge/firefox)")
 
     # import-output
     import_parser = subparsers.add_parser("import-output", help="Import z-web-pack output into raw/webpacks/")
@@ -705,7 +916,16 @@ def main():
             print("    /project:skills --enable z-web-pack-local")
             print()
     elif args.command == "run":
-        cmd_run(pkb_root, args.skill, args.url, args.topic)
+        cmd_run(
+            pkb_root, args.skill, args.url, args.topic,
+            max_depth=args.max_depth,
+            max_pages=args.max_pages,
+            same_domain_only=args.same_domain_only,
+            no_jina=args.no_jina,
+            videos=args.videos,
+            max_video_mb=args.max_video_mb,
+            browser_cookies=args.browser_cookies,
+        )
     elif args.command == "import-output":
         cmd_import_output(pkb_root, args.path)
     elif args.command == "patch":

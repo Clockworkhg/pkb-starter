@@ -71,19 +71,23 @@ MACOS_PATH_PATTERNS = [
 
 
 def check_z_web_pack(pkb_root: Path) -> dict:
-    """Detect z-web-pack availability across 10 dimensions."""
+    """Detect z-web-pack availability across 12 dimensions."""
     checks = {}
     warnings = []
 
-    # 1. z_skills_installed
+    # 1. z_skills_installed (check both possible names)
     z_skills_dir = pkb_root / "skills" / "_vendor" / "z-skills"
+    alt_skills_dir = pkb_root / "skills" / "_vendor" / "tjxj-z-skills"
+    z_skills_found = z_skills_dir.is_dir() or alt_skills_dir.is_dir()
+    effective_skills_dir = z_skills_dir if z_skills_dir.is_dir() else alt_skills_dir
     checks["z_skills_installed"] = {
-        "ok": z_skills_dir.is_dir(),
+        "ok": z_skills_found,
         "detail": f"skills/_vendor/z-skills/ {'exists' if z_skills_dir.is_dir() else 'NOT FOUND'}"
+                  + (f" (found tjxj-z-skills)" if alt_skills_dir.is_dir() and not z_skills_dir.is_dir() else "")
     }
 
     # 2. z_web_pack_dir
-    z_web_pack_dir = z_skills_dir / "z-web-pack"
+    z_web_pack_dir = effective_skills_dir / "z-web-pack"
     checks["z_web_pack_dir"] = {
         "ok": z_web_pack_dir.is_dir(),
         "detail": f"z-web-pack/ directory {'exists' if z_web_pack_dir.is_dir() else 'NOT FOUND'}"
@@ -110,19 +114,48 @@ def check_z_web_pack(pkb_root: Path) -> dict:
         "detail": f"collect_web_pack.py {'found' if collect_script.is_file() else 'NOT FOUND'}"
     }
 
-    # 6. 1-web-research-pack dependency
-    research_pack_dir = z_skills_dir / "1-web-research-pack"
-    research_skill_md = research_pack_dir / "SKILL.md"
-    research_has_dir = research_pack_dir.is_dir()
-    research_has_skill = research_skill_md.is_file()
-    checks["research_pack_dep"] = {
-        "ok": research_has_dir and research_has_skill,
-        "detail": (
-            f"1-web-research-pack {'found' if research_has_dir else 'NOT FOUND'}"
-            + (f", SKILL.md {'found' if research_has_skill else 'NOT FOUND'}"
-               if research_has_dir else "")
-        )
-    }
+    # 6a. Real 1-web-research-pack dependency (check both possible paths)
+    base_script_real = (
+        pkb_root / ".agent" / "skills" / "1-web-research-pack" /
+        "scripts" / "collect_web_research_pack.py"
+    )
+    alt_base_script_real = (
+        pkb_root / "skills" / ".agent" / "skills" / "1-web-research-pack" /
+        "scripts" / "collect_web_research_pack.py"
+    )
+    has_real_base = base_script_real.is_file() or alt_base_script_real.is_file()
+
+    # 6b. PKB compat base (tools/pkb_compat/ or .pkb_local/patches/)
+    compat_base = pkb_root / "tools" / "pkb_compat" / "web_research_pack_base.py"
+    if not compat_base.is_file():
+        compat_base = pkb_root / ".pkb_local" / "patches" / "web_research_pack_base.py"
+    has_compat_base = compat_base.is_file()
+
+    # 6c. Dummy readability
+    readability_dummy = (
+        pkb_root / ".agent" / "skills" / "1-web-research-pack" /
+        "readability" / "__init__.py"
+    )
+
+    if has_real_base:
+        checks["research_pack_dep"] = {
+            "ok": True,
+            "detail": "1-web-research-pack found (real base module)"
+        }
+    elif has_compat_base:
+        checks["research_pack_dep"] = {
+            "ok": True,
+            "detail": "PKB compat base available at .pkb_local/patches/web_research_pack_base.py"
+        }
+        warnings.append("Using PKB compat base — not the original 1-web-research-pack. "
+                       "readability-lxml is NOT used (BS4 fallback).")
+    else:
+        checks["research_pack_dep"] = {
+            "ok": False,
+            "detail": "1-web-research-pack NOT FOUND. "
+                      "Compat base also NOT FOUND at .pkb_local/patches/web_research_pack_base.py. "
+                      "z-web-pack cannot run without this dependency."
+        }
 
     # 7. macOS hardcoded paths
     if scripts_dir.is_dir():
@@ -199,12 +232,25 @@ def check_z_web_pack(pkb_root: Path) -> dict:
         failed_critical = [k for k in critical_keys if not checks.get(k, {}).get("ok", False)]
         warnings.insert(0, f"Critical components missing: {', '.join(failed_critical)}")
     else:
-        optional_keys = ["research_pack_dep", "macos_paths", "windows_compat",
-                         "bridge_execution", "adapter_enabled"]
-        non_critical_fail = any(
-            not checks.get(k, {}).get("ok", False) for k in optional_keys
-        )
-        status = "degraded" if non_critical_fail else "available"
+        # research_pack_dep is a hard requirement — cannot run without it
+        if not checks.get("research_pack_dep", {}).get("ok", False):
+            status = "unavailable"
+            warnings.insert(0, "Missing base dependency: 1-web-research-pack (no real module, no compat base)")
+        else:
+            # With base module available, check runtime readiness
+            runtime_keys = ["bridge_execution", "adapter_enabled",
+                           "macos_paths", "windows_compat"]
+            runtime_fail = any(
+                not checks.get(k, {}).get("ok", False) for k in runtime_keys
+            )
+            if runtime_fail:
+                status = "degraded"
+                if not checks.get("bridge_execution", {}).get("ok", False):
+                    warnings.append("Bridge cannot execute scripts — update pkb-starter")
+                if not checks.get("adapter_enabled", {}).get("ok", False):
+                    warnings.append("Adapter not enabled — run /project:skills --enable z-web-pack-local")
+            else:
+                status = "available"
 
     return {
         "name": "z-web-pack (local, user-installed)",
@@ -278,7 +324,7 @@ def check_windows_compat(scripts_dir: Path) -> dict:
 
 
 def check_bridge_execution(pkb_root: Path) -> dict:
-    """Check if zskill_bridge.py cmd_run() actually executes scripts or just prints."""
+    """Check if zskill_bridge.py cmd_run() actually executes scripts (v0.2+)."""
     bridge_path = pkb_root / "tools" / "zskill_bridge.py"
     if not bridge_path.is_file():
         return {"ok": False, "detail": "tools/zskill_bridge.py NOT FOUND"}
@@ -288,18 +334,25 @@ def check_bridge_execution(pkb_root: Path) -> dict:
     except OSError:
         return {"ok": False, "detail": "Cannot read tools/zskill_bridge.py"}
 
+    # Check for subprocess.run() in cmd_run — indicates actual execution
     has_exec = bool(re.search(r'subprocess\.(run|Popen|call|check_output)', content))
-    has_importlib = bool(re.search(r'importlib|__import__|exec\s*\(|eval\s*\(', content))
+    # Check for compat base deployment — indicates PKB bridge v0.2+
+    has_compat = "deploy_compat_base" in content
 
-    if has_exec or has_importlib:
+    if has_exec and has_compat:
         return {
             "ok": True,
-            "detail": "Bridge supports auto-execution of z-web-pack scripts"
+            "detail": "Bridge v0.2+ supports real subprocess execution + compat base deployment"
+        }
+    elif has_exec:
+        return {
+            "ok": True,
+            "detail": "Bridge supports subprocess execution (no compat base deployment detected)"
         }
     return {
         "ok": False,
-        "detail": "Bridge does NOT auto-execute z-web-pack (prints instructions only). "
-                  "Manual invocation via Claude Code SKILL.md loading required."
+        "detail": "Bridge v0.1 — does NOT execute scripts (prints instructions only). "
+                  "Update pkb-starter to v0.6.5+ for bridge execution support."
     }
 
 
