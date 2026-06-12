@@ -55,6 +55,22 @@ In Claude Code (project mode):
 
 > **v0.1.0 uses project commands**. Commands are invoked as `/project:<name>` when you `cd` into your PKB directory and run `claude`. Bare `/pkb` is only available if pkb-starter is installed as a Claude Code plugin.
 
+## Optional: Install Skill Packs
+
+Extend PKB with domain-specific skills (academic research, document processing, etc.):
+
+```bash
+# Install a skill profile (from pkb-starter directory)
+python scripts/install_skills.py --target "D:\MyKnowledgeBase" --profile student
+
+# Or from Claude Code
+/project:skills --install student
+```
+
+Profiles: `core` (none) | `student` | `research` | `developer` | `creator` | `full` | `custom`
+
+[Full skill catalog →](OPTIONAL_SKILLS.md)
+
 ## Step 5: Add Your First Knowledge
 
 ```

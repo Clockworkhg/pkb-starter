@@ -112,6 +112,45 @@
 - Open Obsidian → "Open folder as vault" → select the `wiki/` directory
 - OR open the PKB root directory as vault (wiki links still work via path)
 
+### Skill installation fails with "git clone" error
+
+**Cause**: Network issue, repo URL change, or repo is private/deleted.
+
+**Fix**:
+1. Check the repo URL in `skills_registry/skill_catalog.json`
+2. Verify you can access the repo in a browser
+3. For private repos, ensure git is authenticated
+4. Try installing skills individually: `python scripts/install_skills.py --target . --profile custom`
+
+### High-risk skill won't install
+
+**Cause**: Skills with `risk_level: high` or `reference_only` are blocked by default.
+
+**Fix**: Use `--enable-risky` to install high-risk skills:
+```
+python scripts/install_skills.py --target "D:\MyKB" --profile full --enable-risky
+```
+Reference-only skills (like z-skills) can NEVER be installed -- they are catalog entries for design reference only.
+
+### Skill adapter not working
+
+**Cause**: Adapter wasn't copied to target PKB, or skill output is going to wrong directory.
+
+**Fix**:
+1. Verify adapter exists: `ls templates/skill_adapters/`
+2. Re-install the skill to copy its adapter
+3. Check `SKILL_LINKS.md` for adapter mappings
+4. Manually copy: `cp template/skill_adapters/<adapter>.md "D:\MyKB\templates\skill_adapters\"`
+
+### /project:skills says "unknown command"
+
+**Cause**: The `.claude/commands/skills.md` file wasn't copied to the target PKB.
+
+**Fix**:
+1. Verify `.claude/commands/skills.md` exists in your PKB directory
+2. Re-install PKB template: `python scripts/install.py "D:\MyKB" --force`
+3. Or create the command file manually from the pkb-starter template
+
 ---
 
 ## Still Stuck?

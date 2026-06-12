@@ -106,6 +106,19 @@ privacy: public     # Safe to share
 
 Set in frontmatter. The `/ask` skill respects this and won't expose `internal` content in responses.
 
+## Optional Skills Security
+
+PKB's optional skill system uses the following safety measures:
+
+1. **No auto-execution**: Skills are installed via `git clone --depth 1` only. No install scripts, no post-clone hooks, no npm/pip install.
+2. **Vendored isolation**: Skills live in `skills/_vendor/` (gitignored). They do not modify PKB core files.
+3. **Adapter routing**: All skill output goes through PKB adapters that enforce `raw/`/`wiki/` placement. Skills cannot scatter files in the project root.
+4. **No MCP auto-config**: Skills requiring MCP servers need manual `.claude/mcp.json` configuration. PKB never touches MCP config.
+5. **No API key storage**: PKB never reads, stores, or passes API keys for third-party skills.
+6. **Risk classification**: High-risk and reference-only skills are blocked from auto-install. Users must opt in with `--enable-risky`.
+7. **LICENSE review**: Each skill repo should have a LICENSE file. Review it before use. PKB Starter does not verify third-party licenses.
+8. **Removal = delete directory**: To remove a skill, delete `skills/_vendor/<skill-id>/`. No lingering state.
+
 ## Reporting Security Issues
 
 Found a security issue in PKB Starter? Please report via GitHub Issues on the pkb-starter repository. Do NOT include sensitive data in the issue.

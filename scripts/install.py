@@ -5,6 +5,9 @@ Creates a new PKB directory from the pkb-starter template.
 
 Usage:
     python scripts/install.py "<target_directory>"
+    python scripts/install.py "<target_directory>" --profile student
+    python scripts/install.py "<target_directory>" --interactive-skills
+    python scripts/install.py "<target_directory>" --skip-skills
     python scripts/install.py "<target_directory>" --no-git
     python scripts/install.py "<target_directory>" --force
 """
@@ -165,6 +168,36 @@ def install_requirements(target: Path) -> bool:
         return False
 
 
+def _run_skill_installer(target: Path, profile: str):
+    """Run install_skills.py as a subprocess from the starter directory."""
+    installer = Path(__file__).resolve().parent / "install_skills.py"
+    if not installer.is_file():
+        print(f"  [WARN] install_skills.py not found -- skipping skill installation")
+        return
+
+    cmd = [sys.executable, str(installer), "--target", str(target), "--profile", profile]
+    try:
+        result = subprocess.run(cmd, timeout=300, encoding="utf-8", errors="replace",
+                                capture_output=True, text=True)
+        # Pass through stdout
+        if result.stdout:
+            # Filter out JSON report (printed separately by install_skills.py)
+            in_json = False
+            for line in result.stdout.split("\n"):
+                if line.strip() == "--- JSON REPORT ---":
+                    in_json = True
+                    continue
+                if in_json:
+                    continue
+                print(f"  {line}")
+        if result.returncode != 0:
+            print(f"  [WARN] Skill installer exited with code {result.returncode}")
+    except subprocess.TimeoutExpired:
+        print(f"  [WARN] Skill installer timed out (300s)")
+    except Exception as e:
+        print(f"  [WARN] Skill installer failed: {e}")
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -174,6 +207,15 @@ def main():
     force = "--force" in sys.argv
     skip_git = "--no-git" in sys.argv
     skip_deps = "--no-deps" in sys.argv
+    skip_skills = "--skip-skills" in sys.argv
+    interactive_skills = "--interactive-skills" in sys.argv
+
+    # Parse --profile
+    profile = "core"
+    for i, arg in enumerate(sys.argv):
+        if arg == "--profile" and i + 1 < len(sys.argv):
+            profile = sys.argv[i + 1]
+            break
 
     target = Path(target_dir).resolve()
 
@@ -225,11 +267,24 @@ def main():
         print("[5/6] Git -- skipped (--no-git)")
 
     # Install dependencies
+    total_steps = 7 if not skip_skills else 6
     if not skip_deps:
-        print("[6/6] Installing Python dependencies...")
+        print(f"[6/{total_steps}] Installing Python dependencies...")
         install_requirements(target)
     else:
-        print("[6/6] Dependencies -- skipped (--no-deps)")
+        print(f"[6/{total_steps}] Dependencies -- skipped (--no-deps)")
+
+    # Install optional skills
+    if not skip_skills:
+        if interactive_skills:
+            profile = "custom"
+        print(f"[7/{total_steps}] Installing optional skills (profile: {profile})...")
+        _run_skill_installer(target, profile)
+    else:
+        if interactive_skills:
+            print(f"[WARN] --interactive-skills ignored (--skip-skills is set)")
+        print(f"[7/{total_steps}] Skills -- skipped (--skip-skills)")
+        total_steps = 6  # correction for display
 
     # Done
     print()
@@ -248,6 +303,7 @@ Next steps:
   /project:pkb <anything>     -- start adding knowledge
   /project:pkb <url>          -- collect a web page
   /project:pkb <file.pdf>     -- import a file
+  /project:skills             -- manage optional skills
 
   # Or open from anywhere:
   claude --project "{target}"

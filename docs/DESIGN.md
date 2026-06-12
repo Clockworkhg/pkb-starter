@@ -125,6 +125,30 @@ Every change is a git commit. You can rollback, branch, and collaborate using st
 ### 5. Obsidian-compatible
 The `wiki/` directory structure and `[[wikilink]]` syntax are fully Obsidian-compatible. Open `wiki/` as an Obsidian vault for visual graph browsing.
 
+### 6. Optional Skill Architecture
+
+PKB's skill system follows a **registry + adapter** pattern:
+
+```
+skills_registry/           pkb-starter (catalog, not bundled)
+  skill_catalog.json       14 known skills with metadata
+  profiles.json           7 preset profiles (core/student/...)
+
+skills/_vendor/            target PKB (installed on demand)
+  obsidian-skills/         cloned via git, never auto-executed
+  academic-research-skills/
+  ...
+
+template/skill_adapters/   pkb-starter (routing rules)
+  <adapter>.md             maps skill output -> raw/wiki paths
+```
+
+Key principles:
+- **No bundling**: Skills are cloned from their own repos, not copied from pkb-starter.
+- **Adapter pattern**: Each skill gets a markdown adapter telling the LLM where to route output.
+- **Risk classification**: low (auto-install), medium (warn), high (require --enable-risky), reference_only (never install).
+- **No auto-execution**: Installation = `git clone --depth 1`. Nothing runs until you invoke the skill in Claude Code.
+
 ## Tools
 
 | Tool | Purpose |

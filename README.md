@@ -66,6 +66,21 @@ tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 | `/project:save` | Git commit with auto doc update |
 | `/project:rollback` | View/rollback git history |
 | `/project:sanitize` | Privacy scan |
+| `/project:skills` | Manage optional skill packs |
+
+## Optional Skills
+
+PKB Starter ships with zero external dependencies. Extend it with **optional skill packs**:
+
+```bash
+python scripts/install.py "D:\MyKB" --profile student    # academic research
+python scripts/install.py "D:\MyKB" --profile developer  # docs + projects
+python scripts/install.py "D:\MyKB" --profile full       # everything
+```
+
+Profiles: **Core** (none) | **Student** | **Research** | **Developer** | **Creator** | **Full** | **Custom**
+
+[Optional Skills Guide →](docs/OPTIONAL_SKILLS.md)
 
 ## Who Is This For?
 
@@ -119,6 +134,7 @@ The collector's functional design is inspired by [z-web-pack](https://github.com
 | [SECURITY.md](docs/SECURITY.md) | Privacy & safety |
 | [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) | web_pack capabilities |
 | [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues |
+| [OPTIONAL_SKILLS.md](docs/OPTIONAL_SKILLS.md) | Optional skill packs |
 | [EXAMPLES.md](docs/EXAMPLES.md) | Usage examples |
 
 ## Contributing

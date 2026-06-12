@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "0.2.0",
+  "updated": "2026-06-12",
+  "description": "PKB Starter -- Skill installation profiles. Each profile selects a subset of skills from skill_catalog.json.",
+  "profiles": {
+    "core": {
+      "name": "Core",
+      "description": "No external skills. Pure PKB Starter with basic web collector and wiki tools.",
+      "skills": [],
+      "default_for": "minimal"
+    },
+    "student": {
+      "name": "Student",
+      "description": "Academic research skills for paper analysis, literature review, and note-taking.",
+      "skills": [
+        "obsidian-skills",
+        "academic-research-skills",
+        "deep-research-skills"
+      ],
+      "default_for": "learning"
+    },
+    "research": {
+      "name": "Research",
+      "description": "Full research pipeline: literature search, deep research, agent-based analysis, semantic search.",
+      "skills": [
+        "obsidian-skills",
+        "academic-research-skills",
+        "deep-research-skills",
+        "agent-research-skills",
+        "qmd"
+      ],
+      "default_for": "deep_research"
+    },
+    "developer": {
+      "name": "Developer",
+      "description": "Document processing, semantic code search, and project kanban management.",
+      "skills": [
+        "obsidian-skills",
+        "anthropic-skills",
+        "qmd",
+        "kanban-skill"
+      ],
+      "default_for": "coding"
+    },
+    "creator": {
+      "name": "Creator",
+      "description": "Content creation with wiki management and project tracking.",
+      "skills": [
+        "obsidian-skills",
+        "kanban-skill"
+      ],
+      "default_for": "writing"
+    },
+    "full": {
+      "name": "Full Stack",
+      "description": "All recommended skills. Academic + document + search + project management.",
+      "skills": [
+        "obsidian-skills",
+        "academic-research-skills",
+        "deep-research-skills",
+        "agent-research-skills",
+        "anthropic-skills",
+        "qmd",
+        "kanban-skill"
+      ],
+      "default_for": "power_users"
+    },
+    "custom": {
+      "name": "Custom",
+      "description": "Interactive selection from the full catalog. Choose exactly which skills to install.",
+      "skills": [],
+      "default_for": "advanced",
+      "interactive": true
+    }
+  },
+  "risk_policy": {
+    "low": "Auto-install when selected in profile.",
+    "medium": "Install but warn about external dependencies and token usage.",
+    "high": "Require explicit --enable-risky flag. Display MCP/runtime requirements before install.",
+    "reference_only": "Never install. Display as read-only reference in catalog."
+  }
+}

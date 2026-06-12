@@ -53,6 +53,18 @@ Throw anything at `/pkb`, the Agent auto-decides what to do:
 | `/save "message"` | Git commit (with auto doc update) |
 | `/rollback` | View/rollback git history |
 | `/help` | Show help |
+| `/skills` | Manage optional skill packs |
+
+### Skill Management Commands
+| Command | Purpose |
+|---------|---------|
+| `/project:skills` | Show installed skills and profiles |
+| `/project:skills --list` | List full skill catalog |
+| `/project:skills --install <profile>` | Install a skill profile (student, research, etc.) |
+| `/project:skills --audit` | Audit installed skills |
+| `/project:skills --enable <id>` | Enable an adapter for a skill |
+| `/project:skills --disable <id>` | Disable an adapter for a skill |
+| `/project:skills --remove <id>` | Remove a skill entirely |
 
 ### Research Commands (requires academic-research-skills plugin)
 | Command | Purpose |

@@ -208,4 +208,60 @@ Only edits project-level markdown files — never touches `wiki/` content.
 
 ---
 
+## XIII. Optional Skill Integration
+
+### 13.1 Registration
+
+All third-party skills must be recorded in `SKILL_LINKS.md` before use.
+This includes skills installed via `install_skills.py` or manually into `skills/_vendor/`.
+
+### 13.2 Output Routing
+
+Any third-party skill output MUST pass through a PKB adapter that maps it to `raw/` or `wiki/`:
+
+| Skill Output Type | PKB Target |
+|------------------|-----------|
+| Academic research results | `wiki/outputs/research/` or `wiki/papers/` |
+| Literature sources and citations | `wiki/sources/` |
+| Extracted concepts | `wiki/concepts/` |
+| Project-related output | `wiki/projects/` |
+| Search results | Do NOT modify wiki. Route through `/project:inbox` or `/project:output`. |
+| Task/kanban data | `wiki/tasks/` |
+| Document conversions | `wiki/outputs/<name>.md`, original to `raw/imported_processed/` |
+
+### 13.3 Prohibited Output Locations
+
+Third-party skill results must NEVER scatter files across the project root.
+Acceptable paths: `wiki/`, `raw/`, `templates/`, `skills/_vendor/`.
+Unacceptable: `*.md` at project root, `output/`, `results/`, `data/` (unless explicitly created by user).
+
+### 13.4 Risk-Level Rules
+
+| Risk Level | Policy |
+|-----------|--------|
+| `low` | Auto-install when selected in profile. |
+| `medium` | Install with warning. Review adapter before first use. |
+| `high` | Require explicit `--enable-risky`. Display MCP/runtime requirements. Never auto-enable. |
+| `reference_only` | Never install. Catalog entry only. |
+
+### 13.5 Adapter Protocol
+
+Each skill has an adapter in `templates/skill_adapters/<adapter>.md` defining:
+- When to use the skill
+- What input types it accepts
+- Where output must be placed in PKB structure
+- How to integrate with PKB commands (`/project:inbox`, `/project:lint`, `/project:save`)
+
+Adapters are copied to the target PKB on skill installation. They are reference documents for the LLM, not executable code.
+
+### 13.6 MCP-Required Skills
+
+Skills requiring MCP servers (e.g., zotero-mcp) need manual configuration:
+1. Install the MCP server separately (follow its documentation).
+2. Add server entry to `.claude/mcp.json` manually.
+3. PKB NEVER auto-configures MCP servers.
+4. PKB NEVER reads or stores MCP API keys.
+
+---
+
 *Synchronized with CLAUDE.md. Last updated: YYYY-MM-DD*
