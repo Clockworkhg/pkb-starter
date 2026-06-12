@@ -11,6 +11,8 @@ Usage:
     python scripts/install.py "<target_directory>" --skip-skills
     python scripts/install.py "<target_directory>" --no-git
     python scripts/install.py "<target_directory>" --force
+    python scripts/install.py "<target_directory>" --lang zh-CN
+    python scripts/install.py "<target_directory>" --lang bilingual
 """
 
 import os
@@ -147,9 +149,24 @@ PROFILE_DESCRIPTIONS = {
 }
 
 
-def generate_config(target: Path) -> Path:
-    """Generate pkb.config.json with full skills state model."""
+def generate_config(target: Path, lang: str = "en") -> Path:
+    """Generate pkb.config.json with full skills state model and language fields."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    # Language settings
+    if lang == "zh-CN":
+        language = "zh-CN"
+        wiki_language = "zh-CN"
+        output_language = "zh-CN"
+    elif lang == "bilingual":
+        language = "bilingual"
+        wiki_language = "zh-CN"
+        output_language = "zh-CN"
+    else:
+        language = "en"
+        wiki_language = "en"
+        output_language = "en"
+
     config = {
         "name": target.name,
         "version": "0.1.0",
@@ -158,6 +175,9 @@ def generate_config(target: Path) -> Path:
         "created": today,
         "last_updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "template": "pkb-starter",
+        "language": language,
+        "wiki_language": wiki_language,
+        "output_language": output_language,
         "directories": {
             "raw": "raw",
             "wiki": "wiki",
@@ -185,6 +205,79 @@ def generate_config(target: Path) -> Path:
     config_path = target / "pkb.config.json"
     config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
     return config_path
+
+
+def apply_locale(target: Path, lang: str) -> list[str]:
+    """Apply Chinese locale files after template copy. Returns list of applied files."""
+    if lang not in ("zh-CN", "bilingual"):
+        return []
+
+    locale_dir = TEMPLATE_DIR / "locales" / "zh-CN"
+    if not locale_dir.is_dir():
+        print(f"  [WARN] Locale directory not found: {locale_dir}")
+        return []
+
+    applied = []
+
+    # zh-CN mode: overwrite root files with Chinese versions
+    if lang == "zh-CN":
+        root_files = {
+            "README.md": "README.md",
+            "AGENTS.md": "AGENTS.md",
+            "COMMANDS.md": "COMMANDS.md",
+            "index.md": "index.md",
+            "log.md": "log.md",
+        }
+        for src_name, dst_name in root_files.items():
+            src = locale_dir / src_name
+            dst = target / dst_name
+            if src.is_file():
+                shutil.copy2(src, dst)
+                applied.append(str(dst_name))
+
+        # Wiki files
+        wiki_files = {
+            "wiki_index.md": "wiki/index.md",
+            "wiki_log.md": "wiki/log.md",
+        }
+        for src_name, dst_rel in wiki_files.items():
+            src = locale_dir / src_name
+            dst = target / dst_rel
+            if src.is_file():
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+                applied.append(str(dst_rel))
+
+    # bilingual mode: keep English files, add Chinese alongside
+    elif lang == "bilingual":
+        bilingual_files = {
+            "README.md": "README.zh-CN.md",
+            "AGENTS.md": "AGENTS.zh-CN.md",
+            "COMMANDS.md": "COMMANDS.zh-CN.md",
+            "index.md": "index.zh-CN.md",
+            "log.md": "log.zh-CN.md",
+        }
+        for src_name, dst_name in bilingual_files.items():
+            src = locale_dir / src_name
+            dst = target / dst_name
+            if src.is_file():
+                shutil.copy2(src, dst)
+                applied.append(str(dst_name))
+
+        # Wiki files still use Chinese content
+        wiki_files = {
+            "wiki_index.md": "wiki/index.md",
+            "wiki_log.md": "wiki/log.md",
+        }
+        for src_name, dst_rel in wiki_files.items():
+            src = locale_dir / src_name
+            dst = target / dst_rel
+            if src.is_file():
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+                applied.append(str(dst_rel))
+
+    return applied
 
 
 def init_git(target: Path) -> bool:
@@ -291,13 +384,25 @@ def main():
             profile = sys.argv[i + 1]
             break
 
+    # Parse --lang
+    lang = "en"
+    for i, arg in enumerate(sys.argv):
+        if arg == "--lang" and i + 1 < len(sys.argv):
+            lang_val = sys.argv[i + 1]
+            if lang_val in ("en", "zh-CN", "bilingual"):
+                lang = lang_val
+            else:
+                print(f"[WARN] Unknown language '{lang_val}', using 'en'")
+            break
+
     target = Path(target_dir).resolve()
 
     if interactive_skills:
         profile = "custom"
 
-    print(f"=== PKB Starter Installer v0.4.0 ===")
+    print(f"=== PKB Starter Installer v0.5.0-alpha ===")
     print(f"Target: {target}")
+    print(f"Language: {lang}")
     if dry_run:
         print(f"Mode: DRY RUN -- no files will be written")
     print()
@@ -325,9 +430,18 @@ def main():
     for f in sorted(created):
         print(f"    {f}")
 
+    # Apply locale (zh-CN / bilingual)
+    if lang != "en":
+        print(f"  Applying locale: {lang}...")
+        locale_files = apply_locale(target, lang)
+        if locale_files:
+            print(f"  {len(locale_files)} locale files applied")
+            for f in sorted(locale_files):
+                print(f"    {f}")
+
     # Generate config
     print("[4/6] Generating pkb.config.json...")
-    config_path = generate_config(target)
+    config_path = generate_config(target, lang=lang)
     print(f"  {config_path}")
 
     # Initialize git

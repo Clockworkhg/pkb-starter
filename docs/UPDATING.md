@@ -49,6 +49,18 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <what changed>"
 - **v0.5.0-alpha**: Current. Adds sync/update/migration workflow. Baseline is v0.4.1-alpha.
 - **v0.4.1-alpha**: Z-Skills Compatibility Module (commit 9e8d33b). Introduced `tools/zskill_bridge.py`, `skill_adapters/z_skills_adapter.md`, `docs/Z_WEB_PACK_PARITY.md`, and skills_registry.
 
+### Language Templates
+
+PKB Starter v0.6.0-alpha adds Chinese (zh-CN) localization support. Users can install with `--lang zh-CN` or `--lang bilingual`.
+
+During update:
+
+- `update_pkb.py` does NOT overwrite user-customized README, AGENTS, or COMMANDS files, regardless of language.
+- The `language`, `wiki_language`, and `output_language` fields in `pkb.config.json` are preserved during update.
+- If new language template files are added in a later version, `update_pkb.py` only adds missing files — it never overwrites user-modified documents.
+- Bilingual installations keep both English (`*.md`) and Chinese (`*.zh-CN.md`) root documents.
+- Wiki content language is controlled by `wiki_language` in `pkb.config.json`, not by which template was installed.
+
 ### Version Bump Checklist
 
 1. Update `CURRENT_VERSION` in `scripts/update_pkb.py`.

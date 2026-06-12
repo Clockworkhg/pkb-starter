@@ -68,6 +68,80 @@ RISK_SYMBOLS = {
     "reference_only": "[REF]",
 }
 
+# Chinese translations for zh-CN mode
+CATEGORY_LABELS_ZH = {
+    "knowledge_capture": "知识采集",
+    "academic_research": "学术研究",
+    "document_processing": "文档处理",
+    "knowledge_management": "知识管理",
+    "security_privacy": "安全与隐私",
+    "creation_output": "创作与产出",
+    "meta_tooling": "元工具",
+    "development": "开发",
+    "reference": "仅供参考",
+}
+
+RISK_SYMBOLS_ZH = {
+    "low": "[低风险]",
+    "medium": "[中风险]",
+    "high": "[高风险]",
+    "reference_only": "[参考]",
+}
+
+RISK_EXPLANATIONS_ZH = {
+    "low": "低风险 -- 仅操作本地文件，无需外部 API，不需要特殊权限",
+    "medium": "中风险 -- 可能涉及网络请求或可选的外部 API，请查看说明",
+    "high": "高风险 -- 需要外部运行时、MCP 服务器或 API key，需明确同意才能安装",
+    "reference_only": "仅供参考 -- 不会安装。需要手动从插件市场或 MCP 商店获取",
+}
+
+# Language cache per target
+_lang_cache = {}
+
+def detect_language(target: Path) -> str:
+    """Detect language preference from pkb.config.json. Returns 'en' or 'zh-CN'."""
+    target_key = str(target.resolve())
+    if target_key in _lang_cache:
+        return _lang_cache[target_key]
+    try:
+        config = load_pkb_config(target)
+        lang = config.get("language") or config.get("output_language") or "en"
+    except Exception:
+        lang = "en"
+    _lang_cache[target_key] = lang
+    return lang
+
+def zh_label(zh_text: str, en_text: str, target: Path = None) -> str:
+    """Return Chinese or English label based on target language."""
+    if target is not None and detect_language(target) in ("zh-CN", "bilingual"):
+        return zh_text
+    return en_text
+
+def get_category_label(cat: str, target: Path = None) -> str:
+    """Get category label in the appropriate language."""
+    return zh_label(
+        CATEGORY_LABELS_ZH.get(cat, cat),
+        CATEGORY_LABELS.get(cat, cat),
+        target
+    )
+
+def get_risk_symbol(level: str, target: Path = None) -> str:
+    """Get risk symbol in the appropriate language."""
+    return zh_label(
+        RISK_SYMBOLS_ZH.get(level, level),
+        RISK_SYMBOLS.get(level, level),
+        target
+    )
+
+def get_field_zh(entry: dict, field_en: str, field_zh: str) -> str:
+    """Get a field from catalog entry, preferring Chinese if available."""
+    zh_val = entry.get(field_zh)
+    if zh_val:
+        if isinstance(zh_val, list):
+            return zh_val
+        return zh_val
+    return entry.get(field_en, "")
+
 
 # -- JSON Helpers ------------------------------------------------------------
 
@@ -217,9 +291,12 @@ def cmd_list(catalog: dict, target: Path):
     pkb_config = load_pkb_config(target)
     installed_ids = set(pkb_config.get("skills", {}).get("installed_skills", []))
     enabled_ids = set(pkb_config.get("skills", {}).get("enabled_skills", []))
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
 
-    print_header("PKB Skill Catalog -- {} entries (v{})".format(
-        len(skills), catalog.get("version", "?")))
+    title = "PKB Skill Catalog -- {} entries (v{})".format(len(skills), catalog.get("version", "?"))
+    if is_zh:
+        title = f"PKB 技能目录 -- {len(skills)} 个条目 (v{catalog.get('version', '?')})"
+    print_header(title)
 
     categories = {}
     for s in skills:
@@ -227,42 +304,55 @@ def cmd_list(catalog: dict, target: Path):
         categories.setdefault(cat, []).append(s)
 
     for cat_key in sorted(categories.keys()):
-        cat_label = CATEGORY_LABELS.get(cat_key, cat_key.replace("_", " ").title())
+        cat_label = get_category_label(cat_key, target)
         print()
         print(f"  [{cat_label}]")
         print()
 
         for s in sorted(categories[cat_key], key=lambda x: x["id"]):
-            risk = s.get("risk_level", "?").upper()
+            risk_sym = get_risk_symbol(s.get('risk_level', ''), target)
             src = s.get("source_type", "?").replace("_", " ")
             mcp = " [MCP]" if s.get("requires_mcp") else ""
             api = " [API]" if s.get("requires_api_key") else ""
-            installed = " [INSTALLED]" if s["id"] in installed_ids else ""
-            enabled = " [ENABLED]" if s["id"] in enabled_ids else ""
+            installed = " [已安装]" if s["id"] in installed_ids and is_zh else " [INSTALLED]" if s["id"] in installed_ids else ""
+            enabled = " [已启用]" if s["id"] in enabled_ids and is_zh else " [ENABLED]" if s["id"] in enabled_ids else ""
 
-            print(f"  {s['id']:<35s} {RISK_SYMBOLS.get(s.get('risk_level'), '[?]'):<8s} {src}{mcp}{api}{installed}{enabled}")
-            print(f"    {s.get('short_description', s.get('description', ''))}")
+            # Use Chinese description if available
+            desc = get_field_zh(s, "short_description", "short_description_zh")
+            if not desc:
+                desc = s.get("description", "")
+
+            print(f"  {s['id']:<35s} {risk_sym:<8s} {src}{mcp}{api}{installed}{enabled}")
+            print(f"    {desc}")
             sub = s.get("sub_skills", [])
+            sub_label = "Sub-skills" if not is_zh else "子技能"
             if sub:
-                print(f"    Sub-skills ({len(sub)}): {', '.join(sub[:8])}{' ...' if len(sub) > 8 else ''}")
+                print(f"    {sub_label} ({len(sub)}): {', '.join(sub[:8])}{' ...' if len(sub) > 8 else ''}")
             print()
 
     print_separator()
     print()
-    print("  Risk legend:")
-    print("    [LOW]     = auto-install safe, no external dependencies")
-    print("    [MEDIUM]  = install with warnings (deps, tokens, or API)")
-    print("    [HIGH]    = requires confirmation (MCP, external runtime, login)")
-    print("    [REF]     = reference only, never installable")
+    if is_zh:
+        print("  风险说明:")
+        print("    [低风险] = 可安全自动安装，无外部依赖")
+        print("    [中风险] = 安装时有警告（依赖、token 或 API）")
+        print("    [高风险] = 需要确认（MCP、外部运行时、登录）")
+        print("    [参考]   = 仅供参考，不可安装")
+    else:
+        print("  Risk legend:")
+        print("    [LOW]     = auto-install safe, no external dependencies")
+        print("    [MEDIUM]  = install with warnings (deps, tokens, or API)")
+        print("    [HIGH]    = requires confirmation (MCP, external runtime, login)")
+        print("    [REF]     = reference only, never installable")
     print()
-    print("  Use --describe <skill-id> to see full details for any skill.")
-    print("  Use --install-profile <profile> to install a preset group.")
+    print("  Use --describe <skill-id> to see full details for any skill." if not is_zh else "  使用 --describe <skill-id> 查看技能详情。")
+    print("  Use --install-profile <profile> to install a preset group." if not is_zh else "  使用 --install-profile <profile> 安装预设技能组。")
     print()
 
 
 # -- Describe Skill ----------------------------------------------------------
 
-def cmd_describe(catalog: dict, skill_id: str):
+def cmd_describe(catalog: dict, skill_id: str, target: Path = None):
     """Show full details for a single skill."""
     catalog_map = {s["id"]: s for s in catalog["skills"]}
     s = catalog_map.get(skill_id)
@@ -272,60 +362,96 @@ def cmd_describe(catalog: dict, skill_id: str):
         print(f"       Run --list to see all available skills.")
         sys.exit(1)
 
-    print_header(f"Skill: {s['name']} ({s['id']})")
+    is_zh = target is not None and detect_language(target) in ("zh-CN", "bilingual")
+
+    name_display = get_field_zh(s, "name", "name_zh") if is_zh else s['name']
+    print_header(f"Skill: {name_display} ({s['id']})" if not is_zh else f"技能: {name_display} ({s['id']})")
 
     # Identity
     print(f"  ID:              {s['id']}")
-    print(f"  Name:            {s['name']}")
-    print(f"  Category:        {CATEGORY_LABELS.get(s.get('category', ''), s.get('category', ''))}")
+    if s.get("name_zh") and is_zh:
+        print(f"  Name (EN):       {s['name']}")
+        print(f"  Name (ZH):       {s['name_zh']}")
+    else:
+        print(f"  Name:            {s['name']}")
+    print(f"  Category:        {get_category_label(s.get('category', ''), target) if target else CATEGORY_LABELS.get(s.get('category', ''), s.get('category', ''))}")
     print()
 
     # Description
-    print(f"  [What it does]")
-    print(f"  {s.get('short_description', 'No description.')}")
+    section_what = "[What it does]" if not is_zh else "[功能说明]"
+    print(f"  {section_what}")
+    short_desc = get_field_zh(s, "short_description", "short_description_zh") if is_zh else s.get('short_description', 'No description.')
+    if not short_desc:
+        short_desc = s.get("short_description", "No description.")
+    print(f"  {short_desc}")
     print()
-    print(f"  [Details]")
-    long_desc = s.get('long_description', s.get('description', ''))
+    section_detail = "[Details]" if not is_zh else "[详细说明]"
+    print(f"  {section_detail}")
+    long_desc = get_field_zh(s, "long_description", "long_description_zh") if is_zh else s.get('long_description', s.get('description', ''))
+    if not long_desc:
+        long_desc = s.get("long_description", s.get("description", ""))
     for line in textwrap.wrap(long_desc, width=68):
         print(f"  {line}")
     print()
 
     # Best for / Not for
-    best = s.get("best_for", [])
+    best = get_field_zh(s, "best_for", "best_for_zh") if is_zh else s.get("best_for", [])
+    if not best:
+        best = s.get("best_for", [])
     if best:
-        print(f"  [Best for]")
+        section_best = "[Best for]" if not is_zh else "[适用场景]"
+        print(f"  {section_best}")
         for b in best:
             print(f"    - {b}")
         print()
 
-    not_for = s.get("not_for", [])
+    not_for = get_field_zh(s, "not_for", "not_for_zh") if is_zh else s.get("not_for", [])
+    if not not_for:
+        not_for = s.get("not_for", [])
     if not_for:
-        print(f"  [Not for]")
+        section_not = "[Not for]" if not is_zh else "[不适用场景]"
+        print(f"  {section_not}")
         for n in not_for:
             print(f"    - {n}")
         print()
 
     # Risk
     risk = s.get("risk_level", "unknown")
-    print(f"  [Risk]")
+    section_risk = "[Risk]" if not is_zh else "[风险]"
+    print(f"  {section_risk}")
     print(f"  Level:          {risk.upper()}")
-    print(f"  Explanation:    {s.get('risk_explanation', 'No explanation provided.')}")
+    risk_exp = get_field_zh(s, "risk_explanation", "risk_explanation_zh") if is_zh else s.get('risk_explanation', 'No explanation provided.')
+    if not risk_exp:
+        risk_exp = s.get("risk_explanation", "No explanation provided.")
+    label_exp = "Explanation:" if not is_zh else "说明:"
+    print(f"  {label_exp}    {risk_exp}")
     print()
 
     # Requirements
-    print(f"  [Requirements]")
-    print(f"  API key needed:         {'Yes' if s.get('requires_api_key') else 'No'}")
-    print(f"  MCP server needed:      {'Yes' if s.get('requires_mcp') else 'No'}")
-    print(f"  External runtime:       {'Yes' if s.get('requires_external_runtime') else 'No'}")
+    section_req = "[Requirements]" if not is_zh else "[环境要求]"
+    print(f"  {section_req}")
+    label_api = "API key needed:" if not is_zh else "需要 API key:"
+    label_mcp = "MCP server needed:" if not is_zh else "需要 MCP 服务器:"
+    label_ext = "External runtime:" if not is_zh else "需要外部运行时:"
+    yn_yes = "Yes" if not is_zh else "是"
+    yn_no = "No" if not is_zh else "否"
+    print(f"  {label_api:<22s} {yn_yes if s.get('requires_api_key') else yn_no}")
+    print(f"  {label_mcp:<22s} {yn_yes if s.get('requires_mcp') else yn_no}")
+    print(f"  {label_ext:<22s} {yn_yes if s.get('requires_external_runtime') else yn_no}")
     print()
 
     # Installation
-    print(f"  [Installation]")
-    print(f"  Source type:     {s.get('source_type', 'unknown')}")
-    print(f"  Install method:  {s.get('install_method', 'unknown')}")
+    section_inst = "[Installation]" if not is_zh else "[安装信息]"
+    print(f"  {section_inst}")
+    label_src = "Source type:" if not is_zh else "来源类型:"
+    label_method = "Install method:" if not is_zh else "安装方式:"
+    label_repo = "Repository:" if not is_zh else "仓库地址:"
+    label_lic = "License:" if not is_zh else "许可证:"
+    print(f"  {label_src:<16s} {s.get('source_type', 'unknown')}")
+    print(f"  {label_method:<16s} {s.get('install_method', 'unknown')}")
     if s.get("repo_url"):
-        print(f"  Repository:      {s['repo_url']}")
-    print(f"  License:         {s.get('license_status', 'unknown')}")
+        print(f"  {label_repo:<16s} {s['repo_url']}")
+    print(f"  {label_lic:<16s} {s.get('license_status', 'unknown')}")
     print()
 
     # Adapter

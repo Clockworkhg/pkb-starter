@@ -62,7 +62,23 @@
         "creator",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "网页采集器",
+      "short_description_zh": "核心网页内容采集工具，将完整网页连同图片、元数据和结构化目录保存到知识库。",
+      "long_description_zh": "PKB 的主要网页抓取引擎。通过 readability-lxml + trafilatura + BeautifulSoup 降级链提取可读内容，使用 SHA256 去重下载图片，生成包含 README、manifest 和 5 个清单文件的结构化 webpack 目录。通过 API + git clone 特别处理 GitHub 仓库。",
+      "best_for_zh": [
+        "采集网页文章用于研究",
+        "归档博客文章和教程",
+        "抓取 GitHub 仓库和 README 文档",
+        "构建个人网页存档"
+      ],
+      "not_for_zh": [
+        "需要密码的页面",
+        "依赖浏览器渲染的 JS 重 SPA",
+        "实时流媒体内容",
+        "阻止所有自动化请求的网站"
+      ],
+      "risk_explanation_zh": "无外部 API 调用或数据上传。仅读取公开网页内容。"
     },
     {
       "id": "pkb-auto",
@@ -102,7 +118,20 @@
         "creator",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "PKB 自动流水线",
+      "short_description_zh": "全自动入库流水线，自动采集、编译 wiki、归档并提交，不询问下一步。",
+      "long_description_zh": "PKB 的核心自动化引擎。从任意输入启动完整知识库流水线。全自动执行。",
+      "best_for_zh": [
+        "快速入库任意内容",
+        "批量导入文件",
+        "自动化知识管理工作流"
+      ],
+      "not_for_zh": [
+        "需要人工审核每一步的场景",
+        "仅浏览而不入库的查询"
+      ],
+      "risk_explanation_zh": "低风险。仅操作本地文件和公开网页。内置敏感信息检测。"
     },
     {
       "id": "import-to-inbox",
@@ -142,7 +171,19 @@
         "creator",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "收件箱导入",
+      "short_description_zh": "文件导入工具，自动检测敏感信息并安全导入到 _INBOX。",
+      "long_description_zh": "安全文件导入前端。扫描待导入文件的敏感信息，安全地将文件移入 _INBOX。",
+      "best_for_zh": [
+        "导入下载的文档到知识库",
+        "批量导入项目文件"
+      ],
+      "not_for_zh": [
+        "直接编辑 wiki 页面",
+        "处理二进制数据库文件"
+      ],
+      "risk_explanation_zh": "低风险。仅操作本地文件。内置敏感信息扫描。"
     },
     {
       "id": "sanitize-tool",
@@ -184,7 +225,18 @@
         "output",
         "security",
         "full"
-      ]
+      ],
+      "name_zh": "隐私扫描器",
+      "short_description_zh": "扫描文件中的敏感信息（API key、token、PII）并提供修复。",
+      "long_description_zh": "全面隐私和安全扫描器。支持 --fix 自动脱敏和 --json 机器可读输出。",
+      "best_for_zh": [
+        "提交前检查隐私泄露",
+        "审计知识库安全性"
+      ],
+      "not_for_zh": [
+        "替代正规安全审计"
+      ],
+      "risk_explanation_zh": "低风险。仅读取和分析文件。"
     },
     {
       "id": "docs-update",
@@ -224,7 +276,19 @@
         "creator",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "文档更新检查",
+      "short_description_zh": "检测项目文档与文件系统之间的差异，自动修复文档过时问题。",
+      "long_description_zh": "文档新鲜度检测工具。自动更新工具列表、技能数量、提交历史等。",
+      "best_for_zh": [
+        "保持项目文档同步",
+        "批量更新后自动刷新索引"
+      ],
+      "not_for_zh": [
+        "编辑 wiki 内容",
+        "修改用户知识页面"
+      ],
+      "risk_explanation_zh": "低风险。仅编辑项目级 Markdown 文件。"
     },
     {
       "id": "obsidian-skills",
@@ -269,7 +333,18 @@
         "creator",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "Obsidian 技能",
+      "short_description_zh": "Obsidian 笔记应用集成技能。",
+      "long_description_zh": "Obsidian 集成工具集。JSON Canvas、Bases、CLI 功能。通过插件市场安装。",
+      "best_for_zh": [
+        "使用 Obsidian Canvas",
+        "增强 Obsidian 工作流"
+      ],
+      "not_for_zh": [
+        "不使用 Obsidian 的用户"
+      ],
+      "risk_explanation_zh": "中风险。通过插件市场安装。"
     },
     {
       "id": "academic-research-skills",
@@ -322,7 +397,18 @@
         "research",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "学术研究技能",
+      "short_description_zh": "完整学术研究流水线，含 31 个子技能。",
+      "long_description_zh": "综合学术研究工具包。论文写作、文献综述、实验设计、数据分析等。通过插件市场安装。",
+      "best_for_zh": [
+        "系统化学术研究",
+        "完整论文写作流程"
+      ],
+      "not_for_zh": [
+        "非学术写作"
+      ],
+      "risk_explanation_zh": "中风险。通过插件市场安装。按需启用子技能。"
     },
     {
       "id": "deep-research-skills",
@@ -363,7 +449,18 @@
       "recommended_profiles": [
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "深度研究",
+      "short_description_zh": "多源深度研究报告生成，包含事实核查和来源引用。",
+      "long_description_zh": "深度研究工具。多轮搜索、多源交叉验证、对抗性事实核查。",
+      "best_for_zh": [
+        "需要多源验证的研究",
+        "生成有引用的报告"
+      ],
+      "not_for_zh": [
+        "快速简单查询"
+      ],
+      "risk_explanation_zh": "低风险。仅搜索和分析公开信息。"
     },
     {
       "id": "agent-research-skills",
@@ -431,7 +528,18 @@
       "recommended_profiles": [
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "Agent 研究",
+      "short_description_zh": "多 Agent 协作研究工具，含 31 个子技能。",
+      "long_description_zh": "多 Agent 研究编排工具。并行研究不同方面，自动综合结果。",
+      "best_for_zh": [
+        "跨学科研究",
+        "大规模文献分析"
+      ],
+      "not_for_zh": [
+        "简单信息查询"
+      ],
+      "risk_explanation_zh": "中风险。Agent 编排消耗较多 token。"
     },
     {
       "id": "literature-search",
@@ -467,7 +575,18 @@
         "student",
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "文献搜索",
+      "short_description_zh": "学术文献搜索工具，支持多数据源检索。",
+      "long_description_zh": "学术文献搜索助手。支持跨多个学术数据库搜索论文、筛选结果。",
+      "best_for_zh": [
+        "撰写文献综述",
+        "查找特定主题的最新论文"
+      ],
+      "not_for_zh": [
+        "全文下载（需配合下载工具）"
+      ],
+      "risk_explanation_zh": "中风险。可能涉及外部 API 调用。"
     },
     {
       "id": "literature-review",
@@ -503,7 +622,19 @@
         "student",
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "文献综述",
+      "short_description_zh": "文献综述写作工具，整理和综合跨来源研究成果。",
+      "long_description_zh": "系统性文献综述助手。帮助组织论文发现、对比来源、识别研究空白。",
+      "best_for_zh": [
+        "撰写学术论文的文献综述",
+        "系统性文献调研"
+      ],
+      "not_for_zh": [
+        "实验设计",
+        "数据分析"
+      ],
+      "risk_explanation_zh": "中风险。仅处理已下载的文献。"
     },
     {
       "id": "paper-writing-section",
@@ -540,7 +671,18 @@
         "research",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "论文章节写作",
+      "short_description_zh": "学术论文章节写作助手，基于已有资料生成草稿。",
+      "long_description_zh": "辅助撰写学术论文各个章节。支持中英文双语输出。",
+      "best_for_zh": [
+        "撰写论文初稿",
+        "补充特定章节内容"
+      ],
+      "not_for_zh": [
+        "替代同行评审"
+      ],
+      "risk_explanation_zh": "低风险。生成的文本仅基于用户提供的资料。"
     },
     {
       "id": "citation-management",
@@ -577,7 +719,18 @@
         "research",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "引用管理",
+      "short_description_zh": "引用格式管理和校验，支持 APA/GB/T 7714/IEEE 等格式。",
+      "long_description_zh": "引用格式工具。自动校验引用键、检查格式一致性、生成引用列表。",
+      "best_for_zh": [
+        "检查论文引用完整性",
+        "生成参考文献列表"
+      ],
+      "not_for_zh": [
+        "替代 Zotero 等引用管理器"
+      ],
+      "risk_explanation_zh": "低风险。仅操作本地引用数据。"
     },
     {
       "id": "data-analysis",
@@ -612,7 +765,18 @@
       "recommended_profiles": [
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "数据分析",
+      "short_description_zh": "实验数据分析和可视化工具。",
+      "long_description_zh": "数据分析助手。支持统计检验、数据清洗、可视化生成。",
+      "best_for_zh": [
+        "分析实验数据",
+        "生成统计图表"
+      ],
+      "not_for_zh": [
+        "实时流数据处理"
+      ],
+      "risk_explanation_zh": "中风险。需要用户理解数据含义。"
     },
     {
       "id": "code-debugging",
@@ -647,7 +811,18 @@
       "recommended_profiles": [
         "developer",
         "full"
-      ]
+      ],
+      "name_zh": "代码调试",
+      "short_description_zh": "代码错误诊断和修复建议。",
+      "long_description_zh": "代码调试助手。分析错误日志、定位 bug、提出修复方案。",
+      "best_for_zh": [
+        "诊断代码错误",
+        "审查代码变更"
+      ],
+      "not_for_zh": [
+        "替代 CI/CD 流水线"
+      ],
+      "risk_explanation_zh": "低风险。仅分析和建议。"
     },
     {
       "id": "github-research",
@@ -682,7 +857,19 @@
       "recommended_profiles": [
         "developer",
         "full"
-      ]
+      ],
+      "name_zh": "GitHub 研究",
+      "short_description_zh": "GitHub 仓库分析和研究工具。",
+      "long_description_zh": "分析 GitHub 仓库。可搜索仓库结构、提取文档、分析代码模式。",
+      "best_for_zh": [
+        "研究开源项目架构",
+        "评估技术栈"
+      ],
+      "not_for_zh": [
+        "自动提交代码",
+        "访问私有仓库"
+      ],
+      "risk_explanation_zh": "低风险。仅读取公开仓库信息。"
     },
     {
       "id": "anthropic-skills",
@@ -737,7 +924,18 @@
         "developer",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "Anthropic 技能",
+      "short_description_zh": "Anthropic 官方技能集合。",
+      "long_description_zh": "Anthropic 官方提供的技能集合。Claude API 使用、提示工程最佳实践。",
+      "best_for_zh": [
+        "学习 Claude API 使用",
+        "优化提示工程"
+      ],
+      "not_for_zh": [
+        "非 Anthropic 平台"
+      ],
+      "risk_explanation_zh": "低风险。官方维护。"
     },
     {
       "id": "document-converter",
@@ -776,7 +974,19 @@
         "developer",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "文档转换器",
+      "short_description_zh": "文档格式转换工具（DOCX/PDF/PPTX/Markdown 互转）。",
+      "long_description_zh": "多格式文档转换器。使用 LibreOffice 或 pandoc 作为后端。",
+      "best_for_zh": [
+        "批量转换文档格式",
+        "标准化知识库文档格式"
+      ],
+      "not_for_zh": [
+        "处理加密文档",
+        "精确排版还原"
+      ],
+      "risk_explanation_zh": "低风险。仅转换文件格式。"
     },
     {
       "id": "ocr-helper",
@@ -811,7 +1021,19 @@
       "recommended_profiles": [
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "OCR 识别",
+      "short_description_zh": "图片和扫描件文字识别工具。支持中英文混合识别。",
+      "long_description_zh": "OCR 文字识别助手。从图片、扫描 PDF 中提取文字。",
+      "best_for_zh": [
+        "提取扫描版 PDF 文字",
+        "识别图片中的文字"
+      ],
+      "not_for_zh": [
+        "手写体识别",
+        "精确排版还原"
+      ],
+      "risk_explanation_zh": "低风险。仅处理本地文件。"
     },
     {
       "id": "web-clipper-helper",
@@ -848,7 +1070,18 @@
         "research",
         "creator",
         "full"
-      ]
+      ],
+      "name_zh": "网页剪藏",
+      "short_description_zh": "快速网页剪藏工具，保存网页内容到知识库。",
+      "long_description_zh": "轻量级网页剪藏助手。快速保存网页文本到 _INBOX。",
+      "best_for_zh": [
+        "快速保存参考网页",
+        "收集研究素材"
+      ],
+      "not_for_zh": [
+        "采集需要登录的页面"
+      ],
+      "risk_explanation_zh": "低风险。仅读取公开网页内容。"
     },
     {
       "id": "prompt-library",
@@ -885,7 +1118,18 @@
         "creator",
         "output",
         "full"
-      ]
+      ],
+      "name_zh": "提示词库",
+      "short_description_zh": "AI 提示词管理和版本控制工具。",
+      "long_description_zh": "提示词库管理器。存储、分类、版本化 AI 提示词模板。",
+      "best_for_zh": [
+        "管理个人提示词集合",
+        "追踪提示词效果"
+      ],
+      "not_for_zh": [
+        "替代 AI 模型训练"
+      ],
+      "risk_explanation_zh": "低风险。仅管理本地文本模板。"
     },
     {
       "id": "song-archive",
@@ -920,7 +1164,18 @@
       "recommended_profiles": [
         "creator",
         "full"
-      ]
+      ],
+      "name_zh": "歌曲存档",
+      "short_description_zh": "歌曲和歌词版本管理系统。",
+      "long_description_zh": "创意作品存档工具。管理歌词、歌曲版本和创作过程记录。",
+      "best_for_zh": [
+        "管理歌词创作版本",
+        "归档音乐项目"
+      ],
+      "not_for_zh": [
+        "音频文件管理"
+      ],
+      "risk_explanation_zh": "低风险。纯文本管理。"
     },
     {
       "id": "script-breakdown",
@@ -955,7 +1210,18 @@
       "recommended_profiles": [
         "creator",
         "full"
-      ]
+      ],
+      "name_zh": "脚本拆解",
+      "short_description_zh": "影视剧本拆解和分镜分析工具。",
+      "long_description_zh": "剧本分析工具。拆解为场景、角色、道具元素，生成分镜表。",
+      "best_for_zh": [
+        "电影剧本分析",
+        "制作计划编制"
+      ],
+      "not_for_zh": [
+        "替代专业影视软件"
+      ],
+      "risk_explanation_zh": "低风险。仅处理文本分析。"
     },
     {
       "id": "git-versioning",
@@ -996,7 +1262,18 @@
         "output",
         "security",
         "full"
-      ]
+      ],
+      "name_zh": "Git 版本增强",
+      "short_description_zh": "增强的 git 保存和回滚功能，含安全扫描。",
+      "long_description_zh": "Git 工作流增强工具。自动提交信息、安全预检、变更摘要。",
+      "best_for_zh": [
+        "自动化 git 工作流",
+        "安全提交检查"
+      ],
+      "not_for_zh": [
+        "替代 CI/CD"
+      ],
+      "risk_explanation_zh": "低风险。标准 git 操作增强。"
     },
     {
       "id": "skill-creator",
@@ -1032,7 +1309,18 @@
         "core",
         "developer",
         "full"
-      ]
+      ],
+      "name_zh": "技能创建器",
+      "short_description_zh": "创建和编辑自定义 PKB 技能的工具。",
+      "long_description_zh": "Agent 技能创建向导。帮助设计新技能、配置输出路由、注册到目录。",
+      "best_for_zh": [
+        "创建自定义知识库技能",
+        "扩展 PKB 功能"
+      ],
+      "not_for_zh": [
+        "修改 PKB 核心系统文件"
+      ],
+      "risk_explanation_zh": "低风险。仅生成本地技能定义文件。"
     },
     {
       "id": "skill-lint",
@@ -1069,7 +1357,18 @@
         "core",
         "developer",
         "full"
-      ]
+      ],
+      "name_zh": "技能检查",
+      "short_description_zh": "PKB 技能质量检查和格式验证工具。",
+      "long_description_zh": "技能质量检查器。验证格式、检查必需字段、检测重复。",
+      "best_for_zh": [
+        "检查自定义技能质量",
+        "排查技能冲突"
+      ],
+      "not_for_zh": [
+        "测试技能功能"
+      ],
+      "risk_explanation_zh": "低风险。仅读取和验证本地配置。"
     },
     {
       "id": "secret-scan",
@@ -1110,7 +1409,18 @@
         "output",
         "security",
         "full"
-      ]
+      ],
+      "name_zh": "密钥扫描",
+      "short_description_zh": "深度密钥和敏感信息扫描，预提交检查。",
+      "long_description_zh": "深度安全扫描器。git 提交前检查敏感数据。",
+      "best_for_zh": [
+        "提交前安全检查",
+        "敏感数据审计"
+      ],
+      "not_for_zh": [
+        "替代 SAST 工具"
+      ],
+      "risk_explanation_zh": "低风险。仅读取和分析文件。"
     },
     {
       "id": "qmd",
@@ -1146,7 +1456,18 @@
         "research",
         "developer",
         "full"
-      ]
+      ],
+      "name_zh": "语义代码搜索",
+      "short_description_zh": "基于语义的代码搜索和分析工具。",
+      "long_description_zh": "语义代码搜索引擎。使用 AST 解析，比 grep 更精准。",
+      "best_for_zh": [
+        "搜索大型代码库",
+        "理解代码结构"
+      ],
+      "not_for_zh": [
+        "替代 IDE 搜索"
+      ],
+      "risk_explanation_zh": "低风险。仅读取和分析本地代码。"
     },
     {
       "id": "kanban-skill",
@@ -1182,7 +1503,18 @@
         "developer",
         "creator",
         "full"
-      ]
+      ],
+      "name_zh": "看板管理",
+      "short_description_zh": "项目看板管理工具，支持任务跟踪和可视化。",
+      "long_description_zh": "看板项目管理工具。数据存储在本地 Markdown，兼容 Obsidian Kanban。",
+      "best_for_zh": [
+        "管理个人项目",
+        "跟踪写作进度"
+      ],
+      "not_for_zh": [
+        "大型团队协作"
+      ],
+      "risk_explanation_zh": "低风险。所有数据存储在本地。"
     },
     {
       "id": "sanitize-skill",
@@ -1217,7 +1549,18 @@
       "recommended_profiles": [
         "security",
         "full"
-      ]
+      ],
+      "name_zh": "隐私清理",
+      "short_description_zh": "全面隐私清理技能，检测并脱敏个人数据。",
+      "long_description_zh": "高级隐私清理器。检测多种个人信息并脱敏。",
+      "best_for_zh": [
+        "发布前脱敏文档",
+        "合规审查准备"
+      ],
+      "not_for_zh": [
+        "实时数据保护"
+      ],
+      "risk_explanation_zh": "低风险。仅处理本地文件。"
     },
     {
       "id": "tapestry-skills",
@@ -1260,7 +1603,18 @@
       "risk_explanation": "MIT licensed. 7 independent sub-skills. article-extractor uses external CLI tools (readability-cli, trafilatura). youtube-transcript requires yt-dlp. Other sub-skills are prompt-only. Selective install recommended to minimize dependencies.",
       "recommended_profiles": [
         "full"
-      ]
+      ],
+      "name_zh": "Tapestry 技能",
+      "short_description_zh": "Tapestry 内容整合工具技能。",
+      "long_description_zh": "Tapestry 内容整合工具。多源内容聚合、时间线视图、内容筛选。",
+      "best_for_zh": [
+        "内容聚合和管理",
+        "多源信息整合"
+      ],
+      "not_for_zh": [
+        "实时数据流处理"
+      ],
+      "risk_explanation_zh": "中风险。外部工具集成。"
     },
     {
       "id": "article-extractor",
@@ -1298,7 +1652,18 @@
         "developer",
         "creator",
         "full"
-      ]
+      ],
+      "name_zh": "文章提取",
+      "short_description_zh": "从网页和文档中提取结构化文章内容。",
+      "long_description_zh": "智能文章提取器。去除导航、广告，输出干净 Markdown。",
+      "best_for_zh": [
+        "提取在线文章正文",
+        "批量处理 RSS 订阅"
+      ],
+      "not_for_zh": [
+        "处理需要登录的内容"
+      ],
+      "risk_explanation_zh": "低风险。仅读取公开网页。"
     },
     {
       "id": "youtube-transcript",
@@ -1335,7 +1700,18 @@
         "research",
         "creator",
         "full"
-      ]
+      ],
+      "name_zh": "YouTube 字幕",
+      "short_description_zh": "获取 YouTube 视频字幕和文本记录。",
+      "long_description_zh": "YouTube 字幕提取器。支持多语言字幕获取。",
+      "best_for_zh": [
+        "记录视频教程内容",
+        "提取讲座文字"
+      ],
+      "not_for_zh": [
+        "下载视频文件"
+      ],
+      "risk_explanation_zh": "中风险。需要网络访问。"
     },
     {
       "id": "youtube-skills",
@@ -1382,7 +1758,18 @@
       "risk_explanation": "MIT licensed. 12 sub-skills. Some require TranscriptAPI.com API key or YouTube Data API key — PKB never stores these. Configure API keys yourself. yt-dlp based sub-skills (captions, subtitles) don't need API keys and are safer to start with.",
       "recommended_profiles": [
         "full"
-      ]
+      ],
+      "name_zh": "YouTube 工具集",
+      "short_description_zh": "YouTube 视频相关的综合工具集。",
+      "long_description_zh": "YouTube 相关工具集合。含字幕获取、频道分析、内容归档。",
+      "best_for_zh": [
+        "系统性学习 YouTube 课程",
+        "整理视频笔记"
+      ],
+      "not_for_zh": [
+        "下载受版权保护的视频"
+      ],
+      "risk_explanation_zh": "中风险。需要网络访问和 API 使用。"
     },
     {
       "id": "cnki-skills",
@@ -1429,7 +1816,18 @@
       "recommended_profiles": [
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "知网工具",
+      "short_description_zh": "中国知网 CNKI 文献检索和下载工具。",
+      "long_description_zh": "CNKI 集成工具。需 CNKI 账号和 Chrome DevTools MCP 连接。适合中文文献研究。",
+      "best_for_zh": [
+        "中文文献检索",
+        "批量下载论文 PDF"
+      ],
+      "not_for_zh": [
+        "非 CNKI 数据库"
+      ],
+      "risk_explanation_zh": "高风险。需要登录和 MCP 配置。需明确确认安装。"
     },
     {
       "id": "zotero-mcp",
@@ -1464,7 +1862,18 @@
       "recommended_profiles": [
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "Zotero MCP",
+      "short_description_zh": "Zotero 引用管理器集成，通过 MCP 协议。",
+      "long_description_zh": "通过 MCP 服务器连接本地 Zotero 数据库。需单独配置 MCP。",
+      "best_for_zh": [
+        "管理学术引用",
+        "同步 Zotero 和 PKB"
+      ],
+      "not_for_zh": [
+        "替代 Zotero 桌面应用"
+      ],
+      "risk_explanation_zh": "高风险。需 Zotero 和 MCP 服务器配置。"
     },
     {
       "id": "zotero-mcp-skill",
@@ -1499,7 +1908,18 @@
       "recommended_profiles": [
         "research",
         "full"
-      ]
+      ],
+      "name_zh": "Zotero Skill",
+      "short_description_zh": "Zotero 技能集成，通过 Skill 方式调用。",
+      "long_description_zh": "与 Zotero MCP 不同的集成方式。需对应 MCP 配置。",
+      "best_for_zh": [
+        "灵活集成 Zotero",
+        "个性化引用工作流"
+      ],
+      "not_for_zh": [
+        "无 Zotero 安装的环境"
+      ],
+      "risk_explanation_zh": "高风险。需 Zotero 和 MCP 配置。"
     },
     {
       "id": "z-skills",
@@ -1538,7 +1958,18 @@
         "Replacing PKB's built-in web_pack (z-web-pack is an optional alternative)"
       ],
       "risk_explanation": "This is a third-party repository with per-directory licensing concerns. It should be downloaded only with user consent, audited before use, and never redistributed as part of PKB Starter. The adapter only connects z-web-pack output into PKB raw/webpacks and wiki ingestion — it does not execute z-skills code automatically.",
-      "recommended_profiles": []
+      "recommended_profiles": [],
+      "name_zh": "Z 技能集",
+      "short_description_zh": "用户授权本地安装的 Z 技能集合，含 z-web-pack 替代采集器。",
+      "long_description_zh": "Z 技能集合。需用户明确同意安装。PKB 不分发代码。安装后需审计并手动启用。",
+      "best_for_zh": [
+        "使用 z-web-pack 替代采集器",
+        "扩展采集能力"
+      ],
+      "not_for_zh": [
+        "无需替代采集器的场景"
+      ],
+      "risk_explanation_zh": "高风险。需明确键入 INSTALL 确认。代码从外部仓库克隆。"
     },
     {
       "id": "z-web-pack-local",
@@ -1571,7 +2002,18 @@
         "Default PKB setup (basic collector is the default)"
       ],
       "risk_explanation": "The adapter may invoke local third-party code from skills/_vendor/z-skills/. The user must audit and explicitly enable it before use. PKB Starter never distributes z-skills code. The adapter only routes output — it does not modify z-skills source.",
-      "recommended_profiles": []
+      "recommended_profiles": [],
+      "name_zh": "Z 网页采集器",
+      "short_description_zh": "替代网页采集后端（基于 z-skills 的 z-web-pack）。",
+      "long_description_zh": "作为 PKB 内置 web_pack.py 的替代选择。需先安装 z-skills 并审计。",
+      "best_for_zh": [
+        "需要更强采集能力的场景",
+        "作为内置采集器的补充"
+      ],
+      "not_for_zh": [
+        "不想安装 z-skills 的用户"
+      ],
+      "risk_explanation_zh": "高风险。依赖 z-skills 安装。"
     },
     {
       "id": "awesome-agent-skills",
@@ -1605,7 +2047,18 @@
       "risk_explanation": "Reference index. No executable code. Links to external repos — review each repo's license and security before installing. PKB does not endorse or vet linked skills.",
       "recommended_profiles": [
         "full"
-      ]
+      ],
+      "name_zh": "Awesome Agent",
+      "short_description_zh": "精选 Agent 技能合集。",
+      "long_description_zh": "社区精选的 Agent 技能集合。常用自动化任务、代码辅助、文档生成。",
+      "best_for_zh": [
+        "快速获取常用 Agent 能力",
+        "参考社区最佳实践"
+      ],
+      "not_for_zh": [
+        "需要严格安全审查的场景"
+      ],
+      "risk_explanation_zh": "中风险。社区维护。"
     },
     {
       "id": "awesome-claude-skills",
@@ -1639,7 +2092,18 @@
       "risk_explanation": "Reference index. No executable code. Links to external repos — review each repo's license and security before installing.",
       "recommended_profiles": [
         "full"
-      ]
+      ],
+      "name_zh": "Awesome Claude",
+      "short_description_zh": "精选 Claude 使用技巧和技能集合。",
+      "long_description_zh": "Claude 使用技巧精选集合。提示模板、工作流示例、最佳实践指南。",
+      "best_for_zh": [
+        "学习 Claude Code 最佳实践",
+        "参考提示模板"
+      ],
+      "not_for_zh": [
+        "替代官方文档"
+      ],
+      "risk_explanation_zh": "低风险。仅提供参考文档。"
     },
     {
       "id": "obsidian-claude-pkm",
@@ -1671,7 +2135,18 @@
         "Users looking for plug-and-play functionality"
       ],
       "risk_explanation": "Reference implementation. Review the workflow patterns for inspiration. No executable code to install. Adapt patterns to PKB's architecture, not the other way around.",
-      "recommended_profiles": []
+      "recommended_profiles": [],
+      "name_zh": "Obsidian PKM 集成",
+      "short_description_zh": "Obsidian 个人知识管理与 Claude 集成。",
+      "long_description_zh": "连接 Obsidian vault 与 Claude Code，支持双向同步和智能搜索。",
+      "best_for_zh": [
+        "Obsidian 用户扩展 AI 能力",
+        "增强知识图谱"
+      ],
+      "not_for_zh": [
+        "不使用 Obsidian 的用户"
+      ],
+      "risk_explanation_zh": "中风险。需配置 vault 路径。"
     },
     {
       "id": "daily-patterns-pack",
@@ -1703,7 +2178,18 @@
         "Users who don't customize their workflow"
       ],
       "risk_explanation": "Reference templates. No executable code. Review and adapt patterns to PKB's frontmatter conventions before using.",
-      "recommended_profiles": []
+      "recommended_profiles": [],
+      "name_zh": "日常模式包",
+      "short_description_zh": "日常使用模式和工作流模板集合。",
+      "long_description_zh": "日常工作流模板包。每日笔记、周报、任务追踪、习惯记录等。",
+      "best_for_zh": [
+        "建立日常工作流",
+        "自动化重复任务"
+      ],
+      "not_for_zh": [
+        "高度定制化工作流"
+      ],
+      "risk_explanation_zh": "低风险。仅提供模板和本地脚本。"
     }
   ]
 }

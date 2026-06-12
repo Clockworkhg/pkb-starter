@@ -264,4 +264,58 @@ Skills requiring MCP servers (e.g., zotero-mcp) need manual configuration:
 
 ---
 
+## XIV. Language Policy
+
+### 14.1 Language Detection
+
+On every session, read `pkb.config.json` and check:
+
+- `language` — UI/display language preference
+- `wiki_language` — default language for wiki page generation
+- `output_language` — default language for reports and command summaries
+
+### 14.2 Behavior by Language
+
+| Setting | Behavior |
+|---------|----------|
+| `language: "en"` | All output in English. This is the default. |
+| `language: "zh-CN"` | All output in Simplified Chinese. |
+| `language: "bilingual"` | Root docs in English, wiki pages in Chinese. |
+| `wiki_language: "zh-CN"` | Generate wiki pages, source notes, concept pages in Simplified Chinese unless user explicitly requests another language. |
+| `wiki_language: "en"` | Generate wiki pages in English. |
+| `output_language: "zh-CN"` | Generate reports, logs, command summaries in Simplified Chinese. |
+| `output_language: "en"` | Generate reports in English. |
+
+### 14.3 Wiki Page Generation Rules (zh-CN mode)
+
+When `wiki_language` is `"zh-CN"`:
+
+1. Page titles use Chinese unless the concept has a well-known English name.
+2. Page content is written in natural Simplified Chinese.
+3. YAML frontmatter uses English keys (`created`, `updated`, `tags`, `type`).
+4. Tag values may use Chinese (e.g., `tags: [机器学习, 论文]`).
+5. `[[wikilink]]` targets use the page title language (Chinese for Chinese-titled pages).
+6. Technical commands, file paths, and code remain in English.
+7. Filenames use safe slugs (ASCII) but page titles use Chinese.
+
+### 14.4 Report Generation Rules (zh-CN mode)
+
+When `output_language` is `"zh-CN"`:
+
+1. `/project:lint` output in Chinese.
+2. `/project:save` commit messages may use Chinese.
+3. `update_report.md` sections use Chinese headings.
+4. Health check summaries use Chinese labels.
+5. Error and warning messages use Chinese descriptions.
+
+### 14.5 Mixed Mode
+
+Users may request English output at any time regardless of language settings. The language setting is a default, not a constraint. If the user types a question in English, respond in English. If they type in Chinese, respond in Chinese.
+
+### 14.6 GBK/ASCII Compatibility
+
+All tool output (Python scripts, shell commands) must use ASCII-safe characters. Chinese text is only used within wiki pages, Markdown documents, and Claude Code responses — never in terminal escape sequences or binary output.
+
+---
+
 *Synchronized with CLAUDE.md. Last updated: YYYY-MM-DD*
