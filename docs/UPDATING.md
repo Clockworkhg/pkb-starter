@@ -44,6 +44,11 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <what changed>"
 
 **Safety**: The sync tool (`starter_sync_manifest.json`) defines exactly what CAN sync. Everything else is blocked. Personal paths, emails, and sensitive patterns are sanitized automatically.
 
+### Version History
+
+- **v0.5.0-alpha**: Current. Adds sync/update/migration workflow. Baseline is v0.4.1-alpha.
+- **v0.4.1-alpha**: Z-Skills Compatibility Module (commit 9e8d33b). Introduced `tools/zskill_bridge.py`, `skill_adapters/z_skills_adapter.md`, `docs/Z_WEB_PACK_PARITY.md`, and skills_registry.
+
 ### Version Bump Checklist
 
 1. Update `CURRENT_VERSION` in `scripts/update_pkb.py`.
@@ -136,10 +141,26 @@ These directories and files are **completely off-limits** to the update process:
 - `raw/` — Your raw materials (web collections, PDFs, files)
 - `wiki/` — Your knowledge pages (concepts, sources, projects)
 - `_INBOX/` — Your pending imports
-- `skills/_vendor/` — Your installed skill source code
+- `skills/_vendor/` — Your installed skill source code (including z-skills vendor directory)
+- `skills/_vendor/z-skills/` — Z-skills local clone, never touched by update
 - `.pkb_local/` — Your local configuration
+- `.pkb_local/patches/` — Your local patches, never overwritten
+- `zskill_audit_report.md` — Z-skills audit report, never overwritten
+- `skill_manager_report.md` — Skill manager report, never overwritten
 - `pkb.config.json` user settings — Your preferences, profiles, enabled skills
+- `pkb.config.json` skills state — `installed_profiles`, `installed_skills`, `enabled_skills`, `disabled_skills`, `vendor_downloads`, `enabled_adapters`, `pending_audit` are preserved
 - Any file not explicitly listed as a system file
+
+### Z-Skills State Preservation
+
+If you have z-skills installed and z-web-pack-local enabled:
+- `skills/_vendor/` is **never** touched during update
+- `enabled_adapters` in `pkb.config.json` is preserved (your `z-web-pack-local` stays enabled)
+- `vendor_downloads` is preserved (your z-skills clone path stays)
+- `zskill_audit_report.md` is never overwritten
+- `.pkb_local/patches/` is never overwritten
+
+The update only touches PKB system files — it never updates third-party vendor code.
 
 ---
 

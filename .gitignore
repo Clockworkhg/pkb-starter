@@ -1,0 +1,35 @@
+# pkb-starter root .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# OS
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# IDE
+.idea/
+.vscode/
+.vs/
+
+# Temp
+*.tmp
+*.temp
+*.bak
+*.log
+*.swp
+*.swo
+*~
+
+# Generated artifacts
+.pkb_backup/
+
+# Local test directories
+test-pkb-*/

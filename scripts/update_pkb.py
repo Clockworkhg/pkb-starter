@@ -32,16 +32,25 @@ SKILLS_DIR = REPO_ROOT / "skills"
 REGISTRY_DIR = REPO_ROOT / "skills_registry"
 
 # Current pkb-starter version
-CURRENT_VERSION = "0.5.0"
+CURRENT_VERSION = "0.5.0-alpha"
 CURRENT_SCHEMA_VERSION = "0.5.0"
 
-# User data paths — NEVER overwrite
+# User data paths — NEVER overwrite or delete
 PROTECTED_DIRS = [
     "raw",
     "wiki",
     "_INBOX",
-    ".pkb_local",
     "skills/_vendor",
+    ".pkb_local",
+    ".pkb_local/patches",
+    "zskill_audit_report.md",
+    "skill_manager_report.md",
+]
+
+# Files within protected dirs that should still be skipped individually
+PROTECTED_FILES = [
+    "zskill_audit_report.md",
+    "skill_manager_report.md",
 ]
 
 # System paths that DO get updated
@@ -79,6 +88,8 @@ def die(msg: str, code: int = 1):
 def is_protected(rel_path: str) -> bool:
     """Check if a path is user data that must NEVER be overwritten."""
     rel = rel_path.replace("\\", "/")
+
+    # Check directory patterns
     for pattern in PROTECTED_DIRS:
         p = pattern.replace("\\", "/")
         if p.endswith("/"):
@@ -86,6 +97,12 @@ def is_protected(rel_path: str) -> bool:
                 return True
         elif rel == p or rel.startswith(p + "/"):
             return True
+
+    # Check exact file patterns
+    for f_pattern in PROTECTED_FILES:
+        if rel == f_pattern or rel.endswith("/" + f_pattern):
+            return True
+
     return False
 
 
@@ -102,22 +119,47 @@ def is_user_config_key(key: str) -> bool:
 
 
 def get_installed_version(config: dict) -> str:
-    """Extract installed starter version from config."""
+    """Extract installed starter version from config.
+    Normalizes to handle 0.4.0, 0.4.1-alpha, 0.5.0-alpha, etc.
+    """
     return config.get("starter_version") or config.get("version") or "0.0.0"
 
 
-def version_lt(a: str, b: str) -> bool:
-    """True if semantic version a < b."""
+def _parse_version(v: str) -> tuple:
+    """Parse version string into comparable tuple.
+    Handles suffixes: -alpha, -beta, -rc1, and leading 'v'.
+    Suffix ordering: alpha < beta < rc < final (no suffix).
+    """
+    suffix_order = {"alpha": 0, "beta": 1, "rc": 2}
+    v = v.lstrip("v").lower()
+    numeric_part = v
+    suffix = ""
+    suffix_num = 0
+    for sep in ("-",):
+        if sep in v:
+            parts = v.split(sep, 1)
+            numeric_part = parts[0]
+            suffix_part = parts[1]
+            import re as _re
+            m = _re.match(r"([a-zA-Z]+)(\d*)", suffix_part)
+            if m:
+                suffix = m.group(1).lower()
+                suffix_num = int(m.group(2)) if m.group(2) else 0
+            break
     try:
-        pa = [int(x) for x in a.split(".")]
-        pb = [int(x) for x in b.split(".")]
-        while len(pa) < 3:
-            pa.append(0)
-        while len(pb) < 3:
-            pb.append(0)
-        return pa < pb
-    except Exception:
-        return a < b
+        nums = [int(x) for x in numeric_part.split(".")]
+    except ValueError:
+        nums = [0, 0, 0]
+    while len(nums) < 3:
+        nums.append(0)
+    suffix_rank = suffix_order.get(suffix, 99) if suffix else 99
+    return (nums[0], nums[1], nums[2], suffix_rank, suffix_num)
+
+
+def version_lt(a: str, b: str) -> bool:
+    """True if version a < b. Handles alpha/beta/rc suffixes."""
+    import re as _re
+    return _parse_version(a) < _parse_version(b)
 
 
 # ---------------------------------------------------------------------------
@@ -234,7 +276,7 @@ def _copy_file(src: Path, dst: Path, dry_run: bool) -> Optional[str]:
 # ---------------------------------------------------------------------------
 
 def update_config(target: Path, opts: dict) -> list:
-    """Update pkb.config.json version fields. Preserves user settings."""
+    """Update pkb.config.json version fields. Preserves ALL user settings and skills state."""
     changes = []
     config_path = target / "pkb.config.json"
 
@@ -257,11 +299,28 @@ def update_config(target: Path, opts: dict) -> list:
     config["last_updated_at"] = now
     changes.append(f"pkb.config.json: last_updated_at = {now}")
 
-    # Ensure skills section structure
+    # Ensure skills section exists (don't overwrite existing!)
     if "skills" not in config:
         config["skills"] = {}
-    if "catalog_version" not in config["skills"]:
-        config["skills"]["catalog_version"] = CURRENT_VERSION
+
+    # Only add missing skills state fields — never clear existing values
+    skills_defaults = {
+        "installed_profiles": [],
+        "installed_skills": [],
+        "enabled_skills": [],
+        "disabled_skills": [],
+        "vendor_downloads": [],
+        "enabled_adapters": [],
+        "pending_audit": [],
+    }
+    existing_skills = config["skills"]
+    for key, default in skills_defaults.items():
+        if key not in existing_skills:
+            existing_skills[key] = default
+            changes.append(f"pkb.config.json: added missing skills.{key}")
+
+    if "catalog_version" not in existing_skills:
+        existing_skills["catalog_version"] = CURRENT_VERSION
         changes.append(f"pkb.config.json: skills.catalog_version = {CURRENT_VERSION}")
 
     if not opts.get("dry_run"):
@@ -470,18 +529,24 @@ def main():
     info(f"  Mode: {'DRY RUN' if opts['dry_run'] else 'LIVE'}")
     print()
 
+    # Phase 0: Backup (runs even if up-to-date, for --backup-only)
+    if opts.get("backup_only"):
+        if not opts["dry_run"]:
+            backup_dir = str(create_backup(target))
+            ok(f"Backup complete: {backup_dir}")
+        else:
+            info("Would create backup (dry-run)")
+        sys.exit(0)
+
+    # Early exit if already current
     if not version_lt(installed_ver, to_ver):
         ok(f"Already up-to-date ({installed_ver} >= {to_ver})")
         sys.exit(0)
 
-    # Phase 1: Backup
+    # Phase 1: Backup (for actual update)
     if not opts["dry_run"]:
         backup_dir = str(create_backup(target))
         print()
-
-    if opts.get("backup_only"):
-        ok(f"Backup complete: {backup_dir}")
-        sys.exit(0)
 
     # Phase 2: Run migrations
     migration_changes = run_migrations(target, installed_ver, to_ver, opts)

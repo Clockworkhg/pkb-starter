@@ -153,7 +153,7 @@ def generate_config(target: Path) -> Path:
     config = {
         "name": target.name,
         "version": "0.1.0",
-        "starter_version": "0.5.0",
+        "starter_version": "0.5.0-alpha",
         "schema_version": "0.5.0",
         "created": today,
         "last_updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
