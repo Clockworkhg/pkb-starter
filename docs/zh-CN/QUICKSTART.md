@@ -34,7 +34,7 @@ python scripts/install.py "D:\MyKB" --lang zh-CN
 此命令将创建：
 - 完整目录结构（`raw/`、`wiki/`、`_INBOX/`）
 - `.claude/commands/` 中的 11 个项目命令
-- Python 工具：`web_pack.py`、`pkb_auto.py`、`sanitize.py`、`import_to_inbox.py`、`docs_update.py`
+- Python 工具：`web_pack.py`、`pkb_auto.py`、`sanitize.py`、`import_to_inbox.py`、`docs_update.py`、`pkb_update_client.py`
 - 包含安全规则的 `.gitignore`
 - 初始化的 Git 仓库
 
@@ -60,11 +60,11 @@ claude
 ```
 /project:help                          # 查看所有命令
 /project:pkb https://example.com       # 采集网页
-/project:pkb ~/Downloads/paper.pdf     # 导入文件
+/project:pkb Downloads\paper.pdf       # 导入文件
 /project:ask transformer 概念          # 搜索知识库
 ```
 
-> **v0.1.0 使用项目命令**。当你 `cd` 到知识库目录并运行 `claude` 时，命令以 `/project:<名称>` 格式调用。裸 `/pkb` 仅在安装为 Claude Code 插件时可用。
+> **项目命令**：当你 `cd` 到知识库目录并运行 `claude` 时，命令以 `/project:<名称>` 格式调用。裸 `/pkb` 仅在安装为 Claude Code 插件时可用。
 
 ## 可选：安装技能包
 

@@ -29,7 +29,7 @@ python scripts/install.py "D:\MyKB"
 This creates:
 - Full directory structure (`raw/`, `wiki/`, `_INBOX/`)
 - 11 project commands in `.claude/commands/`
-- Python tools: `web_pack.py`, `pkb_auto.py`, `sanitize.py`, `import_to_inbox.py`, `docs_update.py`
+- Python tools: `web_pack.py`, `pkb_auto.py`, `sanitize.py`, `import_to_inbox.py`, `docs_update.py`, `pkb_update_client.py`
 - `.gitignore` with security rules
 - Git repository initialized
 
@@ -53,15 +53,15 @@ In Claude Code (project mode):
 ```
 /project:help                          # See all commands
 /project:pkb https://example.com       # Collect a web page
-/project:pkb ~/Downloads/paper.pdf     # Import a file
+/project:pkb Downloads\paper.pdf       # Import a file
 /project:ask transformer concept       # Search your knowledge base
 ```
 
-> **v0.1.0 uses project commands**. Commands are invoked as `/project:<name>` when you `cd` into your PKB directory and run `claude`. Bare `/pkb` is only available if pkb-starter is installed as a Claude Code plugin.
+> **Project commands**: Commands are invoked as `/project:<name>` when you `cd` into your PKB directory and run `claude`. Bare `/pkb` is only available if pkb-starter is installed as a Claude Code plugin.
 
 ## Optional: Install Skill Packs
 
-Extend PKB with domain-specific skills from a catalog of 42 entries. You can install skills during setup or anytime later:
+Extend PKB with domain-specific skills from a catalog of 43 entries. You can install skills during setup or anytime later:
 
 ```bash
 # During installation: choose a profile
@@ -78,7 +78,7 @@ python scripts/skill_manager.py --target "D:\MyKB" --audit
 
 # Or from Claude Code
 /project:skills                       # See status and available profiles
-/project:skills --list                # Browse all 42 entries
+/project:skills --list                # Browse all 43 entries
 /project:skills --describe <id>       # Full details for one skill
 /project:skills --install <id>        # Install a single skill
 /project:skills --install-profile student

@@ -156,7 +156,7 @@ PROFILE_DESCRIPTIONS = {
 }
 
 
-def generate_config(target: Path, lang: str = "en", repo_url: str = None) -> Path:
+def generate_config(target: Path, lang: str = "en", repo_url: str = None, dry_run: bool = False) -> Path:
     """Generate pkb.config.json with full skills state model and language fields."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
@@ -218,7 +218,9 @@ def generate_config(target: Path, lang: str = "en", repo_url: str = None) -> Pat
         },
     }
     config_path = target / "pkb.config.json"
-    config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+    if not dry_run:
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
     return config_path
 
 
@@ -564,7 +566,7 @@ def main():
 
     # Generate config
     print("[4/6] Generating pkb.config.json...")
-    config_path = generate_config(target, lang=lang, repo_url=repo_url)
+    config_path = generate_config(target, lang=lang, repo_url=repo_url, dry_run=dry_run)
     if dry_run:
         print(f"  [DRY RUN] Would write: {config_path}")
     else:

@@ -82,6 +82,7 @@ skill_manager_report.md
 .pkb_system/
 
 # === Update Reports (auto-generated, never committed) ===
+update_report.md
 update_client_report.md
 
 # === Temp Downloads and Cache ===
