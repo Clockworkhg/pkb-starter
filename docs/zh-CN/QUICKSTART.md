@@ -1,6 +1,8 @@
 # PKB Starter -- 快速开始
 
 > 5 分钟搭建你自己的 LLM 驱动个人知识库。
+>
+> **版本**：v0.6.2-alpha
 
 语言：[English](../QUICKSTART.md) | [简体中文](QUICKSTART.md)
 
@@ -133,8 +135,8 @@ python scripts/skill_manager.py --target "D:\MyKB" --audit
 
 ```bash
 cd "D:\MyKB"
-python tools/pkb_update_client.py --dry-run    # 预览变更
-python tools/pkb_update_client.py              # 执行更新
+python tools/pkb_update_client.py              # 预览变更（默认 dry-run）
+python tools/pkb_update_client.py --apply      # 执行更新
 ```
 
 或在 Claude Code 中：`/project:update`（默认预览），`/project:update --apply` 确认执行。

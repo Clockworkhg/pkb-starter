@@ -48,7 +48,8 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <what changed>"
 
 ### Version History
 
-- **v0.5.0-alpha**: Current. Adds sync/update/migration workflow. Baseline is v0.4.1-alpha.
+- **v0.6.2-alpha**: Current. Custom install paths, built-in update client, enhanced config preservation.
+- **v0.5.0-alpha**: Adds sync/update/migration workflow. Baseline is v0.4.1-alpha.
 - **v0.4.1-alpha**: Z-Skills Compatibility Module (commit 9e8d33b). Introduced `tools/zskill_bridge.py`, `skill_adapters/z_skills_adapter.md`, `docs/Z_WEB_PACK_PARITY.md`, and skills_registry.
 
 ### Language Templates
@@ -97,8 +98,8 @@ The update client is installed in every KB at `tools/pkb_update_client.py`:
 
 ```bash
 cd "D:\MyKB"
-python tools/pkb_update_client.py --dry-run    # Preview changes (safe)
-python tools/pkb_update_client.py              # Apply update
+python tools/pkb_update_client.py              # Preview changes (safe, dry-run by default)
+python tools/pkb_update_client.py --apply      # Apply update
 ```
 
 This reads `starter_repo_url` from `pkb.config.json`, clones/pulls the repo to `.pkb_system/starter_cache/`, then runs the updater.
@@ -114,8 +115,8 @@ Or in Claude Code:
 If you have a local pkb-starter clone:
 
 ```bash
-python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --dry-run
-python tools/pkb_update_client.py --starter-path "D:\pkb-starter"
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter"            # dry-run (safe)
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --apply    # apply changes
 ```
 
 #### Mode 3: Direct update_pkb.py (advanced)
@@ -154,10 +155,11 @@ If not set, use `--repo-url` or `--starter-path` with the update client.
 ### Preview Before Updating
 
 ```
-/project:update --dry-run
+/project:update                  # Dry-run by default — preview only
+/project:update --apply          # Apply changes after review
 ```
 
-Shows exactly what would change without making any changes.
+The update client defaults to dry-run. No changes are made without `--apply`.
 
 ### Manual Update
 
@@ -166,8 +168,8 @@ If you prefer to update manually:
 ```bash
 cd D:\pkb-starter
 git pull
-python scripts/update_pkb.py "D:\MyKB" --dry-run
-python scripts/update_pkb.py "D:\MyKB"
+python scripts/update_pkb.py "D:\MyKB" --dry-run    # Preview
+python scripts/update_pkb.py "D:\MyKB"               # Apply
 ```
 
 ---

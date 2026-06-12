@@ -23,8 +23,8 @@ Usage:
     python scripts/update_pkb.py "<KB_ROOT>" --from-version 0.3.0 --to-version 0.5.0
 
 For most users, prefer the client-side update tool installed in each KB:
-    python tools/pkb_update_client.py --dry-run
-    python tools/pkb_update_client.py
+    python tools/pkb_update_client.py              # dry-run by default (safe)
+    python tools/pkb_update_client.py --apply      # apply changes
 """
 
 import os
@@ -73,6 +73,7 @@ PROTECTED_FILES = [
 SYSTEM_PATHS = [
     "tools",
     ".claude/commands",
+    ".claude/hooks",
     "skill_adapters",
     "skills_registry",
     "docs",

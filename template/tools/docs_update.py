@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """PKB documentation freshness checker.
 
-Detects drift between the filesystem and the 5 project docs:
+Detects drift between the filesystem and the 6 project docs:
   index.md, COMMANDS.md, SKILL_LINKS.md, AGENTS.md, CLAUDE.md, log.md
+
+Also tracks: tools/ scripts, .claude/skills/, .claude/commands/, .claude/hooks/, wiki/ pages.
 
 Usage:
     python tools/docs_update.py            # human-readable report
@@ -29,6 +31,9 @@ SKILLS_DIR = ROOT / ".claude" / "skills"
 
 # Check: .claude/commands/ markdown files
 COMMANDS_DIR = ROOT / ".claude" / "commands"
+
+# Check: .claude/hooks/ Python scripts (harness hooks)
+HOOKS_DIR = ROOT / ".claude" / "hooks"
 
 # Check: wiki/ pages
 WIKI_DIR = ROOT / "wiki"
@@ -64,6 +69,19 @@ def get_commands():
         p.stem
         for p in COMMANDS_DIR.glob("*.md")
         if not p.name.startswith("_")
+    ])
+
+
+def get_hooks():
+    """List all hook scripts in .claude/hooks/ (excluding shared lib and pycache)."""
+    if not HOOKS_DIR.is_dir():
+        return []
+    return sorted([
+        p.name
+        for p in HOOKS_DIR.glob("*.py")
+        if not p.name.startswith("_")
+        and not p.name.startswith(".")
+        and p.name not in ("hook_lib.py", "test_hooks.py")
     ])
 
 
@@ -141,6 +159,10 @@ def check_doc_freshness(doc_name):
         if f"最后更新: {today}" not in content and f"最后更新：{today}" not in content:
             stale.append("date: not today")
 
+        # Check hooks referenced in system section
+        if ".claude/hooks/" not in content and "hooks" not in content.lower():
+            stale.append("hooks: .claude/hooks/ not referenced in system section")
+
     elif doc_name == "COMMANDS.md":
         # Check commands mentioned
         cmds = get_commands()
@@ -178,11 +200,11 @@ def check_doc_freshness(doc_name):
             chinese_to_int = {
                 '一': 1, '二': 2, '三': 3, '四': 4, '五': 5,
                 '六': 6, '七': 7, '八': 8, '九': 9, '十': 10,
-                '十一': 11, '十二': 12, '十三': 13, '十四': 14,
+                '十一': 11, '十二': 12, '十三': 13, '十四': 14, '十五': 15,
             }
             section_numbers.add(chinese_to_int.get(num_str, 0))
 
-        expected_sections = set(range(1, 15))  # §1–§14
+        expected_sections = set(range(1, 16))  # §1–§15
         missing_sections = expected_sections - section_numbers
         if missing_sections:
             stale.append(f"sections missing: {sorted(missing_sections)}")
@@ -196,12 +218,23 @@ def check_doc_freshness(doc_name):
         if "CLAUDE.md" not in content:
             stale.append("cross-ref: CLAUDE.md not mentioned")
 
+        # Check hooks section exists
+        if "十五、Hooks" not in content and "Hooks 系统" not in content and "XV. Hooks" not in content:
+            stale.append("section missing: Hooks 系统 / XV. Hooks")
+
+        # Check hooks scripts mentioned
+        hooks = get_hooks()
+        hooks_mentioned = sum(1 for h in hooks if h in content or h.replace(".py", "") in content)
+        if len(hooks) > 0 and hooks_mentioned < len(hooks) * 0.5:
+            missing = [h for h in hooks if h not in content and h.replace(".py", "") not in content]
+            stale.append(f"hooks: {hooks_mentioned}/{len(hooks)} scripts mentioned, missing: {missing}")
+
     elif doc_name == "CLAUDE.md":
         # Check file exists (already handled by outer check)
         # Check key sections
         required_sections = [
             "项目身份", "关键路径", "Skill 路由速查", "编码约定",
-            "工具速查", "常用工作流", "行为准则"
+            "工具速查", "常用工作流", "行为准则", "Hooks 速查"
         ]
         for section in required_sections:
             if section not in content:
@@ -212,6 +245,12 @@ def check_doc_freshness(doc_name):
             tool_name = Path(tool).name
             if tool_name not in content:
                 stale.append(f"tool/{tool_name} not mentioned")
+
+        # Check hooks mentioned (match both "01_session_start.py" and "01_session_start")
+        for hook in get_hooks():
+            hook_stem = hook.replace(".py", "")
+            if hook not in content and hook_stem not in content:
+                stale.append(f"hook/{hook} not mentioned")
 
         # Check date freshness
         today = datetime.now().strftime("%Y-%m-%d")
@@ -242,6 +281,7 @@ def main():
         "tools": get_tools(),
         "skills": get_skills(),
         "commands": get_commands(),
+        "hooks": get_hooks(),
         "wiki_pages": get_wiki_pages(),
         "recent_commits": [f"{h} {s}" for h, s in get_recent_git_log(5)],
         "total_stale": total_stale,
@@ -278,7 +318,7 @@ def main():
 
     print("=" * 60)
     ctx = report["_context"]
-    print(f"  Tools: {len(ctx['tools'])} | Skills: {len(ctx['skills'])} | Commands: {len(ctx['commands'])}")
+    print(f"  Tools: {len(ctx['tools'])} | Skills: {len(ctx['skills'])} | Commands: {len(ctx['commands'])} | Hooks: {len(ctx['hooks'])}")
     wiki_total = sum(len(v) for v in ctx["wiki_pages"].values())
     print(f"  Wiki pages: {wiki_total} (c:{len(ctx['wiki_pages']['concepts'])} s:{len(ctx['wiki_pages']['sources'])} p:{len(ctx['wiki_pages']['projects'])})")
     print("=" * 60)

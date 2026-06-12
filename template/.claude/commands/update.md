@@ -28,8 +28,8 @@ This reads `starter_repo_url` from `pkb.config.json`, clones/pulls to `.pkb_syst
 If you already have a local pkb-starter repository:
 
 ```
-python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --dry-run
-python tools/pkb_update_client.py --starter-path "D:\pkb-starter"
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter"            # dry-run (safe)
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --apply    # apply changes
 ```
 
 ### Mode 3: Direct update (advanced)
@@ -40,8 +40,8 @@ python scripts/update_pkb.py "<KB_ROOT>" --dry-run
 
 ## Behavior
 
-1. Run `python tools/pkb_update_client.py --dry-run` by default.
-2. If user confirms (`--apply`), run `python tools/pkb_update_client.py`.
+1. Run `python tools/pkb_update_client.py` by default (dry-run, no files changed).
+2. If user confirms (`--apply`), run `python tools/pkb_update_client.py --apply`.
 3. Client detects installed version from `pkb.config.json` (`starter_version`).
 4. Compares with the latest pkb-starter version.
 5. If up-to-date, reports and exits.

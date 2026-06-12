@@ -155,11 +155,11 @@ python scripts/skill_manager.py --target "D:\MyKB" --enable kanban-skill
 ## 示例 8：更新知识库系统文件
 
 ```
-# 预览更新
-/project:update --dry-run
+# 预览更新（默认 dry-run，安全）
+/project:update
 
 # 执行更新
-/project:update
+/project:update --apply
 
 # 仅创建备份
 /project:update --backup-only

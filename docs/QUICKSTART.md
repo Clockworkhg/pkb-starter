@@ -1,6 +1,8 @@
 # PKB Starter — Quick Start
 
 > 5 minutes to your own LLM-powered personal knowledge base.
+>
+> **Version**: v0.6.2-alpha
 
 Languages: [English](QUICKSTART.md) | [简体中文](zh-CN/QUICKSTART.md)
 
@@ -128,8 +130,8 @@ When pkb-starter releases a new version on GitHub, upgrade your installed KB wit
 
 ```bash
 cd "D:\MyKB"
-python tools/pkb_update_client.py --dry-run    # Preview what would change
-python tools/pkb_update_client.py              # Apply the update
+python tools/pkb_update_client.py              # Preview (dry-run by default)
+python tools/pkb_update_client.py --apply      # Apply the update
 ```
 
 Or in Claude Code: `/project:update` (dry-run by default), `/project:update --apply` to apply.

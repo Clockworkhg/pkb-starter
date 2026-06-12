@@ -1,6 +1,8 @@
-# PKB Starter
+# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.2--alpha-blue)
 
 > **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
+>
+> **Current version**: v0.6.2-alpha
 
 Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -147,8 +149,8 @@ PKB Starter tracks its version in `pkb.config.json`. When you update pkb-starter
 
 ```bash
 cd "D:\MyKB"
-python tools/pkb_update_client.py --dry-run    # Preview
-python tools/pkb_update_client.py              # Apply
+python tools/pkb_update_client.py              # Preview (dry-run by default)
+python tools/pkb_update_client.py --apply      # Apply changes
 ```
 
 Or in Claude Code:

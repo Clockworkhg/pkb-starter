@@ -320,4 +320,105 @@ All tool output (Python scripts, shell commands) must use ASCII-safe characters.
 
 ---
 
+## XV. Hooks System
+
+### 15.1 Overview
+
+PKB uses Claude Code harness hooks to elevate security rules, health checks, and state management from the prompt layer to the harness layer. Hooks are registered in `.claude/settings.json` with scripts in `.claude/hooks/`.
+
+**Design principles**:
+- Hook failures never block workflow (except security violations)
+- Idempotency: cooldown windows prevent redundant execution (state cached in `_INBOX/.hook_state/`)
+- Performance budget: all hooks total < 65s
+- Dry-run mode: every script supports `--dry-run` for testing
+
+### 15.2 Hook Inventory
+
+| # | Hook | Event | Matcher | Behavior | Blocks? |
+|---|------|-------|---------|----------|---------|
+| 1 | `01_session_start.py` | SessionStart | — | Environment validation + context card + docs freshness | No |
+| 2 | `02_pre_tool_use.py` | PreToolUse | All tools | Blocks secret commits, raw/ deletion, sensitive file writes | **Yes** |
+| 3 | `03_post_tool_use.py` | PostToolUse | Write\|Edit | Wiki frontmatter quick check; post-commit full health check | No |
+| 4 | `04_post_tool_use_failure.py` | PostToolUseFailure | — | 11-category error classification + recovery suggestions | No |
+| 5 | `05_stop.py` | Stop | — | Uncommitted change reminder + INBOX staleness + session summary | No |
+| 6 | `06_user_prompt_submit.py` | UserPromptSubmit | — | Smart routing: URL/path/CNKI/paper suggestions | No |
+
+### 15.3 Shared Library (hook_lib.py)
+
+`hook_lib.py` provides common utilities for all hook scripts:
+
+| Module | Function |
+|--------|----------|
+| `get_root()` | Resolve PKB root from `PKB_ROOT` env var |
+| `is_safe_to_run(name, cooldown)` | Idempotency guard — skip within cooldown window |
+| `warn(msg)` / `block(msg)` | Severity-graded output — warn is non-blocking, block exits 1 |
+| `hook_timer(secs)` | Timeout context manager — auto-aborts hung hooks |
+| `check_pkb_env()` | Verify PKB_ROOT and critical directories exist |
+| `scan_content_for_secrets()` | 11 secret pattern detectors (API key / token / private key / password) |
+| `is_sensitive_filename()` | Sensitive filename detection (.env / credentials / .pem / .key) |
+| `is_protected_write_path()` | Protected path check (raw/ / .claude/) |
+| `is_protected_delete_path()` | Forbidden delete path check (raw/ / wiki/ / .claude/) |
+| `git_staged_files()` | List staged files (git diff --cached) |
+| `git_uncommitted_files()` | List modified or untracked files |
+| `count_wiki_pages()` | Count wiki pages by type |
+| `load_hook_config()` | Merge settings.json + settings.local.json config |
+| `is_dry_run()` | Detect `--dry-run` flag |
+
+### 15.4 Security Gate Rules (PreToolUse)
+
+| Trigger | Action | Notes |
+|---------|--------|-------|
+| `Bash(git commit)` + staged files contain secret patterns | 🛑 block | Detects API key / token / password / private key |
+| `Bash(rm/del/rd)` + path under `raw/` | 🛑 block | "Never delete raw/ materials" |
+| `Write/Edit` + path under `raw/` | 🛑 block | raw/ is append-only, cannot modify existing files |
+| `Write/Edit` + filename matches sensitive pattern | 🛑 block | .env / credentials / .pem / .key / id_rsa |
+| `Bash(git push)` | ⚠️ warn | Push is not default PKB behavior |
+
+**Note**: Does not duplicate existing `settings.json` `deny` rules (`rm -rf`, `git push --force`, `curl`, `wget`).
+
+### 15.5 Error Classification (PostToolUseFailure)
+
+| Category | Trigger Pattern | Recovery Suggestion |
+|----------|----------------|---------------------|
+| network | ConnectionError / Timeout | Retry or use `--collect-only` |
+| commit_blocked | git commit rejected | Run `/lint` to see health check issues |
+| permission | Permission denied | Check file locks |
+| security | Sensitive content detected | Remove API key / token |
+| encoding | GBK encoding error | `export PYTHONIOENCODING=utf-8` |
+| auth | 401 / 403 / Jina fail | Use raw URL or manual collection |
+| not_found | 404 / FileNotFoundError | Check URL/path spelling |
+| invalid_url | Invalid protocol | Use `/pkb <path>` for local files |
+| server_error | 502/503/504 | Retry later |
+| dependency | ModuleNotFoundError | `pip install <package>` |
+| tool_missing | yt-dlp/ffmpeg missing | Install required tool |
+
+### 15.6 Smart Routing (UserPromptSubmit)
+
+| Input Pattern | Suggestion |
+|---------------|------------|
+| GitHub/Gist/WeChat URL | `/pkb <url>` |
+| Generic URL | `/pkb <url>` or `/web <url>` |
+| File path | `/pkb <path>` |
+| Contains "CNKI"/"知网" | `/pkb-cnki search ...` |
+| Contains "paper"/"literature review" | `/paper` or `/research` |
+| Contains "save"/"commit" | `/save` |
+| Contains "check"/"lint" | `/lint` |
+
+> Suggestion only, never redirects. 30-second cooldown to avoid noise.
+
+### 15.7 Configuration & Overrides
+
+- **Global config**: `.claude/settings.json` — registers all 6 hooks
+- **User overrides**: `.claude/settings.local.json` (gitignored) — disable or tune per hook
+- **Hook state cache**: `_INBOX/.hook_state/` (gitignored) — stores cooldown timestamps; loss is non-fatal
+
+### 15.8 Maintenance Rules
+
+- Add hook script → update `.claude/settings.json` registration + update CLAUDE.md hooks table + update this §15.2
+- Modify hook behavior → update corresponding subsection + sync CLAUDE.md
+- Hook troubleshooting → check `_INBOX/.hook_state/` cache + `--dry-run` test
+- `/save` auto-detects whether CLAUDE.md includes hooks entries
+
+---
+
 *Synchronized with CLAUDE.md. Last updated: YYYY-MM-DD*

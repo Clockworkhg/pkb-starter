@@ -4,11 +4,13 @@
 Reads pkb.config.json and syncs system files from the pkb-starter source.
 Supports both online (git clone/pull) and local (--starter-path) modes.
 
+SAFETY: Defaults to DRY-RUN. No files are modified unless --apply is passed.
+
 Usage:
-    python tools/pkb_update_client.py
-    python tools/pkb_update_client.py --dry-run
+    python tools/pkb_update_client.py                          # dry-run (safe)
+    python tools/pkb_update_client.py --apply                  # apply changes
     python tools/pkb_update_client.py --repo-url <repo>
-    python tools/pkb_update_client.py --starter-path <local-pkb-starter-path>
+    python tools/pkb_update_client.py --starter-path <path>
     python tools/pkb_update_client.py --checkout v0.6.2-alpha
 """
 
@@ -224,20 +226,42 @@ def main():
         print(__doc__)
         sys.exit(0)
 
-    # Determine KB root — cwd or first positional arg
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    flag_args = [a for a in sys.argv[1:] if a.startswith("--")]
+    # -------------------------------------------------------------------
+    # Parse arguments — properly skip flag values to avoid mistaking
+    # --starter-path / --repo-url / --checkout values as positional args.
+    # -------------------------------------------------------------------
+    valued_flags = {"--starter-path", "--repo-url", "--checkout"}
 
-    if args and not args[0].startswith("-"):
-        kb_root = Path(args[0]).resolve()
+    positional = []
+    i = 1  # skip program name (sys.argv[0])
+    while i < len(sys.argv):
+        arg = sys.argv[i]
+        if arg in valued_flags and i + 1 < len(sys.argv):
+            i += 2  # skip flag and its value
+        elif arg.startswith("--") or arg.startswith("-"):
+            i += 1  # skip boolean flag or short flag
+        else:
+            positional.append(arg)
+            i += 1
+
+    if positional:
+        kb_root = Path(positional[0]).resolve()
     else:
         kb_root = Path.cwd()
 
     if not kb_root.is_dir():
         die(f"KB root not found: {kb_root}")
 
+    # -------------------------------------------------------------------
+    # Mode: default = dry-run (safe).  --apply is required to write files.
+    # --dry-run is accepted for compatibility but is the default.
+    # -------------------------------------------------------------------
+    apply_mode = "--apply" in sys.argv
+    dry_run = not apply_mode
+
+    # Extract flag values
     opts = {
-        "dry_run": "--dry-run" in sys.argv,
+        "dry_run": dry_run,
         "starter_path": None,
         "repo_url": None,
         "checkout": None,
@@ -258,6 +282,15 @@ def main():
     info(f"Installed starter_version: {config.get('starter_version', 'unknown')}")
     print()
 
+    # -------------------------------------------------------------------
+    # Announce mode clearly before any work
+    # -------------------------------------------------------------------
+    if dry_run:
+        info("=== DRY-RUN MODE: no files will be changed ===")
+    else:
+        info("=== APPLY MODE: files may be changed ===")
+    print()
+
     starter_dir = resolve_starter_path(opts, config, kb_root)
     run_update(starter_dir, kb_root, opts)
 
@@ -272,7 +305,9 @@ def main():
     print()
     ok("Update client finished.")
     if opts.get("dry_run"):
-        info("This was a dry run. Run without --dry-run to apply changes.")
+        info("This was a dry run. Run with --apply to apply changes.")
+    else:
+        info("Changes have been applied.")
 
 
 if __name__ == "__main__":

@@ -224,6 +224,20 @@ def generate_config(target: Path, lang: str = "en", repo_url: str = None, dry_ru
     return config_path
 
 
+def _set_pkb_root(target: Path) -> bool:
+    """Replace __PKB_ROOT__ placeholder in settings.json with actual target path."""
+    settings_path = target / ".claude" / "settings.json"
+    if not settings_path.is_file():
+        return False
+    content = settings_path.read_text(encoding="utf-8")
+    if "__PKB_ROOT__" not in content:
+        return False
+    actual_path = str(target.resolve()).replace("\\", "\\\\")
+    content = content.replace("__PKB_ROOT__", actual_path)
+    settings_path.write_text(content, encoding="utf-8")
+    return True
+
+
 def apply_locale(target: Path, lang: str) -> list[str]:
     """Apply Chinese locale files after template copy. Returns list of applied files."""
     if lang not in ("zh-CN", "bilingual"):
@@ -555,6 +569,10 @@ def main():
         for f in sorted(created):
             print(f"    {f}")
 
+        # Set PKB_ROOT in settings.json
+        if _set_pkb_root(target):
+            print(f"  PKB_ROOT set in .claude/settings.json")
+
         # Apply locale (zh-CN / bilingual)
         if lang != "en":
             print(f"  Applying locale: {lang}...")
@@ -661,8 +679,8 @@ Next steps:
   /project:skills             -- manage optional skills
 
   # To check for pkb-starter updates:
-  python tools/pkb_update_client.py --dry-run
-  python tools/pkb_update_client.py
+  python tools/pkb_update_client.py              # preview (dry-run by default)
+  python tools/pkb_update_client.py --apply      # apply changes
 
   # Or from anywhere:
   claude --project "{target}"

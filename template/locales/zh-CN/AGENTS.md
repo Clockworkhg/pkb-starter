@@ -341,4 +341,105 @@ Agent 应根据实际运行环境自动适配路径分隔符（Windows `\` 或 P
 
 ---
 
+## 十五、Hooks 系统
+
+### 15.1 概述
+
+PKB 使用 Claude Code harness hooks 将安全规则、健康检查、状态管理从 prompt 层提升到 harness 层。Hooks 注册在 `.claude/settings.json`，脚本存放在 `.claude/hooks/`。
+
+**设计原则**：
+- Hook 失败不阻塞工作流（安全违规除外）
+- 幂等性：冷却窗口内不重复执行（状态缓存在 `_INBOX/.hook_state/`）
+- 性能预算：全部 hooks 总计 < 65s
+- Dry-run 模式：每个脚本支持 `--dry-run` 测试
+
+### 15.2 Hook 清单
+
+| # | Hook | 事件 | 匹配 | 行为 | 阻塞？ |
+|---|------|------|------|------|--------|
+| 1 | `01_session_start.py` | SessionStart | — | 环境验证 + 上下文卡片 + 文档新鲜度检测 | 否 |
+| 2 | `02_pre_tool_use.py` | PreToolUse | 全部工具 | 拦截 secret commit / raw 删除 / 敏感文件写入 | **是** |
+| 3 | `03_post_tool_use.py` | PostToolUse | Write\|Edit | wiki 文件快速 frontmatter 检查；commit 后全量健康检查 | 否 |
+| 4 | `04_post_tool_use_failure.py` | PostToolUseFailure | — | 11 类错误模式匹配 + 恢复建议 | 否 |
+| 5 | `05_stop.py` | Stop | — | 未提交提醒 + INBOX 过期预警 + 会话摘要 | 否 |
+| 6 | `06_user_prompt_submit.py` | UserPromptSubmit | — | URL/路径/CNKI/论文 智能路由建议 | 否 |
+
+### 15.3 共享库（hook_lib.py）
+
+`hook_lib.py` 为所有 hook 脚本提供基础能力：
+
+| 模块 | 功能 |
+|------|------|
+| `get_root()` | 从 `PKB_ROOT` 环境变量获取项目根目录 |
+| `is_safe_to_run(name, cooldown)` | 幂等性守卫 — 冷却窗口内跳过重复执行 |
+| `warn(msg)` / `block(msg)` | 分级输出 — warn 不阻塞，block 退出码 1 |
+| `hook_timer(secs)` | 超时上下文管理器 — 超时自动终止 hook |
+| `check_pkb_env()` | 验证 PKB_ROOT + 关键目录存在 |
+| `scan_content_for_secrets()` | 11 种 secret 模式检测（API key / token / 私钥 / password） |
+| `is_sensitive_filename()` | 敏感文件名检测（.env / credentials / .pem / .key） |
+| `is_protected_write_path()` | 受保护路径检测（raw/ / .claude/） |
+| `is_protected_delete_path()` | 禁止删除路径检测（raw/ / wiki/ / .claude/） |
+| `git_staged_files()` | 获取 git 暂存区文件列表 |
+| `git_uncommitted_files()` | 获取未提交变更文件列表 |
+| `count_wiki_pages()` | 按类型统计 wiki 页面数 |
+| `load_hook_config()` | 合并 settings.json + settings.local.json 配置 |
+| `is_dry_run()` | 检测 `--dry-run` 标志 |
+
+### 15.4 安全门控（PreToolUse）详细规则
+
+| 触发条件 | 行为 | 说明 |
+|---------|------|------|
+| `Bash(git commit)` + staged 文件含 secret 模式 | 🛑 block | 检测 API key / token / password / 私钥 |
+| `Bash(rm/del/rd)` + 路径含 `raw/` | 🛑 block | "不删除 raw/ 原始资料" |
+| `Write/Edit` + 路径在 `raw/` 下 | 🛑 block | raw/ 仅追加，不能修改已有文件 |
+| `Write/Edit` + 文件名匹配敏感模式 | 🛑 block | .env / credentials / .pem / .key / id_rsa |
+| `Bash(git push)` | ⚠️ warn | push 不是默认行为 |
+
+**注意**：不重复 `settings.json` 中已有的 `deny` 规则（`rm -rf`、`git push --force`、`curl`、`wget`）。
+
+### 15.5 错误分类（PostToolUseFailure）覆盖
+
+| 类别 | 触发模式 | 恢复建议 |
+|------|---------|---------|
+| network | ConnectionError / Timeout | 重试或 `--collect-only` |
+| commit_blocked | git commit rejected | `/lint` 查看健康检查问题 |
+| permission | Permission denied | 检查文件占用 |
+| security | 敏感信息检测 | 移除 API key / token |
+| encoding | GBK 编码错误 | `export PYTHONIOENCODING=utf-8` |
+| auth | 401 / 403 / Jina fail | 用 raw URL 或手动采集 |
+| not_found | 404 文件不存在 | 检查 URL/路径拼写 |
+| invalid_url | 无效协议 | 本地文件用 `/pkb <path>` |
+| server_error | 502/503/504 | 稍后重试 |
+| dependency | ModuleNotFoundError | `pip install <pkg>` |
+| tool_missing | yt-dlp/ffmpeg 缺失 | 安装对应工具 |
+
+### 15.6 智能路由（UserPromptSubmit）规则
+
+| 输入模式 | 建议 |
+|---------|------|
+| GitHub/Gist/微信 URL | `/pkb <url>` |
+| 通用 URL | `/pkb <url>` or `/web <url>` |
+| 文件路径 | `/pkb <path>` |
+| 含"知网"/"CNKI" | `/pkb-cnki search ...` |
+| 含"论文"/"paper"/"文献" | `/paper` or `/research` |
+| 含"保存"/"commit" | `/save` |
+| 含"检查"/"lint" | `/lint` |
+
+> 路由仅建议，不重定向。30 秒冷却窗口避免噪声。
+
+### 15.7 配置与覆盖
+
+- **全局配置**：`.claude/settings.json` — 注册所有 6 个 hooks
+- **用户覆盖**：`.claude/settings.local.json`（gitignored）— 可按 hook 禁用或调整参数
+- **Hook 状态缓存**：`_INBOX/.hook_state/`（gitignored）— 存储冷却时间戳，丢失不影响功能
+
+### 15.8 维护规则
+
+- 新增 hook 脚本 → 更新 `.claude/settings.json` 注册 + 更新 CLAUDE.md hooks 速查表 + 更新本文 §15.2
+- 修改 hook 行为 → 更新本文对应小节 + 同步 CLAUDE.md
+- Hook 故障排查 → 检查 `_INBOX/.hook_state/` 缓存 + `--dry-run` 测试
+- 每次 `/save` 自动检测 CLAUDE.md 是否包含 hooks 条目
+
+---
+
 *与 CLAUDE.md 保持同步。最后更新：YYYY-MM-DD*
