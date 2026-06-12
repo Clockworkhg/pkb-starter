@@ -22,7 +22,7 @@ PKB: [auto-collects → extracts → classifies → creates wiki page → links 
 - 🧠 **LLM-organized**: AI classifies, links, and maintains your knowledge
 - 📄 **Rich collection**: Web pages, PDFs, DOCX, PPTX, GitHub repos, videos
 - 🔗 **Obsidian-compatible**: `[[wikilink]]` graph, open wiki/ as vault
-- 🔒 **本地文件优先、无云同步、无遥测**；使用 Claude Code 整理时，进入模型上下文的内容按模型服务商规则处理
+- 🔒 **Local-first, no cloud sync, no telemetry**; when using Claude Code for organization, content that enters model context is handled per the model provider's data usage policies
 - 🩺 **Self-healing**: Health checks find broken links, stale content, orphans
 - 💾 **Git-native**: Every change is a commit, full rollback support
 
