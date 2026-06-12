@@ -322,6 +322,48 @@ python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 2. 迁移后，`/project:update` 将可用
 3. 后续更新可直接使用该命令
 
+### 找不到 pkb_update_client.py
+
+**原因**：你的知识库是在 v0.6.2-alpha 之前安装的。更新客户端在该版本中添加。
+
+**解决方法**：
+1. 手动更新一次：`python scripts/update_pkb.py "D:\MyKB"`（从 pkb-starter 目录运行）
+2. 更新后，`tools/pkb_update_client.py` 即可用
+3. 后续更新：`python tools/pkb_update_client.py`
+
+### 更新客户端提示 "No valid starter_repo_url"
+
+**原因**：`pkb.config.json` 中的 `starter_repo_url` 未设置或者是占位符。
+
+**解决方法**：
+1. 编辑 `pkb.config.json`，将 `starter_repo_url` 设置为你的 pkb-starter fork
+2. 或使用 `--starter-path "D:\pkb-starter"` 指向本地克隆
+3. 或使用 `--repo-url https://github.com/<your-fork>/pkb-starter.git`
+
+### 安装失败 "Target directory not empty"
+
+**原因**：目标安装路径中已有文件。
+
+**解决方法**：
+1. 使用空目录：`python scripts/install.py "D:\MyKB"`
+2. 或使用 `--force` 覆盖：`python scripts/install.py "D:\MyKB" --force`
+3. 或使用交互模式确认：`python scripts/install.py --interactive`
+
+### 未提供安装目标路径
+
+**原因**：`install.py` 需要第一个位置参数指定目标路径。
+
+**解决方法**：
+```bash
+# 提供目标路径
+python scripts/install.py "D:\MyKB"
+
+# 或使用交互模式
+python scripts/install.py --interactive
+```
+
+路径可以是任意目录——`E:\KnowledgeBase`、`C:\Users\...\Documents\PKB` 等，无默认强制路径。
+
 ---
 
 ## 仍然卡住了？

@@ -29,11 +29,13 @@ PKB: [auto-collects → extracts → classifies → creates wiki page → links 
 ```bash
 git clone https://github.com/pkb-starter/pkb-starter.git
 cd pkb-starter
-python scripts/install.py "D:\MyKnowledgeBase"
-cd "D:\MyKnowledgeBase"
+python scripts/install.py "D:\MyKB"
+cd "D:\MyKB"
 pip install -r requirements.txt
 claude
 ```
+
+> **Path is up to you**: `D:\MyKB` is an example. Install anywhere — `E:\KnowledgeBase`, `C:\Users\...\Documents\PKB`, `F:\ResearchKB`, etc. The first positional argument to `install.py` is your chosen target directory. ASCII paths are recommended to avoid encoding issues with Python, Git, and shell tools.
 
 In Claude Code (project mode):
 ```
@@ -139,23 +141,35 @@ See [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) for capability comparison 
 
 ## Updating
 
-PKB Starter tracks its version in `pkb.config.json`. To update your installed PKB's system files:
+PKB Starter tracks its version in `pkb.config.json`. When you update pkb-starter from GitHub, your installed KB can be upgraded without reinstalling.
 
-```
-/project:update                  # Full check and update
-/project:update --dry-run        # Preview changes
-/project:update --backup-only    # Create backup only
-```
+**Recommended — use the update client installed in your KB:**
 
-Or manually:
 ```bash
-cd D:\pkb-starter
-git pull
-python scripts/update_pkb.py "D:\MyKB" --dry-run
-python scripts/update_pkb.py "D:\MyKB"
+cd "D:\MyKB"
+python tools/pkb_update_client.py --dry-run    # Preview
+python tools/pkb_update_client.py              # Apply
 ```
 
-Every update creates a timestamped backup in `.pkb_backup/`. User data (`raw/`, `wiki/`, `_INBOX/`) is **never** touched.
+Or in Claude Code:
+```
+/project:update                  # Dry-run by default
+/project:update --apply          # Apply changes
+```
+
+**Alternative — for users with a local pkb-starter clone:**
+
+```bash
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter"
+```
+
+**Advanced — direct update_pkb.py:**
+
+```bash
+python scripts/update_pkb.py "D:\MyKB" --dry-run
+```
+
+Every update creates a timestamped backup in `.pkb_backup/`. User data (`raw/`, `wiki/`, `_INBOX/`, `skills/_vendor/`, `.pkb_local/`) is **never** touched. Config fields (`language`, `install_path`, `starter_repo_url`) are **always preserved**.
 
 [Update Guide →](docs/UPDATING.md)
 

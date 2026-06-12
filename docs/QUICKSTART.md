@@ -21,8 +21,10 @@ cd pkb-starter
 ## Step 2: Install
 
 ```bash
-python scripts/install.py "D:\MyKnowledgeBase"
+python scripts/install.py "D:\MyKB"
 ```
+
+> **Path is up to you**: `D:\MyKB` is an example. You may use any path — `E:\KnowledgeBase`, `C:\Users\YourName\Documents\PKB`, `F:\ResearchKB`, etc. The first positional argument to `install.py` is your chosen target. ASCII paths are recommended. For interactive guided setup: `python scripts/install.py --interactive`
 
 This creates:
 - Full directory structure (`raw/`, `wiki/`, `_INBOX/`)
@@ -36,14 +38,14 @@ This creates:
 ## Step 3: Install Python Dependencies
 
 ```bash
-cd "D:\MyKnowledgeBase"
+cd "D:\MyKB"
 pip install -r requirements.txt
 ```
 
 ## Step 4: Launch
 
 ```bash
-cd "D:\MyKnowledgeBase"
+cd "D:\MyKB"
 claude
 ```
 
@@ -119,6 +121,22 @@ Open `wiki/concepts/` in Obsidian to see the result.
 ```
 
 That's it! You now have a living, growing personal knowledge base maintained by LLM.
+
+## Staying Updated
+
+When pkb-starter releases a new version on GitHub, upgrade your installed KB without reinstalling:
+
+```bash
+cd "D:\MyKB"
+python tools/pkb_update_client.py --dry-run    # Preview what would change
+python tools/pkb_update_client.py              # Apply the update
+```
+
+Or in Claude Code: `/project:update` (dry-run by default), `/project:update --apply` to apply.
+
+Your data (`raw/`, `wiki/`, `_INBOX/`, `skills/_vendor/`) is never touched. All config settings are preserved.
+
+[Full Update Guide →](UPDATING.md)
 
 ---
 

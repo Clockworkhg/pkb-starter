@@ -4,19 +4,27 @@
 Safely updates system files (tools, commands, registry, adapters) while
 preserving all user data (raw/, wiki/, _INBOX/).
 
-Language protection:
-  - Language fields (language, wiki_language, output_language) in pkb.config.json
-    are NEVER overwritten during update.
-  - User-customized Chinese documents (README.zh-CN.md, AGENTS.zh-CN.md, etc.)
-    are preserved. Only missing locale files are added — existing ones are skipped.
-  - System docs (docs/zh-CN/) are only added if missing. Modified files are never
-    force-overwritten.
+Protected data (NEVER touched):
+  - raw/, wiki/, _INBOX/ — user knowledge
+  - skills/_vendor/ — installed third-party skills
+  - .pkb_local/ — local patches and settings
+  - pkb.config.json user fields — language, install_path, starter_repo_url, etc.
+
+Config fields preserved across updates:
+  - language, wiki_language, output_language
+  - install_path, starter_repo_url
+  - starter_update_channel, starter_cache_dir
+  - skills.* (all installed/enabled/disabled state)
 
 Usage:
-    python scripts/update_pkb.py "D:\\MyKB"
-    python scripts/update_pkb.py "D:\\MyKB" --dry-run
-    python scripts/update_pkb.py "D:\\MyKB" --backup-only
-    python scripts/update_pkb.py "D:\\MyKB" --from-version 0.3.0 --to-version 0.5.0
+    python scripts/update_pkb.py "<KB_ROOT>"
+    python scripts/update_pkb.py "<KB_ROOT>" --dry-run
+    python scripts/update_pkb.py "<KB_ROOT>" --backup-only
+    python scripts/update_pkb.py "<KB_ROOT>" --from-version 0.3.0 --to-version 0.5.0
+
+For most users, prefer the client-side update tool installed in each KB:
+    python tools/pkb_update_client.py --dry-run
+    python tools/pkb_update_client.py
 """
 
 import os
@@ -40,7 +48,7 @@ SKILLS_DIR = REPO_ROOT / "skills"
 REGISTRY_DIR = REPO_ROOT / "skills_registry"
 
 # Current pkb-starter version
-CURRENT_VERSION = "0.6.1-alpha"
+CURRENT_VERSION = "0.6.2-alpha"
 CURRENT_SCHEMA_VERSION = "0.6.0"
 
 # User data paths — NEVER overwrite or delete
@@ -119,6 +127,8 @@ def is_user_config_key(key: str) -> bool:
     user_keys = {
         "name", "version", "created", "directories", "settings",
         "language", "wiki_language", "output_language",
+        "install_path", "starter_repo_url",
+        "starter_update_channel", "starter_cache_dir",
         "skills.installed_profiles", "skills.installed_skills",
         "skills.enabled_skills", "skills.disabled_skills",
         "skills.vendor_downloads", "skills.enabled_adapters",
@@ -337,6 +347,16 @@ def update_config(target: Path, opts: dict) -> list:
     for lang_key in ("language", "wiki_language", "output_language"):
         if lang_key in config:
             changes.append(f"pkb.config.json: {lang_key}={config[lang_key]} (preserved)")
+
+    # Install and source fields are preserved
+    for field in ("install_path", "starter_repo_url", "starter_update_channel", "starter_cache_dir"):
+        if field in config:
+            changes.append(f"pkb.config.json: {field}={config[field]} (preserved)")
+        elif field in ("starter_update_channel", "starter_cache_dir"):
+            # Add missing infrastructure fields with defaults
+            defaults = {"starter_update_channel": "alpha", "starter_cache_dir": ".pkb_system/starter_cache"}
+            config[field] = defaults[field]
+            changes.append(f"pkb.config.json: {field}={defaults[field]} (added)")
 
     if not opts.get("dry_run"):
         config_path.write_text(
@@ -569,6 +589,19 @@ def write_report(target: Path, report_data: dict):
         lines.append("These values are **never cleared** by the update process. Only missing fields are added with empty defaults.")
         lines.append("")
 
+    # Config fields preserved — explicit audit
+    config_state = report_data.get('config_state', {})
+    if config_state:
+        lines.append("## Config Fields Preserved")
+        lines.append("")
+        lines.append("| Field | Value | Status |")
+        lines.append("|-------|-------|--------|")
+        for field, value in config_state.items():
+            lines.append(f"| `{field}` | {value} | preserved |")
+        lines.append("")
+        lines.append("These config values are **never modified** by the update process.")
+        lines.append("")
+
     lines.append("## Rollback")
     lines.append("")
     if report_data.get('backup_dir') and report_data['backup_dir'] != 'none':
@@ -688,6 +721,14 @@ def main():
     protected_status = _collect_protected_status(target)
     skills_state = _collect_skills_state(target)
 
+    # Collect preserved config fields for report
+    config_state = {}
+    for field in ("language", "wiki_language", "output_language",
+                  "install_path", "starter_repo_url",
+                  "starter_update_channel", "starter_cache_dir"):
+        if field in config:
+            config_state[field] = config[field]
+
     report_data = {
         "timestamp": now,
         "target": str(target),
@@ -701,6 +742,7 @@ def main():
         "errors": [],
         "protected_paths": protected_status,
         "skills_state": skills_state,
+        "config_state": config_state,
     }
 
     write_report(target, report_data)

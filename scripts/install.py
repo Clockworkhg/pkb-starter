@@ -3,6 +3,10 @@
 
 Creates a new PKB directory from the pkb-starter template.
 
+The first positional argument is the target install path. Users may choose any
+directory (D:\\MyKB, E:\\KnowledgeBase, C:\\Users\\...\\Documents\\PKB, etc.).
+D:\\MyKB is an example only — no default path is forced.
+
 Usage:
     python scripts/install.py "<target_directory>"
     python scripts/install.py "<target_directory>" --profile student
@@ -13,6 +17,9 @@ Usage:
     python scripts/install.py "<target_directory>" --force
     python scripts/install.py "<target_directory>" --lang zh-CN
     python scripts/install.py "<target_directory>" --lang bilingual
+    python scripts/install.py "<target_directory>" --repo-url https://github.com/<user>/pkb-starter.git
+    python scripts/install.py --interactive
+    python scripts/install.py --interactive --dry-run
 """
 
 import os
@@ -149,7 +156,7 @@ PROFILE_DESCRIPTIONS = {
 }
 
 
-def generate_config(target: Path, lang: str = "en") -> Path:
+def generate_config(target: Path, lang: str = "en", repo_url: str = None) -> Path:
     """Generate pkb.config.json with full skills state model and language fields."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
@@ -167,10 +174,14 @@ def generate_config(target: Path, lang: str = "en") -> Path:
         wiki_language = "en"
         output_language = "en"
 
+    # Repo URL — use provided value or a placeholder
+    if not repo_url:
+        repo_url = "https://github.com/<your-username>/pkb-starter.git"
+
     config = {
         "name": target.name,
         "version": "0.1.0",
-        "starter_version": "0.6.1-alpha",
+        "starter_version": "0.6.2-alpha",
         "schema_version": "0.6.0",
         "created": today,
         "last_updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -178,6 +189,10 @@ def generate_config(target: Path, lang: str = "en") -> Path:
         "language": language,
         "wiki_language": wiki_language,
         "output_language": output_language,
+        "install_path": str(target.resolve()),
+        "starter_repo_url": repo_url,
+        "starter_update_channel": "alpha",
+        "starter_cache_dir": ".pkb_system/starter_cache",
         "directories": {
             "raw": "raw",
             "wiki": "wiki",
@@ -364,12 +379,78 @@ def _run_skill_installer(target: Path, profile: str):
         print(f"  [WARN] Skill installer failed: {e}")
 
 
-def main():
-    if len(sys.argv) < 2:
-        print(__doc__)
-        sys.exit(1)
+def _interactive_prompt():
+    """Interactive mode: ask user for target path, language, and profile."""
+    print("=== PKB Starter — Interactive Install ===")
+    print()
 
-    target_dir = sys.argv[1]
+    # Target directory
+    while True:
+        target_str = input("Target directory (e.g. D:\\MyKB): ").strip()
+        if not target_str:
+            print("  [ERROR] Target directory is required.")
+            continue
+        target = Path(target_str).resolve()
+        if target.exists() and any(target.iterdir()):
+            print(f"  [WARN] Directory '{target}' already exists and is not empty.")
+            confirm = input("  Continue? Files may be overwritten. (y/N): ").strip().lower()
+            if confirm not in ("y", "yes"):
+                print("  Aborted.")
+                sys.exit(0)
+        break
+
+    # Language
+    print()
+    print("Language options:")
+    print("  1. en       — English (default)")
+    print("  2. zh-CN    — Simplified Chinese")
+    print("  3. bilingual — English files + Chinese wiki")
+    while True:
+        lang_choice = input("Choose language [1-3] (default 1): ").strip()
+        if not lang_choice:
+            lang = "en"
+            break
+        if lang_choice == "1":
+            lang = "en"; break
+        elif lang_choice == "2":
+            lang = "zh-CN"; break
+        elif lang_choice == "3":
+            lang = "bilingual"; break
+        else:
+            print("  Please enter 1, 2, or 3.")
+
+    # Skill profile
+    print()
+    print("Skill profiles:")
+    for key, pd in PROFILE_DESCRIPTIONS.items():
+        skills_count = pd['skills'] if pd['skills'] != "interactive" else "pick"
+        print(f"  {key:<12} ({skills_count} skills) — {pd['tagline']}")
+    print()
+    skip_skills = False
+    while True:
+        profile_choice = input("Choose profile (default core): ").strip().lower()
+        if not profile_choice:
+            profile = "core"; break
+        if profile_choice in PROFILE_DESCRIPTIONS:
+            profile = profile_choice; break
+        elif profile_choice == "skip":
+            profile = "core"
+            skip_skills = True
+            break
+        else:
+            print(f"  Unknown profile '{profile_choice}'. Valid: {', '.join(PROFILE_DESCRIPTIONS.keys())}, skip")
+
+    # Repo URL
+    print()
+    repo_url = input("Starter repo URL (leave blank for placeholder): ").strip()
+    if not repo_url:
+        repo_url = None
+
+    return target, lang, profile, skip_skills, repo_url
+
+
+def main():
+    interactive_mode = "--interactive" in sys.argv
     force = "--force" in sys.argv
     skip_git = "--no-git" in sys.argv
     skip_deps = "--no-deps" in sys.argv
@@ -377,30 +458,71 @@ def main():
     interactive_skills = "--interactive-skills" in sys.argv
     dry_run = "--dry-run" in sys.argv
 
-    # Parse --profile
-    profile = "core"
+    # Parse --repo-url
+    repo_url = None
     for i, arg in enumerate(sys.argv):
-        if arg == "--profile" and i + 1 < len(sys.argv):
-            profile = sys.argv[i + 1]
+        if arg == "--repo-url" and i + 1 < len(sys.argv):
+            repo_url = sys.argv[i + 1]
             break
 
-    # Parse --lang
-    lang = "en"
-    for i, arg in enumerate(sys.argv):
-        if arg == "--lang" and i + 1 < len(sys.argv):
-            lang_val = sys.argv[i + 1]
-            if lang_val in ("en", "zh-CN", "bilingual"):
-                lang = lang_val
-            else:
-                print(f"[WARN] Unknown language '{lang_val}', using 'en'")
-            break
+    # Interactive mode: prompt for all settings
+    if interactive_mode:
+        target, lang, profile, skip_skills_interactive, repo_url_interactive = _interactive_prompt()
+        if repo_url_interactive:
+            repo_url = repo_url_interactive
+        # Override skip_skills from interactive prompt if user chose "skip"
+        if skip_skills_interactive:
+            skip_skills = True
+    else:
+        # Non-interactive: target path is required
+        if len(sys.argv) < 2 or sys.argv[1].startswith("--"):
+            print("[ERROR] Target directory is required.")
+            print()
+            print("Usage:")
+            print('  python scripts/install.py "<target_directory>"')
+            print("  python scripts/install.py --interactive")
+            print()
+            print("D:\\MyKB is an example only -- you may use any path:")
+            print("  D:\\MyKB")
+            print("  E:\\KnowledgeBase")
+            print("  C:\\Users\\YourName\\Documents\\PKB")
+            print("  F:\\ResearchKB")
+            print()
+            print("Run --interactive for guided setup.")
+            sys.exit(1)
 
-    target = Path(target_dir).resolve()
+        target_dir = sys.argv[1]
+        target = Path(target_dir).resolve()
+
+        # Parse --profile
+        profile = "core"
+        for i, arg in enumerate(sys.argv):
+            if arg == "--profile" and i + 1 < len(sys.argv):
+                profile = sys.argv[i + 1]
+                break
+
+        # Parse --lang
+        lang = "en"
+        for i, arg in enumerate(sys.argv):
+            if arg == "--lang" and i + 1 < len(sys.argv):
+                lang_val = sys.argv[i + 1]
+                if lang_val in ("en", "zh-CN", "bilingual"):
+                    lang = lang_val
+                else:
+                    print(f"[WARN] Unknown language '{lang_val}', using 'en'")
+                break
 
     if interactive_skills:
         profile = "custom"
 
-    print(f"=== PKB Starter Installer v0.6.1-alpha ===")
+    # Check target directory
+    if target.exists() and any(target.iterdir()) and not force:
+        print(f"[WARN] Target directory '{target}' already exists and is not empty.")
+        print(f"       Use --force to overwrite existing files, or choose a different path.")
+        if not interactive_mode:
+            sys.exit(1)
+
+    print(f"=== PKB Starter Installer v0.6.2-alpha ===")
     print(f"Target: {target}")
     print(f"Language: {lang}")
     if dry_run:
@@ -418,103 +540,110 @@ def main():
     else:
         print(f"  Git -- NOT FOUND (--no-git to skip)")
 
-    # Create directories
-    print("[2/6] Creating directory structure...")
-    dirs = create_directories(target)
-    print(f"  {len(dirs)} directories created")
+    if not dry_run:
+        # Create directories
+        print("[2/6] Creating directory structure...")
+        dirs = create_directories(target)
+        print(f"  {len(dirs)} directories created")
 
-    # Copy template files
-    print("[3/6] Copying template files...")
-    created = copy_template(target, force=force)
-    print(f"  {len(created)} files copied")
-    for f in sorted(created):
-        print(f"    {f}")
+        # Copy template files
+        print("[3/6] Copying template files...")
+        created = copy_template(target, force=force)
+        print(f"  {len(created)} files copied")
+        for f in sorted(created):
+            print(f"    {f}")
 
-    # Apply locale (zh-CN / bilingual)
-    if lang != "en":
-        print(f"  Applying locale: {lang}...")
-        locale_files = apply_locale(target, lang)
-        if locale_files:
-            print(f"  {len(locale_files)} locale files applied")
-            for f in sorted(locale_files):
-                print(f"    {f}")
+        # Apply locale (zh-CN / bilingual)
+        if lang != "en":
+            print(f"  Applying locale: {lang}...")
+            locale_files = apply_locale(target, lang)
+            if locale_files:
+                print(f"  {len(locale_files)} locale files applied")
+                for f in sorted(locale_files):
+                    print(f"    {f}")
 
     # Generate config
     print("[4/6] Generating pkb.config.json...")
-    config_path = generate_config(target, lang=lang)
-    print(f"  {config_path}")
-
-    # Initialize git
-    if not skip_git:
-        print("[5/6] Initializing git...")
-        if init_git(target):
-            print(f"  Git repository initialized")
-            # Copy .gitignore from template (already done in step 3, but ensure)
-            gitignore_src = TEMPLATE_DIR / ".gitignore"
-            gitignore_dst = target / ".gitignore"
-            if gitignore_src.is_file() and not gitignore_dst.is_file():
-                shutil.copy2(gitignore_src, gitignore_dst)
-        else:
-            print(f"  Git init skipped (use --no-git to suppress)")
+    config_path = generate_config(target, lang=lang, repo_url=repo_url)
+    if dry_run:
+        print(f"  [DRY RUN] Would write: {config_path}")
     else:
-        print("[5/6] Git -- skipped (--no-git)")
+        print(f"  {config_path}")
 
-    # Install dependencies
-    total_steps = 7 if not skip_skills else 6
-    if not skip_deps:
-        print(f"[6/{total_steps}] Installing Python dependencies...")
-        install_requirements(target)
-    else:
-        print(f"[6/{total_steps}] Dependencies -- skipped (--no-deps)")
-
-    # Install optional skills
-    if not skip_skills:
-        if interactive_skills:
-            profile = "custom"
-
-        # Show profile description
-        if profile in PROFILE_DESCRIPTIONS:
-            pd = PROFILE_DESCRIPTIONS[profile]
-            print(f"[7/{total_steps}] Optional Skills: {pd['title']} Profile")
-            print()
-            print(f"  {pd['tagline']}")
-            print(f"  {pd['desc']}")
-            print()
-            if pd['skills'] != "interactive" and pd['skills'] > 0:
-                print(f"  Skills in this profile: {pd['skills']}")
-                print()
-            if profile == "full":
-                print(f"  [NOTE] Full profile installs all recommended skills.")
-                print(f"         High-risk skills (CNKI, Zotero) are NOT auto-enabled.")
-                print(f"         Start with a smaller profile if unsure.")
-                print(f"         Recommended: install Core first, add skills later via /project:skills.")
-                print()
-            if profile == "custom":
-                print(f"  [NOTE] Custom profile lets you pick individual skills.")
-                print(f"         You will see the full catalog with descriptions and risks.")
-                print()
+    if not dry_run:
+        # Initialize git
+        if not skip_git:
+            print("[5/6] Initializing git...")
+            if init_git(target):
+                print(f"  Git repository initialized")
+                gitignore_src = TEMPLATE_DIR / ".gitignore"
+                gitignore_dst = target / ".gitignore"
+                if gitignore_src.is_file() and not gitignore_dst.is_file():
+                    shutil.copy2(gitignore_src, gitignore_dst)
+            else:
+                print(f"  Git init skipped (use --no-git to suppress)")
         else:
-            print(f"[7/{total_steps}] Optional Skills: profile '{profile}'")
+            print("[5/6] Git -- skipped (--no-git)")
 
-        if dry_run:
-            print(f"  [DRY RUN] Would install skills for profile: {profile}")
-            print(f"  Run without --dry-run to actually install.")
+        # Install dependencies
+        total_steps = 7 if not skip_skills else 6
+        if not skip_deps:
+            print(f"[6/{total_steps}] Installing Python dependencies...")
+            install_requirements(target)
         else:
-            print(f"  Installing optional skills (profile: {profile})...")
-            _run_skill_installer(target, profile)
-    else:
-        if interactive_skills:
-            print(f"[WARN] --interactive-skills ignored (--skip-skills is set)")
-        if profile != "core":
-            print(f"[WARN] --profile {profile} ignored (--skip-skills is set)")
-        print(f"[7/{total_steps}] Skills -- skipped (--skip-skills)")
-        total_steps = 6  # correction for display
+            print(f"[6/{total_steps}] Dependencies -- skipped (--no-deps)")
+
+        # Install optional skills
+        if not skip_skills:
+            if interactive_skills:
+                profile = "custom"
+
+            if profile in PROFILE_DESCRIPTIONS:
+                pd = PROFILE_DESCRIPTIONS[profile]
+                print(f"[7/{total_steps}] Optional Skills: {pd['title']} Profile")
+                print()
+                print(f"  {pd['tagline']}")
+                print(f"  {pd['desc']}")
+                print()
+                if pd['skills'] != "interactive" and pd['skills'] > 0:
+                    print(f"  Skills in this profile: {pd['skills']}")
+                    print()
+                if profile == "full":
+                    print(f"  [NOTE] Full profile installs all recommended skills.")
+                    print(f"         High-risk skills (CNKI, Zotero) are NOT auto-enabled.")
+                    print(f"         Start with a smaller profile if unsure.")
+                    print(f"         Recommended: install Core first, add skills later via /project:skills.")
+                    print()
+                if profile == "custom":
+                    print(f"  [NOTE] Custom profile lets you pick individual skills.")
+                    print(f"         You will see the full catalog with descriptions and risks.")
+                    print()
+            else:
+                print(f"[7/{total_steps}] Optional Skills: profile '{profile}'")
+
+            if dry_run:
+                print(f"  [DRY RUN] Would install skills for profile: {profile}")
+                print(f"  Run without --dry-run to actually install.")
+            else:
+                print(f"  Installing optional skills (profile: {profile})...")
+                _run_skill_installer(target, profile)
+        else:
+            if interactive_skills:
+                print(f"[WARN] --interactive-skills ignored (--skip-skills is set)")
+            if profile != "core":
+                print(f"[WARN] --profile {profile} ignored (--skip-skills is set)")
+            print(f"[7/{total_steps}] Skills -- skipped (--skip-skills)")
+            total_steps = 6
 
     # Done
     print()
     print("=" * 60)
     print("  PKB initialized successfully!")
     print("=" * 60)
+    if repo_url and "<your-username>" in repo_url:
+        print(f"  [NOTE] starter_repo_url is a placeholder. Set your fork URL before upgrading:")
+        print(f"         Edit pkb.config.json -> starter_repo_url")
+        print()
     print(f"""
 Next steps:
   cd "{target}"
@@ -529,7 +658,11 @@ Next steps:
   /project:pkb <file.pdf>     -- import a file
   /project:skills             -- manage optional skills
 
-  # Or open from anywhere:
+  # To check for pkb-starter updates:
+  python tools/pkb_update_client.py --dry-run
+  python tools/pkb_update_client.py
+
+  # Or from anywhere:
   claude --project "{target}"
 """)
     print(f"  Knowledge base location: {target}")

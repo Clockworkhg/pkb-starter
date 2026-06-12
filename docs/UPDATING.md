@@ -87,30 +87,69 @@ Migration scripts in `migrations/` must:
 
 ## For Installed PKB Users
 
+When pkb-starter releases a new version on GitHub, your installed knowledge base can be upgraded **without reinstalling**. All your data, config, and skills are preserved.
+
+### Update Modes
+
+#### Mode 1: Update client (recommended)
+
+The update client is installed in every KB at `tools/pkb_update_client.py`:
+
+```bash
+cd "D:\MyKB"
+python tools/pkb_update_client.py --dry-run    # Preview changes (safe)
+python tools/pkb_update_client.py              # Apply update
+```
+
+This reads `starter_repo_url` from `pkb.config.json`, clones/pulls the repo to `.pkb_system/starter_cache/`, then runs the updater.
+
+Or in Claude Code:
+```
+/project:update                  # Dry-run by default
+/project:update --apply          # Apply after review
+```
+
+#### Mode 2: Local starter path
+
+If you have a local pkb-starter clone:
+
+```bash
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --dry-run
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter"
+```
+
+#### Mode 3: Direct update_pkb.py (advanced)
+
+```bash
+python scripts/update_pkb.py "D:\MyKB" --dry-run
+python scripts/update_pkb.py "D:\MyKB"
+```
+
 ### Checking Your Version
 
 ```bash
 cat pkb.config.json | grep starter_version
 ```
 
-Or use the command:
+### Configuring starter_repo_url
 
-```
-/project:update --dry-run
-```
+Set `starter_repo_url` in `pkb.config.json` to your pkb-starter fork for online updates:
 
-### Updating
-
-```
-/project:update
+```json
+{
+  "starter_repo_url": "https://github.com/<your-username>/pkb-starter.git"
+}
 ```
 
-This will:
-1. Detect your current version.
+If not set, use `--repo-url` or `--starter-path` with the update client.
+
+### What the Update Does
+
+1. Detect your current version from `pkb.config.json`.
 2. Create a backup in `.pkb_backup/`.
 3. Run any pending migrations.
 4. Update system files.
-5. Generate `update_report.md`.
+5. Generate `update_report.md` and `update_client_report.md`.
 
 ### Preview Before Updating
 

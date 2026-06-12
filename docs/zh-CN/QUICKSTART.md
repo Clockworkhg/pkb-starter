@@ -24,6 +24,8 @@ cd pkb-starter
 python scripts/install.py "D:\MyKB"
 ```
 
+> **路径由你决定**：`D:\MyKB` 只是示例。你可以安装到任何路径——`E:\KnowledgeBase`、`C:\Users\...\Documents\PKB`、`F:\ResearchKB` 等。`install.py` 的第一个位置参数就是目标安装路径，无默认强制路径。推荐使用 ASCII 路径。也可使用交互模式：`python scripts/install.py --interactive`
+
 中文用户推荐使用中文模式安装：
 ```bash
 python scripts/install.py "D:\MyKB" --lang zh-CN
@@ -124,6 +126,22 @@ python scripts/skill_manager.py --target "D:\MyKB" --audit
 ```
 
 就是这样！你现在拥有了一个由 LLM 维护的、持续生长的个人知识库。
+
+## 保持更新
+
+当 pkb-starter 在 GitHub 上发布新版本时，无需重装即可升级系统文件：
+
+```bash
+cd "D:\MyKB"
+python tools/pkb_update_client.py --dry-run    # 预览变更
+python tools/pkb_update_client.py              # 执行更新
+```
+
+或在 Claude Code 中：`/project:update`（默认预览），`/project:update --apply` 确认执行。
+
+你的数据（`raw/`、`wiki/`、`_INBOX/`、`skills/_vendor/`）永不被触碰。所有配置设置始终保留。
+
+[完整更新指南 →](UPDATING.md)
 
 ---
 

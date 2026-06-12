@@ -30,6 +30,8 @@ Desktop.ini
 
 # Generated artifacts
 .pkb_backup/
+.pkb_system/
+update_client_report.md
 
 # Local test directories
 test-pkb-*/

@@ -318,6 +318,48 @@ python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 2. After migration, `/project:update` will be available
 3. Future updates can use the command directly
 
+### pkb_update_client.py not found
+
+**Cause**: Your KB was installed before v0.6.2-alpha. The update client is added in that version.
+
+**Fix**:
+1. Update manually once: `python scripts/update_pkb.py "D:\MyKB"` (from pkb-starter directory)
+2. After the update, `tools/pkb_update_client.py` will be available
+3. Future updates: `python tools/pkb_update_client.py`
+
+### Update client says "No valid starter_repo_url"
+
+**Cause**: `starter_repo_url` in `pkb.config.json` is not set or is a placeholder.
+
+**Fix**:
+1. Edit `pkb.config.json` and set `starter_repo_url` to your pkb-starter fork
+2. Or use `--starter-path "D:\pkb-starter"` to point to a local clone
+3. Or use `--repo-url https://github.com/<your-fork>/pkb-starter.git`
+
+### Install fails "Target directory not empty"
+
+**Cause**: The target install path already contains files.
+
+**Fix**:
+1. Use an empty directory: `python scripts/install.py "D:\MyKB"`
+2. Or use `--force` to overwrite: `python scripts/install.py "D:\MyKB" --force`
+3. Or use interactive mode to confirm: `python scripts/install.py --interactive`
+
+### No target path provided to install.py
+
+**Cause**: `install.py` requires a target path as the first positional argument.
+
+**Fix**:
+```bash
+# Provide a target path
+python scripts/install.py "D:\MyKB"
+
+# Or use interactive mode
+python scripts/install.py --interactive
+```
+
+The path can be any directory — `E:\KnowledgeBase`, `C:\Users\...\Documents\PKB`, etc. There is no default.
+
 ---
 
 ## Still Stuck?
