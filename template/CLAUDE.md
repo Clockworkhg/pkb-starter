@@ -110,4 +110,4 @@ Only pause to ask the user when:
 
 ---
 
-*Keep in sync with [AGENTS.md](AGENTS.md). Last updated: 2026-06-12*
+*Keep in sync with [AGENTS.md](AGENTS.md). Last updated: 2026-06-13*

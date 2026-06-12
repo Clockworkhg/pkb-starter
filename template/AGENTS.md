@@ -1,7 +1,7 @@
 # AGENTS.md — PKB System Rules
 
 > This is the PKB "constitution". All agent behavior must follow this file.
-> Version: 1.0.0 | Last updated: 2026-06-12
+> Version: 1.0.0 | Last updated: 2026-06-13
 >
 > Quick reference: [CLAUDE.md](CLAUDE.md) — loaded automatically every session
 
@@ -460,4 +460,4 @@ PKB uses Claude Code harness hooks to elevate security rules, health checks, and
 
 ---
 
-*Synchronized with CLAUDE.md. Last updated: 2026-06-12*
+*Synchronized with CLAUDE.md. Last updated: 2026-06-13*
