@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.2--alpha-blue)
+# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.3--alpha-blue)
 
 > **一个命令管理你的知识。** `/pkb <任何东西>` — 丢入 URL、文件或想法，LLM 自动整理一切。
 >
-> **当前版本**：v0.6.2-alpha
+> **当前版本**：v0.6.3-alpha
 
 语言：[English](README.md) | [简体中文](README.zh-CN.md)
 

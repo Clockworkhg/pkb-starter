@@ -1,6 +1,6 @@
 ---
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
+created: 2026-06-12
+updated: 2026-06-12
 tags: [meta, log]
 ---
 
@@ -8,7 +8,7 @@ tags: [meta, log]
 
 > 🏠 **Project-level log** — Records PKB system events (Git commits, Raw layer collection, tool changes, directory structure changes). Knowledge-layer changes: [[wiki/log]].
 
-## YYYY-MM-DD — PKB Initialized
+## 2026-06-12 — PKB Initialized
 
 - **pkb-starter** template installed
 - Directory structure created: `raw/`, `wiki/`, `skills/`, `tools/`, `templates/`
@@ -20,4 +20,4 @@ tags: [meta, log]
 
 ---
 
-*Auto-updated by `/save`. Last updated: YYYY-MM-DD*
+*Auto-updated by `/save`. Last updated: 2026-06-12*

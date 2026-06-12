@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.2--alpha-blue)
+# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.3--alpha-blue)
 
 > **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
 >
-> **Current version**: v0.6.2-alpha
+> **Current version**: v0.6.3-alpha
 
 Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 

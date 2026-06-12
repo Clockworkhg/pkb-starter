@@ -4,6 +4,38 @@ All notable changes to PKB Starter.
 
 ---
 
+## [0.6.3-alpha] — 2026-06-12
+
+### Fixed
+
+- Fixed fresh installs reporting stale documentation immediately after installation (replaced `YYYY-MM-DD` placeholders with actual dates in all template files).
+- Fixed `docs_update.py` incorrectly rewriting version strings into malformed values such as `v06-12` (version and date fields are now handled separately with context-anchored regex).
+- Fixed `/docs-update` behavior so protected rule files (`CLAUDE.md`, `AGENTS.md`) are reported for manual review instead of being overwritten.
+- Updated starter template docs (`index.md`, `log.md`, `AGENTS.md` EN/ZH) so v0.6.3-alpha installs are self-consistent with stale count = 0 on fresh install.
+- Updated version references in `install.py`, `pkb_update_client.py`, `update.md`, `README`, `QUICKSTART`, and `UPDATING` docs to v0.6.3-alpha.
+- Added `--check` and `--apply` flags to `docs_update.py` with safe, context-aware version/date replacement.
+- Updated `/docs-update` command to default to diagnostic mode, require explicit confirmation for apply, and never bypass ARS scope guard.
+- Added recovery instructions for users who installed v0.6.2-alpha (`docs/RECOVER_FROM_0.6.2_ALPHA.md` EN+ZH).
+- Confirmed PKB Starter has zero Bun dependencies — all hooks and tools are Python 3.9+.
+
+### Added
+
+- `docs/RECOVER_FROM_0.6.2_ALPHA.md` — English recovery guide for v0.6.2-alpha users.
+- `docs/zh-CN/RECOVER_FROM_0.6.2_ALPHA.md` — Chinese recovery guide for v0.6.2-alpha users.
+- Protected-file awareness in `docs_update.py`: `CLAUDE.md` and `AGENTS.md` are check-only, never auto-modified.
+
+### Migration
+
+Users on v0.6.2-alpha should update to v0.6.3-alpha using:
+```bash
+python tools/pkb_update_client.py --checkout v0.6.3-alpha          # dry-run (safe)
+python tools/pkb_update_client.py --checkout v0.6.3-alpha --apply  # apply changes
+```
+
+Users on older versions should update normally. See [UPDATING.md](docs/UPDATING.md) and [RECOVER_FROM_0.6.2_ALPHA.md](docs/RECOVER_FROM_0.6.2_ALPHA.md).
+
+---
+
 ## [0.6.2-alpha] — 2026-06-12
 
 This alpha release adds custom install paths, a built-in update client, and enhanced user data protection.

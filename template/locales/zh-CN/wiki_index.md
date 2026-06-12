@@ -1,6 +1,6 @@
 ---
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
+created: 2026-06-12
+updated: 2026-06-12
 tags: [index]
 type: index
 ---
@@ -33,4 +33,4 @@ type: index
 
 ---
 
-*本页面由 PKB 自动维护。最后更新：YYYY-MM-DD*
+*本页面由 PKB 自动维护。最后更新：2026-06-12*

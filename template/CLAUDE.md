@@ -42,10 +42,11 @@ tools/               Python helper scripts
 |------|---------|
 | `tools/web_pack.py` | Structured web collection |
 | `tools/pkb_auto.py` | Auto ingest + health check |
-| `tools/docs_update.py` | Documentation freshness check (`--json`/`--summary`) |
+| `tools/docs_update.py` | Documentation freshness check and safe apply (`--check`/`--apply`/`--json`/`--summary`) |
 | `tools/import_to_inbox.py` | File import to _INBOX |
 | `tools/sanitize.py` | Privacy pattern scanner |
 | `tools/pkb_update_client.py` | Check and apply pkb-starter updates |
+| `tools/zskill_bridge.py` | Z-skills compatibility bridge |
 
 ## Common Workflows
 
@@ -83,6 +84,17 @@ Only pause to ask the user when:
 - File cannot be parsed (corrupted or unsupported format)
 - Wiki page naming conflict that cannot auto-merge
 - Git commit pre-flight secret scan fails
+
+## Hooks
+
+| Hook | Event | Purpose |
+|------|-------|---------|
+| `01_session_start.py` | SessionStart | Environment validation + context card + docs freshness |
+| `02_pre_tool_use.py` | PreToolUse | Security gate: blocks secret commits, raw/ deletion |
+| `03_post_tool_use.py` | PostToolUse | Wiki frontmatter + post-commit health check |
+| `04_post_tool_use_failure.py` | PostToolUseFailure | 11-category error classification + recovery |
+| `05_stop.py` | Stop | Uncommitted change reminder + session summary |
+| `06_user_prompt_submit.py` | UserPromptSubmit | Smart routing suggestions |
 
 ---
 

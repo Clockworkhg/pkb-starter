@@ -66,11 +66,14 @@ Windows 支持中文路径，但为了减少 Python、Git、Shell、第三方工
 
 ### "Bun not found" 错误
 
-**原因**：某些依赖或脚本假设 Bun 运行时。
+**原因**：此消息来自外部 Claude Code hooks 或本机用户全局 hook 配置。PKB Starter 不使用也不依赖 Bun。
 
 **解决方法**：
-- PKB 使用 Python，不是 Bun。忽略 Bun 相关错误。
-- 确保 Python 3.9+ 和所需包已安装：`pip install -r requirements.txt`
+- PKB Starter 是 Python 项目——所有脚本和 hooks 均为 Python 3.9+。
+- "Bun not found" 消息是非阻塞的，不影响 PKB 操作。
+- 如果看到此消息，请检查全局 Claude Code hook 设置（`~/.claude/settings.json` 或 `%USERPROFILE%\.claude\settings.json`），查找可能引用 Bun 的 hooks。
+- 如果启用了自定义 hooks，请确保安装了所需的运行时，或禁用使用 Bun 的 hooks。
+- 验证 Python 依赖：`pip install -r requirements.txt`
 
 ### 健康检查报告大量断链
 

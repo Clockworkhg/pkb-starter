@@ -62,11 +62,14 @@ Languages: [English](TROUBLESHOOTING.md) | [简体中文](zh-CN/TROUBLESHOOTING.
 
 ### "Bun not found" errors
 
-**Cause**: Some dependencies or scripts assume Bun runtime.
+**Cause**: This message comes from external Claude Code hooks or user-global hook configurations on your machine. PKB Starter does NOT use or require Bun.
 
 **Fix**:
-- PKB uses Python, not Bun. Ignore Bun-related errors.
-- Ensure Python 3.9+ and required packages are installed: `pip install -r requirements.txt`
+- PKB Starter is a Python project — all scripts and hooks are Python 3.9+.
+- The "Bun not found" message is non-blocking and does not affect PKB operations.
+- If you see this message, check your global Claude Code hook settings (`~/.claude/settings.json` or `%USERPROFILE%\.claude\settings.json`) for hooks that may reference Bun.
+- If you have custom hooks enabled, ensure the required runtimes are installed, or disable the hooks that use Bun.
+- Verify Python dependencies: `pip install -r requirements.txt`
 
 ### Health check reports many broken links
 

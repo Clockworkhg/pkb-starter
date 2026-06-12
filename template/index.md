@@ -1,6 +1,6 @@
 ---
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
+created: 2026-06-12
+updated: 2026-06-12
 tags: [home, index]
 ---
 
@@ -42,7 +42,15 @@ LLM Wiki mode compiled personal knowledge base. Three-layer architecture: `raw/`
 - `tools/docs_update.py` — Project documentation auto-update
 - `tools/import_to_inbox.py` — File import to inbox
 - `tools/sanitize.py` — Privacy scan and sanitization
+- `tools/pkb_update_client.py` — Update pkb-starter system files
+- `tools/zskill_bridge.py` — Z-skills compatibility bridge
+
+### 🔗 Skills
+- [SKILL_LINKS](SKILL_LINKS.md) — Installed skills index and adapter registry
+
+### 🪝 Hooks
+- `.claude/hooks/` — 6 harness hooks (session start, pre-tool-use, post-tool-use, error recovery, stop, prompt submit)
 
 ---
 
-*Maintained by the PKB system. Last updated: YYYY-MM-DD*
+*Maintained by the PKB system. Last updated: 2026-06-12*

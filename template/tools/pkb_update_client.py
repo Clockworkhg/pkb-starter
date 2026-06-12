@@ -11,7 +11,7 @@ Usage:
     python tools/pkb_update_client.py --apply                  # apply changes
     python tools/pkb_update_client.py --repo-url <repo>
     python tools/pkb_update_client.py --starter-path <path>
-    python tools/pkb_update_client.py --checkout v0.6.2-alpha
+    python tools/pkb_update_client.py --checkout v0.6.3-alpha
 """
 
 import os

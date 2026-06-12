@@ -48,7 +48,8 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <what changed>"
 
 ### Version History
 
-- **v0.6.2-alpha**: Current. Custom install paths, built-in update client, enhanced config preservation.
+- **v0.6.3-alpha**: Current. Fresh install self-consistency, docs-update safety, recovery from v0.6.2-alpha.
+- **v0.6.2-alpha**: Custom install paths, built-in update client, enhanced config preservation.
 - **v0.5.0-alpha**: Adds sync/update/migration workflow. Baseline is v0.4.1-alpha.
 - **v0.4.1-alpha**: Z-Skills Compatibility Module (commit 9e8d33b). Introduced `tools/zskill_bridge.py`, `skill_adapters/z_skills_adapter.md`, `docs/Z_WEB_PACK_PARITY.md`, and skills_registry.
 
@@ -83,6 +84,18 @@ Migration scripts in `migrations/` must:
 - NEVER touch `raw/`, `wiki/`, `_INBOX/`
 - Be idempotent (safe to run multiple times)
 - Use ASCII output for GBK compatibility
+
+---
+
+## Recovering from v0.6.2-alpha
+
+If you installed v0.6.2-alpha and are seeing stale docs or malformed version strings, see the dedicated recovery guide: [RECOVER_FROM_0.6.2_ALPHA.md](RECOVER_FROM_0.6.2_ALPHA.md).
+
+Quick recovery:
+```bash
+python tools/pkb_update_client.py --checkout v0.6.3-alpha          # dry-run (safe)
+python tools/pkb_update_client.py --checkout v0.6.3-alpha --apply  # apply changes
+```
 
 ---
 

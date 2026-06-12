@@ -181,7 +181,7 @@ def generate_config(target: Path, lang: str = "en", repo_url: str = None, dry_ru
     config = {
         "name": target.name,
         "version": "0.1.0",
-        "starter_version": "0.6.2-alpha",
+        "starter_version": "0.6.3-alpha",
         "schema_version": "0.6.0",
         "created": today,
         "last_updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -538,7 +538,7 @@ def main():
         if not interactive_mode:
             sys.exit(1)
 
-    print(f"=== PKB Starter Installer v0.6.2-alpha ===")
+    print(f"=== PKB Starter Installer v0.6.3-alpha ===")
     print(f"Target: {target}")
     print(f"Language: {lang}")
     if dry_run:
