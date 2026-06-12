@@ -30,7 +30,7 @@ Do NOT pause or ask "next step?" unless one of these 6 conditions occurs:
 
 ## Collector
 
-`/pkb` uses **PKB web_pack** as the default collection engine.
+`/pkb` uses **auto-detection** to select the best available web collector. Priority: z-web-pack → built-in web_pack → WebFetch → gstack.
 
 | Usage | Mode | Behavior |
 |------|------|----------|
@@ -39,14 +39,25 @@ Do NOT pause or ask "next step?" unless one of these 6 conditions occurs:
 | `/pkb --manual <anything>` | full | 🤚 Manual — ask after collection |
 | `/pkb --collect-only <anything>` | full | 📦 Collect only — stop at raw/webpacks |
 | `/pkb --plan <anything>` | - | 📋 Plan only — generate plan, don't execute |
-| `/pkb --collector z-web-pack <url>` | full | 🔧 Use z-web-pack as collector backend |
+| `/pkb --collector z-web-pack <url>` | full | 🔧 Force z-web-pack collector |
+| `/pkb --collector webfetch <url>` | full | 🌐 Force WebFetch collector |
+| `/pkb --collector gstack <url>` | full | 🖥️ Force gstack collector |
 
 ### Collector Backends
 
-| Flag | Collector | Requirements |
-|------|-----------|-------------|
-| *(default)* | PKB basic web_pack | Always available (built-in) |
-| `--collector z-web-pack` | z-web-pack (local) | z-skills installed + audited + z-web-pack-local enabled |
+**Auto-detection flow:**
+1. Run `python tools/check_collectors.py --json` before any web collection
+2. Select highest-priority AVAILABLE collector
+3. Fall back through chain on any failure
+4. `--collector <name>` forces a specific backend, skipping detection
+
+| Flag | Collector | Auto-Detect | Requirements |
+|------|-----------|------------|-------------|
+| *(auto)* | Best available | **Yes** — `check_collectors.py` | None — always finds a working collector |
+| *(default)* | PKB basic web_pack | Yes | Python deps (requests, bs4) |
+| `--collector z-web-pack` | z-web-pack (local) | Yes | z-skills installed + audited + adapter enabled |
+| `--collector webfetch` | WebFetch | Yes | Always available |
+| `--collector gstack` | gstack | Yes | gstack skill registered |
 
 **If `--collector z-web-pack` is used but adapter is not enabled:**
 
@@ -55,6 +66,7 @@ z-web-pack local adapter is not enabled.
 Use /project:skills --install z-skills,
 /project:skills --audit z-skills,
 then /project:skills --enable z-web-pack-local.
+Falling back to built-in web_pack...
 ```
 
 **When z-web-pack collector is enabled:**
@@ -68,6 +80,14 @@ then /project:skills --enable z-web-pack-local.
 ---
 
 ## 🚀 Default Autopilot (10 Steps, No Pauses)
+
+#### Step 0: Collector Health Check (for web URLs only)
+If input contains `http://` or `https://`:
+Run `python tools/check_collectors.py --json`.
+Parse recommendation. Use recommended collector.
+If recommended collector is DEGRADED, fall back to next AVAILABLE in fallback chain.
+Report which collector was selected and why.
+**Never fail** because a specific collector is missing.
 
 #### Step 1: Parse input → classify (file / folder / GitHub / web / existing webpack)
 #### Step 2: Collect → copy files or run web_pack.py

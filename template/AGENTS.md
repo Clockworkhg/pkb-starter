@@ -53,10 +53,13 @@ When receiving `/pkb <anything>`, the agent must auto-classify by priority:
 
 ### 2.3 HTTP/HTTPS URL
 **Trigger**: Input contains `http://` or `https://`.
-**Action**: Run `python tools/web_pack.py --topic "<topic>" --url "<url>"` → collect web content to `raw/webpacks/YYYY-MM-DD-topic/`.
-- Default mode: `full` (complete image pipeline + yt-dlp)
-- GitHub repos auto-use GitHub Collector mode (API → git clone)
-- Content extraction: readability-lxml → trafilatura → BeautifulSoup → Jina (fallback chain)
+**Action**:
+  1. **Run `python tools/check_collectors.py --json`** to detect the best available collector
+  2. Use the recommended collector (see §2.X for full priority rules)
+  3. If collection succeeds: continue to Step 3 (auto ingest)
+  4. If collection fails: try next collector in `fallback_chain`
+
+**NEVER assume z-web-pack is available.** Always run the health check. Always auto-fallback.
 
 ### 2.4 Question / Keywords
 **Trigger**: Doesn't match any above pattern.
@@ -77,11 +80,47 @@ Call `python tools/import_to_inbox.py`:
 
 ## IV. Web Collection Rules
 
+### 4.0 Collector Health Check (MANDATORY)
+
+**Before any web collection**, run `python tools/check_collectors.py --json`. Parse the `recommendation` and use the recommended collector. Never skip this step. Never assume z-web-pack is available.
+
+### 4.1 Collector Priority
+
+| Priority | Collector | When to Use |
+|----------|-----------|-------------|
+| 1 | z-web-pack (local) | Fully available: installed + audited + adapter enabled + bridge executable |
+| 2 | PKB built-in web_pack | Python deps (requests, bs4) importable |
+| 3 | WebFetch (Claude Code built-in) | Always available — single-page, JS-rendered pages that web_pack can't handle |
+| 4 | gstack (headless browser) | gstack skill registered — complex interactions, login-required pages |
+
+### 4.2 Fallback Rules
+
+1. **Auto-fallback**: If the recommended collector is DEGRADED or UNAVAILABLE, skip to the next AVAILABLE collector in priority order.
+2. **Runtime failure**: If the selected collector fails at runtime, retry with the next collector in `recommendation.fallback_chain`.
+3. **Never fail** because a collector is missing. WebFetch is the ultimate fallback — always available.
+4. **Explicit override**: If `--collector <name>` is passed, skip detection and use that collector directly. If it fails, report and suggest alternatives — do not silently fall back.
+5. **JS-rendered pages**: If `web_pack.py` returns weak/empty content (detected via `detect_content_weakness()`), automatically retry with WebFetch.
+
+### 4.3 Built-in Collector
+
 Call `python tools/web_pack.py`:
 1. Extract content from each URL (readability algorithm or BeautifulSoup)
 2. Download in-page images to `assets/` subdirectory
 3. Generate structured webpack directory
 4. Create source index page under `wiki/sources/`
+
+### 4.4 WebFetch Collector
+
+Use Claude Code's built-in WebFetch tool:
+1. Fetch single page content
+2. Create `raw/webpacks/<YYYY-MM-DD>-<topic>/` directory
+3. Save content as `snapshots/<page>.md`
+4. Generate minimal `manifest.json` and `README.md`
+5. Note: no depth crawling, no image download — single page only
+
+### 4.5 gstack Collector
+
+Use gstack skill for headless browser collection. Best for JS-heavy SPAs, login-required pages, multi-step interactions. Route output to `raw/webpacks/<topic>/`.
 
 ---
 

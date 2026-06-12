@@ -40,6 +40,7 @@ tools/               Python helper scripts
 
 | Tool | Purpose |
 |------|---------|
+| `tools/check_collectors.py` | Collector availability detection — run before any web collection (`--json` / `--recommend`) |
 | `tools/web_pack.py` | Structured web collection |
 | `tools/pkb_auto.py` | Auto ingest + health check |
 | `tools/docs_update.py` | Documentation freshness check and safe apply (`--check`/`--apply`/`--json`/`--summary`) |
@@ -67,6 +68,17 @@ Auto-update docs → health check → commit. Omitting the message auto-generate
 /docs-update
 ```
 Diagnose + fix project docs, no commit. `/save` includes this step.
+
+## Collector Priority
+
+When collecting web content, run `python tools/check_collectors.py --json` first. Priority order:
+
+1. **z-web-pack** — if fully installed, audited, adapter enabled, and bridge executable
+2. **PKB built-in web_pack** — if Python deps (requests, bs4) are importable
+3. **WebFetch** — always available as ultimate fallback (single-page only)
+4. **gstack** — if registered as an available skill (complex JS pages)
+
+**Never assume z-web-pack is available.** Always run the health check. Always auto-fallback — never fail because a specific collector is missing.
 
 ## Code of Conduct
 
