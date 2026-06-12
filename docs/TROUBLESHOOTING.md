@@ -332,12 +332,18 @@ python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 
 ### Update client says "No valid starter_repo_url"
 
-**Cause**: `starter_repo_url` in `pkb.config.json` is not set or is a placeholder.
+**Cause**: `starter_repo_url` in `pkb.config.json` is not set or is the old `<your-username>` placeholder (common on v0.6.2-alpha installs).
 
-**Fix**:
-1. Edit `pkb.config.json` and set `starter_repo_url` to your pkb-starter fork
+**Fix** (one step) — use the official repo and save it to config:
+```bash
+python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha --apply
+```
+
+After `--apply`, the URL is saved to `pkb.config.json` and future `/update` calls work without `--repo-url`.
+
+**Alternative fixes**:
+1. Edit `pkb.config.json` and set `starter_repo_url` to your fork or the official repo
 2. Or use `--starter-path "D:\pkb-starter"` to point to a local clone
-3. Or use `--repo-url https://github.com/<your-fork>/pkb-starter.git`
 
 ### Install fails "Target directory not empty"
 

@@ -72,7 +72,7 @@ python scripts/update_pkb.py "<KB_ROOT>" --dry-run
 For custom repo or version:
 ```
 python tools/pkb_update_client.py --repo-url https://github.com/<your-fork>/pkb-starter.git
-python tools/pkb_update_client.py --checkout v0.6.3-alpha
+python tools/pkb_update_client.py --checkout v0.6.4-alpha
 ```
 
 ## What Gets Updated

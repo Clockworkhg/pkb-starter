@@ -2,7 +2,7 @@
 
 > 5 minutes to your own LLM-powered personal knowledge base.
 >
-> **Version**: v0.6.3-alpha
+> **Version**: v0.6.4-alpha
 
 Languages: [English](QUICKSTART.md) | [简体中文](zh-CN/QUICKSTART.md)
 
@@ -135,6 +135,13 @@ python tools/pkb_update_client.py --apply      # Apply the update
 ```
 
 Or in Claude Code: `/project:update` (dry-run by default), `/project:update --apply` to apply.
+
+**Default update source**: Fresh installs use the official pkb-starter repo (`https://github.com/Clockworkhg/pkb-starter.git`). Fork users can override this:
+
+```bash
+# Set a custom fork URL (saved to config after --apply)
+python tools/pkb_update_client.py --repo-url "https://github.com/<your-fork>/pkb-starter.git" --apply
+```
 
 Your data (`raw/`, `wiki/`, `_INBOX/`, `skills/_vendor/`) is never touched. All config settings are preserved.
 

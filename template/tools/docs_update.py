@@ -25,7 +25,7 @@ from datetime import datetime, timezone
 ROOT = Path(__file__).resolve().parent.parent
 
 # ── Configuration ─────────────────────────────────────────────────
-CURRENT_VERSION = "v0.6.3-alpha"
+CURRENT_VERSION = "v0.6.4-alpha"
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # Docs that are safe to auto-fix with --apply
@@ -177,7 +177,7 @@ def check_doc_freshness(doc_name):
 
         # Version check — detect old/placeholder versions
         if "v0.5.0-alpha" in content:
-            stale.append("version: v0.5.0-alpha found (should be v0.6.3-alpha)")
+            stale.append(f"version: v0.5.0-alpha found (should be {CURRENT_VERSION})")
 
     elif doc_name == "COMMANDS.md":
         cmds = get_commands()

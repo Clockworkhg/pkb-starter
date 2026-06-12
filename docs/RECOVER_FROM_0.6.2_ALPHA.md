@@ -29,17 +29,41 @@ Users on older versions (v0.5.0-alpha and earlier) who updated to v0.6.2-alpha a
 - ❌ **Do NOT manually edit random system files** unless you know exactly what changed.
 - ❌ **Do NOT force-reset** if you already added personal notes.
 - ❌ **Do NOT reinstall over your existing KB** — this could overwrite your data.
-- ❌ **Do NOT run `/docs-update` on v0.6.2-alpha** — wait until you've updated to v0.6.3-alpha.
+- ❌ **Do NOT run `/docs-update` on v0.6.2-alpha** — wait until you've updated to v0.6.4-alpha.
 
-## 4. Safe Update to v0.6.3-alpha
+## 4. If Your Update Source Is Still a Placeholder
 
-v0.6.3-alpha fixes all these issues. Use the built-in update client:
+v0.6.2-alpha installs wrote a placeholder `starter_repo_url` into `pkb.config.json`:
+
+```json
+"starter_repo_url": "https://github.com/<your-username>/pkb-starter.git"
+```
+
+This causes the update client to fail with "No valid starter_repo_url configured."
+
+**Fix it in one step:**
+
+```bash
+cd "<your-kb-path>"
+
+# This uses the official repo, applies the update, AND saves the URL for future use:
+python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha
+python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha --apply
+```
+
+After `--apply`, `starter_repo_url` is updated in `pkb.config.json` and you can use `/update` directly going forward.
+
+If you use a personal fork, replace the URL with your fork URL.
+
+## 5. Safe Update to v0.6.4-alpha
+
+v0.6.4-alpha fixes all these issues. Use the built-in update client:
 
 ```bash
 cd "<your-kb-path>"
 
 # Step 1: Preview what will change (safe, no files modified)
-python tools/pkb_update_client.py --checkout v0.6.3-alpha
+python tools/pkb_update_client.py --checkout v0.6.4-alpha
 
 # Step 2: Review the report
 # Open update_client_report.md and check:
@@ -48,7 +72,7 @@ python tools/pkb_update_client.py --checkout v0.6.3-alpha
 #   - No _INBOX/ files in planned changes
 
 # Step 3: Apply the update
-python tools/pkb_update_client.py --checkout v0.6.3-alpha --apply
+python tools/pkb_update_client.py --checkout v0.6.4-alpha --apply
 ```
 
 **After update, verify:**
@@ -64,7 +88,7 @@ Expected output:
 - No malformed `v06-12` version
 - `[OK]` for all tracked docs
 
-## 5. If Docs Were Already Modified by /docs-update on v0.6.2-alpha
+## 6. If Docs Were Already Modified by /docs-update on v0.6.2-alpha
 
 If you ran `/docs-update` while on v0.6.2-alpha, your docs may have incorrect version strings or date values.
 
@@ -72,16 +96,16 @@ If you ran `/docs-update` while on v0.6.2-alpha, your docs may have incorrect ve
 
 1. **Run dry-run first:**
    ```bash
-   python tools/pkb_update_client.py --checkout v0.6.3-alpha
+   python tools/pkb_update_client.py --checkout v0.6.4-alpha
    ```
 
 2. **Check the update report:**
-   - If `update_client_report.md` lists core doc conflicts, accept the v0.6.3-alpha template versions (unless you intentionally customized them).
+   - If `update_client_report.md` lists core doc conflicts, accept the v0.6.4-alpha template versions (unless you intentionally customized them).
    - If you see your personal wiki notes or raw files in planned changes, **STOP** and ask for help.
 
 3. **Apply the update:**
    ```bash
-   python tools/pkb_update_client.py --checkout v0.6.3-alpha --apply
+   python tools/pkb_update_client.py --checkout v0.6.4-alpha --apply
    ```
 
 4. **Verify:**
@@ -89,7 +113,7 @@ If you ran `/docs-update` while on v0.6.2-alpha, your docs may have incorrect ve
    python tools/docs_update.py --check
    ```
 
-## 6. If the Update Client Is Missing or Broken
+## 7. If the Update Client Is Missing or Broken
 
 If `tools/pkb_update_client.py` is missing (installed before v0.6.2-alpha) or broken:
 
@@ -97,24 +121,24 @@ If `tools/pkb_update_client.py` is missing (installed before v0.6.2-alpha) or br
 
 ```bash
 cd "<your-kb-path>"
-python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --checkout v0.6.3-alpha
-python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --checkout v0.6.3-alpha --apply
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --checkout v0.6.4-alpha
+python tools/pkb_update_client.py --starter-path "D:\pkb-starter" --checkout v0.6.4-alpha --apply
 ```
 
 **Option B: Fresh install for comparison, then manual update**
 
 ```bash
-# Install fresh v0.6.3-alpha to a temp directory for comparison
+# Install fresh v0.6.4-alpha to a temp directory for comparison
 git clone https://github.com/pkb-starter/pkb-starter.git D:\pkb-starter-temp
 cd D:\pkb-starter-temp
-git checkout v0.6.3-alpha
+git checkout v0.6.4-alpha
 python scripts/install.py E:\pkb-fresh-063 --force
 
 # Compare system files between fresh install and your KB
 # Manually copy only system template files that need updating
 ```
 
-## 7. Verify After Update
+## 8. Verify After Update
 
 Run all checks:
 
@@ -127,14 +151,14 @@ python tools/docs_update.py --check
 
 # Check version in config
 python -c "import json; c=json.load(open('pkb.config.json')); print(c.get('starter_version'))"
-# Expected: v0.6.3-alpha
+# Expected: v0.6.4-alpha
 
 # Check no malformed versions in docs
 python -c "import re, pathlib; [print(f'{f.name}: v06-12') for f in pathlib.Path('.').glob('*.md') if 'v06-12' in f.read_text()]"
 # Expected: no output
 ```
 
-## 8. When to Ask for Help
+## 9. When to Ask for Help
 
 Contact the pkb-starter maintainers if:
 
@@ -145,4 +169,4 @@ Contact the pkb-starter maintainers if:
 
 ---
 
-*This guide applies to v0.6.2-alpha → v0.6.3-alpha migration. For general update information, see [UPDATING.md](UPDATING.md).*
+*This guide applies to v0.6.2-alpha/v0.6.3-alpha → v0.6.4-alpha migration. For general update information, see [UPDATING.md](UPDATING.md).*

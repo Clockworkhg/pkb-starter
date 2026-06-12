@@ -48,7 +48,8 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <what changed>"
 
 ### Version History
 
-- **v0.6.3-alpha**: Current. Fresh install self-consistency, docs-update safety, recovery from v0.6.2-alpha.
+- **v0.6.4-alpha**: Current. Fixes default starter_repo_url placeholder, official update source for fresh installs.
+- **v0.6.3-alpha**: Fresh install self-consistency, docs-update safety, recovery from v0.6.2-alpha.
 - **v0.6.2-alpha**: Custom install paths, built-in update client, enhanced config preservation.
 - **v0.5.0-alpha**: Adds sync/update/migration workflow. Baseline is v0.4.1-alpha.
 - **v0.4.1-alpha**: Z-Skills Compatibility Module (commit 9e8d33b). Introduced `tools/zskill_bridge.py`, `skill_adapters/z_skills_adapter.md`, `docs/Z_WEB_PACK_PARITY.md`, and skills_registry.
@@ -93,8 +94,8 @@ If you installed v0.6.2-alpha and are seeing stale docs or malformed version str
 
 Quick recovery:
 ```bash
-python tools/pkb_update_client.py --checkout v0.6.3-alpha          # dry-run (safe)
-python tools/pkb_update_client.py --checkout v0.6.3-alpha --apply  # apply changes
+python tools/pkb_update_client.py --checkout v0.6.4-alpha          # dry-run (safe)
+python tools/pkb_update_client.py --checkout v0.6.4-alpha --apply  # apply changes
 ```
 
 ---
@@ -147,15 +148,21 @@ cat pkb.config.json | grep starter_version
 
 ### Configuring starter_repo_url
 
-Set `starter_repo_url` in `pkb.config.json` to your pkb-starter fork for online updates:
+Fresh v0.6.4-alpha installs default to the official starter repo:
 
 ```json
 {
-  "starter_repo_url": "https://github.com/<your-username>/pkb-starter.git"
+  "starter_repo_url": "https://github.com/Clockworkhg/pkb-starter.git"
 }
 ```
 
-If not set, use `--repo-url` or `--starter-path` with the update client.
+Fork users can change this to their own fork URL. If your config still shows the old `<your-username>` placeholder (from v0.6.2-alpha), fix it with:
+
+```bash
+python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha --apply
+```
+
+After `--apply`, the repo URL is saved to `pkb.config.json` for future updates. If not set, use `--repo-url` or `--starter-path` with the update client.
 
 ### What the Update Does
 

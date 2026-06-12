@@ -17,7 +17,7 @@ Usage:
     python scripts/install.py "<target_directory>" --force
     python scripts/install.py "<target_directory>" --lang zh-CN
     python scripts/install.py "<target_directory>" --lang bilingual
-    python scripts/install.py "<target_directory>" --repo-url https://github.com/<user>/pkb-starter.git
+    python scripts/install.py "<target_directory>" --repo-url https://github.com/<your-fork>/pkb-starter.git
     python scripts/install.py --interactive
     python scripts/install.py --interactive --dry-run
 """
@@ -32,6 +32,8 @@ from datetime import datetime, timezone
 
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "template"
 SKILLS_DIR = Path(__file__).resolve().parent.parent / "skills"
+
+DEFAULT_STARTER_REPO_URL = "https://github.com/Clockworkhg/pkb-starter.git"
 
 
 def copy_template(target: Path, force: bool = False) -> list[str]:
@@ -174,14 +176,14 @@ def generate_config(target: Path, lang: str = "en", repo_url: str = None, dry_ru
         wiki_language = "en"
         output_language = "en"
 
-    # Repo URL — use provided value or a placeholder
+    # Repo URL — use provided value or the official default
     if not repo_url:
-        repo_url = "https://github.com/<your-username>/pkb-starter.git"
+        repo_url = DEFAULT_STARTER_REPO_URL
 
     config = {
         "name": target.name,
         "version": "0.1.0",
-        "starter_version": "0.6.3-alpha",
+        "starter_version": "0.6.4-alpha",
         "schema_version": "0.6.0",
         "created": today,
         "last_updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -458,7 +460,8 @@ def _interactive_prompt():
 
     # Repo URL
     print()
-    repo_url = input("Starter repo URL (leave blank for placeholder): ").strip()
+    print(f"Official starter repo: {DEFAULT_STARTER_REPO_URL}")
+    repo_url = input("Custom repo URL (leave blank to use official, or enter your fork URL): ").strip()
     if not repo_url:
         repo_url = None
 
@@ -538,7 +541,7 @@ def main():
         if not interactive_mode:
             sys.exit(1)
 
-    print(f"=== PKB Starter Installer v0.6.3-alpha ===")
+    print(f"=== PKB Starter Installer v0.6.4-alpha ===")
     print(f"Target: {target}")
     print(f"Language: {lang}")
     if dry_run:
@@ -661,8 +664,9 @@ def main():
     print("  PKB initialized successfully!")
     print("=" * 60)
     if repo_url and "<your-username>" in repo_url:
-        print(f"  [NOTE] starter_repo_url is a placeholder. Set your fork URL before upgrading:")
-        print(f"         Edit pkb.config.json -> starter_repo_url")
+        print(f"  [NOTE] starter_repo_url still contains '<your-username>' placeholder.")
+        print(f"         Edit pkb.config.json -> starter_repo_url to your actual fork URL,")
+        print(f"         or set it to the official repo: {DEFAULT_STARTER_REPO_URL}")
         print()
     print(f"""
 Next steps:

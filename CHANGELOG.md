@@ -4,6 +4,36 @@ All notable changes to PKB Starter.
 
 ---
 
+## [0.6.4-alpha] — 2026-06-12
+
+### Fixed
+
+- Fixed default `starter_repo_url` still using the `<your-username>` placeholder in fresh installs — now defaults to the official repo `https://github.com/Clockworkhg/pkb-starter.git`.
+- Fixed `pkb_update_client.py` to detect old placeholder `starter_repo_url` and guide users to fix it (with `--repo-url` flag).
+- `pkb_update_client.py --apply` now writes the `--repo-url` back to `pkb.config.json` so future `/update` calls work without repeating the flag.
+- Preserved `--repo-url` override behavior for fork users.
+- Confirmed dry-run does not modify `pkb.config.json` and `--apply` writes back the selected repo URL safely.
+
+### Migration
+
+Users on v0.6.2-alpha or v0.6.3-alpha should update to v0.6.4-alpha:
+```bash
+python tools/pkb_update_client.py --checkout v0.6.4-alpha          # dry-run (safe)
+python tools/pkb_update_client.py --checkout v0.6.4-alpha --apply  # apply changes
+```
+
+If `starter_repo_url` is still the `<your-username>` placeholder, use:
+```bash
+python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha
+python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha --apply
+```
+
+After `--apply`, the official repo URL is saved to `pkb.config.json` and future `/update` calls work without the `--repo-url` flag.
+
+See [UPDATING.md](docs/UPDATING.md) and [RECOVER_FROM_0.6.2_ALPHA.md](docs/RECOVER_FROM_0.6.2_ALPHA.md).
+
+---
+
 ## [0.6.3-alpha] — 2026-06-12
 
 ### Fixed
@@ -26,13 +56,13 @@ All notable changes to PKB Starter.
 
 ### Migration
 
-Users on v0.6.2-alpha should update to v0.6.3-alpha using:
+Users on v0.6.2-alpha should update to v0.6.4-alpha using:
 ```bash
-python tools/pkb_update_client.py --checkout v0.6.3-alpha          # dry-run (safe)
-python tools/pkb_update_client.py --checkout v0.6.3-alpha --apply  # apply changes
+python tools/pkb_update_client.py --checkout v0.6.4-alpha          # dry-run (safe)
+python tools/pkb_update_client.py --checkout v0.6.4-alpha --apply  # apply changes
 ```
 
-Users on older versions should update normally. See [UPDATING.md](docs/UPDATING.md) and [RECOVER_FROM_0.6.2_ALPHA.md](docs/RECOVER_FROM_0.6.2_ALPHA.md).
+See [UPDATING.md](docs/UPDATING.md) and [RECOVER_FROM_0.6.2_ALPHA.md](docs/RECOVER_FROM_0.6.2_ALPHA.md).
 
 ---
 

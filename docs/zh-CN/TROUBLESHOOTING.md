@@ -336,12 +336,18 @@ python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 
 ### 更新客户端提示 "No valid starter_repo_url"
 
-**原因**：`pkb.config.json` 中的 `starter_repo_url` 未设置或者是占位符。
+**原因**：`pkb.config.json` 中的 `starter_repo_url` 未设置或是旧的 `<your-username>` 占位符（常见于 v0.6.2-alpha 安装）。
 
-**解决方法**：
-1. 编辑 `pkb.config.json`，将 `starter_repo_url` 设置为你的 pkb-starter fork
+**解决方法**（一步修复）—— 使用官方仓库并将 URL 保存到配置：
+```bash
+python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha --apply
+```
+
+`--apply` 后，URL 会保存到 `pkb.config.json`，之后可直接使用 `/update`。
+
+**替代方案**：
+1. 编辑 `pkb.config.json`，将 `starter_repo_url` 设置为你的 fork 或官方仓库
 2. 或使用 `--starter-path "D:\pkb-starter"` 指向本地克隆
-3. 或使用 `--repo-url https://github.com/<your-fork>/pkb-starter.git`
 
 ### 安装失败 "Target directory not empty"
 

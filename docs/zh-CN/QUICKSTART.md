@@ -2,7 +2,7 @@
 
 > 5 分钟搭建你自己的 LLM 驱动个人知识库。
 >
-> **版本**：v0.6.3-alpha
+> **版本**：v0.6.4-alpha
 
 语言：[English](../QUICKSTART.md) | [简体中文](QUICKSTART.md)
 
@@ -140,6 +140,13 @@ python tools/pkb_update_client.py --apply      # 执行更新
 ```
 
 或在 Claude Code 中：`/project:update`（默认预览），`/project:update --apply` 确认执行。
+
+**默认更新源**：全新安装使用官方 pkb-starter 仓库（`https://github.com/Clockworkhg/pkb-starter.git`）。Fork 用户可以覆盖：
+
+```bash
+# 设置自定义 fork URL（--apply 后保存到配置）
+python tools/pkb_update_client.py --repo-url "https://github.com/<your-fork>/pkb-starter.git" --apply
+```
 
 你的数据（`raw/`、`wiki/`、`_INBOX/`、`skills/_vendor/`）永不被触碰。所有配置设置始终保留。
 
