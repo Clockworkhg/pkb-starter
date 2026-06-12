@@ -257,11 +257,13 @@ tools/pkb_auto.py            5. 许可证检查                 template/tools/p
 ### 脱敏
 
 在任何文件到达 pkb-starter 之前：
-1. 个人路径被替换（`D:\PKB_个人知识库` -> `<PKB_ROOT>`）
+1. 个人路径被替换（`<PRIVATE_PKB_ROOT>` -> `<PKB_ROOT>`）
 2. 邮箱地址被替换（`user@example.com` -> `<USER_EMAIL>`）
-3. 用户名变体被替换（`Hershel` -> `<USER_NAME>`）
+3. 用户名变体被替换（`JohnDoe` -> `<USER_NAME>`）
 4. 剩余的通用邮箱被捕获并替换
 5. 敏感关键字（token、password、api_key）被标记
+
+> **占位符说明**：`<PRIVATE_PKB_ROOT>` 表示维护者自己的私有 PKB 目录。`<PKB_STARTER_ROOT>` 表示公开模板仓库。普通用户不需要运行私有 PKB → starter 同步流程 — 本节仅记录维护者流水线。
 
 ### 什么不能同步
 

@@ -257,11 +257,13 @@ tools/pkb_auto.py              5. License check              template/tools/pkb_
 ### Sanitization
 
 Before any file reaches pkb-starter:
-1. Personal paths are replaced (`D:\PKB_个人知识库` -> `<PKB_ROOT>`)
+1. Personal paths are replaced (`<PRIVATE_PKB_ROOT>` -> `<PKB_ROOT>`)
 2. Email addresses are replaced (`user@example.com` -> `<USER_EMAIL>`)
-3. User name variants are replaced (`Hershel` -> `<USER_NAME>`)
+3. User name variants are replaced (`JohnDoe` -> `<USER_NAME>`)
 4. Remaining generic emails are caught and replaced
 5. Sensitive keywords (token, password, api_key) are flagged
+
+> **Placeholder notes**: `<PRIVATE_PKB_ROOT>` represents the maintainer's private PKB directory. `<PKB_STARTER_ROOT>` represents the public template repository. Regular users do not need to run the private PKB → starter sync flow — this section documents the maintainer pipeline only.
 
 ### What Cannot Sync
 
