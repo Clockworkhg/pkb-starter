@@ -48,7 +48,8 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <what changed>"
 
 ### Version History
 
-- **v0.6.4-alpha**: Current. Fixes default starter_repo_url placeholder, official update source for fresh installs.
+- **v0.6.5-alpha**: Current. Adds optional z-web-pack compatibility layer (`tools/pkb_compat/`), collector health check (`tools/check_collectors.py`), and bridge execution support. Built-in web_pack remains the default.
+- **v0.6.4-alpha**: Fixes default starter_repo_url placeholder, official update source for fresh installs.
 - **v0.6.3-alpha**: Fresh install self-consistency, docs-update safety, recovery from v0.6.2-alpha.
 - **v0.6.2-alpha**: Custom install paths, built-in update client, enhanced config preservation.
 - **v0.5.0-alpha**: Adds sync/update/migration workflow. Baseline is v0.4.1-alpha.

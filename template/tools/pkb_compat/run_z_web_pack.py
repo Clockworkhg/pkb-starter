@@ -45,20 +45,47 @@ def deploy_compat_base(pkb_root: Path) -> Path:
     Ensure the compat base module exists at the path collect_web_pack.py expects:
         .agent/skills/1-web-research-pack/scripts/collect_web_research_pack.py
 
+    Checks multiple source locations for the compat base:
+      1. tools/pkb_compat/web_research_pack_base.py (template-distributed)
+      2. .pkb_local/patches/web_research_pack_base.py (user-customized)
+
+    Also checks if real base already exists (skip deploy if so).
+
     Returns the path to the deployed base script.
     """
     target_dir = pkb_root / ".agent" / "skills" / "1-web-research-pack" / "scripts"
     target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / "collect_web_research_pack.py"
 
-    compat_source = pkb_root / ".pkb_local" / "patches" / "web_research_pack_base.py"
+    # Check if real base already exists
+    if target.is_file():
+        # Verify it's the real module, not a compat deployment
+        content = target.read_text(encoding="utf-8", errors="replace")
+        if "1-web-research-pack" in content and "PKB compat" not in content:
+            print(f"[PKB runner] z-web-pack detected (real base found)")
+            return target
 
-    if compat_source.is_file():
+    # Find compat base source: try template-distributed first, then user-customized
+    compat_sources = [
+        pkb_root / "tools" / "pkb_compat" / "web_research_pack_base.py",
+        pkb_root / ".pkb_local" / "patches" / "web_research_pack_base.py",
+    ]
+    compat_source = None
+    for src in compat_sources:
+        if src.is_file():
+            compat_source = src
+            break
+
+    if compat_source:
+        print(f"[PKB runner] base dependency missing — deploying PKB compatibility base")
         shutil.copy2(compat_source, target)
-        print(f"[PKB runner] Deployed compat base: {target}")
+        print(f"[PKB runner] PKB compatibility base deployed: {target}")
+        print(f"[PKB runner] readability-lxml unavailable; using BS4 fallback (via compat base)")
     elif not target.is_file():
         raise FileNotFoundError(
-            f"Compat base not found at {compat_source}. "
+            f"Compat base not found. Checked:\n"
+            f"  {compat_sources[0]}\n"
+            f"  {compat_sources[1]}\n"
             "Run 'python tools/zskill_bridge.py status' to check installation."
         )
     return target
@@ -95,7 +122,7 @@ def inject_dummy_readability(pkb_root: Path) -> Path:
             "# readability-lxml: pip install readability-lxml\n",
             encoding="utf-8",
         )
-        print(f"[PKB runner] Injected dummy readability: {readability_dir}")
+        print(f"[PKB runner] readability-lxml unavailable; injected dummy for import check (BS4 fallback)")
 
     return readability_dir
 
@@ -182,6 +209,12 @@ def main():
 
     if result.returncode != 0:
         print(f"\n[PKB runner] z-web-pack exited with code {result.returncode}")
+        # Special hint: if AttributeError about readability, point to the actual cause
+        print("[PKB runner] If the error mentions 'readability', the upstream script")
+        print("[PKB runner] has added real readability API calls. Install readability-lxml:")
+        print("[PKB runner]   pip install readability-lxml")
+        print("[PKB runner] Then remove the dummy at .agent/skills/1-web-research-pack/readability/")
+        print("[PKB runner] Falling back to built-in web_pack...")
     else:
         print(f"\n[PKB runner] z-web-pack completed successfully")
 

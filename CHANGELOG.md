@@ -4,6 +4,33 @@ All notable changes to PKB Starter.
 
 ---
 
+## [0.6.5-alpha] — 2026-06-12
+
+### Added
+
+- Added optional z-web-pack compatibility layer.
+- Added PKB compatibility base (`tools/pkb_compat/web_research_pack_base.py`) for missing 1-web-research-pack dependency.
+- Added `tools/pkb_compat/run_z_web_pack.py` — standalone z-web-pack runner with runtime compat base deployment.
+- Added collector health check (`tools/check_collectors.py`) — detects availability of built-in web_pack, z-web-pack, WebFetch, and gstack.
+- Added WebFetch and gstack collector documentation to `/web` and `/pkb` commands.
+
+### Changed
+
+- `zskill_bridge.py run` now executes z-skill scripts through `subprocess.run()` instead of only printing instructions.
+- `/web` and `/pkb` collector routing now checks collector health before choosing a collector.
+- Built-in web_pack remains the default recommended collector; z-web-pack is opt-in.
+- `check_collectors.py` supports `--json`, `--recommend`, and `--quiet` flags for CI/automation use.
+
+### Safety
+
+- z-web-pack remains optional and is not a PKB core dependency.
+- Video downloading defaults to `off`; `--videos all` requires explicit opt-in.
+- `--max-video-mb` defaults to 300 MB; subprocess timeout at 10 minutes.
+- Compatibility files are deployed at runtime to `.agent/skills/` (gitignored) — third-party vendor source code is never modified.
+- Dummy readability module only bypasses import pre-check; real readability API calls will raise errors and trigger fallback.
+
+---
+
 ## [0.6.4-alpha] — 2026-06-12
 
 ### Fixed

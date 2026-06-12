@@ -178,6 +178,38 @@ Z-skills requires a different flow: use `/project:skills --install z-skills` (ex
 ```
 Then retry: `/project:web --collector z-web-pack <url>`
 
+### Z-web-pack says "1-web-research-pack is missing"
+
+**Cause**: z-web-pack requires `1-web-research-pack` as a base module. This repository is not publicly available.
+
+**Fix** — PKB automatically deploys a compatibility base:
+1. Run `python tools/check_collectors.py` to see current status
+2. If "compatibility base: AVAILABLE" appears, the bridge will auto-deploy it when you run z-web-pack
+3. If "compatibility base: MISSING" appears, ensure `tools/pkb_compat/web_research_pack_base.py` exists in your PKB
+4. The compatibility base provides all required APIs using BeautifulSoup (no readability-lxml needed)
+5. Re-run: `python tools/zskill_bridge.py run --skill z-web-pack --url <url> --topic <topic>`
+
+### Z-web-pack runs but produces no output
+
+**Cause**: collect_web_pack.py may have failed silently or readability-lxml is missing.
+
+**Fix**:
+1. Run `python tools/check_collectors.py` — check z-web-pack status and warnings
+2. Check the output directory: `raw/webpacks/<topic>/`
+3. If the directory is empty, run with verbose output to see errors
+4. The PKB compatibility base uses BS4 extraction — readability-lxml is NOT required
+5. If the error mentions `readability`, install it: `pip install readability-lxml`, then remove the dummy at `.agent/skills/1-web-research-pack/readability/`
+
+### Z-web-pack downloads too many videos
+
+**Cause**: `--videos all` enables yt-dlp video download with no per-video size check.
+
+**Fix**:
+1. Default is `--videos off` (safe). Only use `--videos all` intentionally.
+2. Use `--max-video-mb 100` to limit individual video size
+3. Use `--videos direct` for direct `<video>` links only (no yt-dlp)
+4. Bridge subprocess has a 10-minute timeout — won't run indefinitely
+
 ### Plugin marketplace skill not installing
 
 **Cause**: Skills with `install_method: plugin_marketplace` (obsidian-skills, academic-research-skills) cannot be git-cloned.

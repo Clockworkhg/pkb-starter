@@ -596,11 +596,11 @@ def _key(collector: dict) -> str:
     name = collector["name"].lower()
     if "z-web-pack" in name:
         return "z-web-pack"
+    if "webfetch" in name:  # check BEFORE "built-in" — WebFetch name also contains "built-in"
+        return "webfetch"
     if "built-in" in name or "web_pack" in name:
         return "builtin-web-pack"
-    if "webfetch" in name.lower():
-        return "webfetch"
-    if "gstack" in name.lower():
+    if "gstack" in name:
         return "gstack"
     return re.sub(r'[^a-z0-9-]', '-', name)
 
