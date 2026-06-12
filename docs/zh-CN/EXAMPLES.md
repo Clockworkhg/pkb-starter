@@ -120,7 +120,7 @@ PKB 健康检查报告
 
 ```
 # 安装时选择中文
-python scripts/install.py "D:\我的知识库" --lang zh-CN
+python scripts/install.py "D:\MyKB" --lang zh-CN
 
 # 日常使用
 /project:pkb https://example.com/article
@@ -137,19 +137,19 @@ python scripts/install.py "D:\我的知识库" --lang zh-CN
 
 ```
 # 浏览技能目录
-python scripts/skill_manager.py --target "D:\我的知识库" --list
+python scripts/skill_manager.py --target "D:\MyKB" --list
 
 # 查看某个技能的详细信息
-python scripts/skill_manager.py --target "D:\我的知识库" --describe deep-research-skills
+python scripts/skill_manager.py --target "D:\MyKB" --describe deep-research-skills
 
 # 安装学生配置预设
-python scripts/skill_manager.py --target "D:\我的知识库" --install-profile student
+python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 
 # 审计已安装技能
-python scripts/skill_manager.py --target "D:\我的知识库" --audit
+python scripts/skill_manager.py --target "D:\MyKB" --audit
 
 # 启用一个技能
-python scripts/skill_manager.py --target "D:\我的知识库" --enable kanban-skill
+python scripts/skill_manager.py --target "D:\MyKB" --enable kanban-skill
 ```
 
 ## 示例 8：更新知识库系统文件

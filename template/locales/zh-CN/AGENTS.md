@@ -72,11 +72,22 @@ AGENTS.md     ← 第四层：Schema（本文件，定义规则）
 ```
 D:\MyKB\raw\webpacks\
 D:\MyKB\wiki\concepts\
-D:\我的知识库\raw\papers\
-D:\我的知识库\tools\web_pack.py
+D:\MyKB\raw\papers\
+D:\MyKB\tools\web_pack.py
 ```
 
 Agent 应根据实际运行环境自动适配路径分隔符（Windows `\` 或 POSIX `/`）。
+
+### 2.4 文件名与 Slug 策略
+
+中文模式下，页面标题和正文默认使用简体中文，但文件名、目录名和 slug 优先使用 ASCII-safe 英文命名：
+
+- **Markdown 文件名**：使用英文 slug（如 `personal-knowledge-base.md`），页面 title（YAML frontmatter 或一级标题）使用中文。
+- **目录名**：使用英文 slug（如 `wiki/concepts/`），不强制生成中文目录名。
+- **source note 文件名**：使用英文 slug（如 `attention-is-all-you-need.md`）。
+- **用户明确要求中文文件名时才使用中文文件名**。
+
+这样更利于 Git 版本管理、脚本处理、跨平台同步和 Obsidian 兼容。
 
 ---
 

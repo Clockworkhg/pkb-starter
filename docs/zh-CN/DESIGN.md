@@ -269,3 +269,37 @@ pkb.config.json                  scripts/update_pkb.py
 只有 `starter_sync_manifest.json` 中列出的文件才有资格同步。个人路径、邮箱和敏感模式在文件到达公共仓库前被替换为占位符。
 
 [完整更新文档 ->](UPDATING.md)
+
+## 中文内容与英文 slug
+
+PKB 支持中文模式（`language: zh-CN`），中文用户可以获得全中文的页面内容和运行时输出。但在文件命名层面，系统遵循 **内容中文、文件名英文 slug** 的策略：
+
+- **页面内容**：中文模式下，wiki 页面标题和正文使用简体中文。
+- **文件名**：Markdown 文件使用英文 slug（如 `wiki/concepts/personal-knowledge-base.md`），不强制生成中文文件名。
+- **目录名**：使用英文 slug（如 `wiki/concepts/`），不生成中文目录名。
+- **用户明确要求中文文件名时才使用中文文件名**。
+
+### 为什么文件名用英文 slug
+
+| 优势 | 说明 |
+|------|------|
+| Git 兼容 | 避免不同操作系统对中文文件名的编码差异 |
+| 脚本处理 | Python/Shell/Node 脚本处理英文路径更可靠 |
+| 跨平台同步 | Windows/macOS/Linux 之间同步时减少编码问题 |
+| Obsidian 兼容 | Obsidian 的 wikilink 解析对英文 slug 更稳定 |
+| URL 友好 | 如果将来发布到 Web，英文 slug 无需编码 |
+
+### 示例
+
+```yaml
+---
+title: 个人知识库
+language: zh-CN
+created: 2026-06-12
+tags: [知识管理, 方法论]
+---
+```
+
+文件路径：`wiki/concepts/personal-knowledge-base.md`
+
+页面 title 为中文，文件名和目录名为英文 slug。用户打开文件时看到中文内容，但文件系统、Git、脚本处理的是稳定的 ASCII 路径。

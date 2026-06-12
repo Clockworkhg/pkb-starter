@@ -21,12 +21,12 @@ cd pkb-starter
 ## 第二步：安装
 
 ```bash
-python scripts/install.py "D:\我的知识库"
+python scripts/install.py "D:\MyKB"
 ```
 
 中文用户推荐使用中文模式安装：
 ```bash
-python scripts/install.py "D:\我的知识库" --lang zh-CN
+python scripts/install.py "D:\MyKB" --lang zh-CN
 ```
 
 此命令将创建：
@@ -38,17 +38,19 @@ python scripts/install.py "D:\我的知识库" --lang zh-CN
 
 > **注意**：`skills/` 目录初始为空。技能属于 pkb-starter **插件仓库**的一部分，不属于项目模板。当 pkb-starter 安装为 Claude Code 插件时，技能全局可用。仅使用项目模板（本安装方式）时，你直接使用 `tools/` Python 脚本。
 
+> **关于路径**：Windows 支持中文路径，但为了减少 Python、Git、Shell、第三方工具和跨平台兼容问题，建议优先使用英文路径，例如 `D:\MyKB`。如果用户坚持使用中文路径，也可以尝试，但遇到编码或工具兼容问题时，建议迁移到英文路径。
+
 ## 第三步：安装 Python 依赖
 
 ```bash
-cd "D:\我的知识库"
+cd "D:\MyKB"
 pip install -r requirements.txt
 ```
 
 ## 第四步：启动
 
 ```bash
-cd "D:\我的知识库"
+cd "D:\MyKB"
 claude
 ```
 
@@ -68,16 +70,16 @@ claude
 
 ```bash
 # 安装时：选择配置预设
-python scripts/install.py "D:\我的知识库" --profile student
-python scripts/install.py "D:\我的知识库" --interactive-skills   # 逐个选择
-python scripts/install.py "D:\我的知识库" --skip-skills           # 仅核心，之后添加
+python scripts/install.py "D:\MyKB" --profile student
+python scripts/install.py "D:\MyKB" --interactive-skills   # 逐个选择
+python scripts/install.py "D:\MyKB" --skip-skills           # 仅核心，之后添加
 
 # 安装后随时管理技能
-python scripts/skill_manager.py --target "D:\我的知识库" --list
-python scripts/skill_manager.py --target "D:\我的知识库" --describe deep-research-skills
-python scripts/skill_manager.py --target "D:\我的知识库" --install deep-research-skills
-python scripts/skill_manager.py --target "D:\我的知识库" --install-profile student --dry-run
-python scripts/skill_manager.py --target "D:\我的知识库" --audit
+python scripts/skill_manager.py --target "D:\MyKB" --list
+python scripts/skill_manager.py --target "D:\MyKB" --describe deep-research-skills
+python scripts/skill_manager.py --target "D:\MyKB" --install deep-research-skills
+python scripts/skill_manager.py --target "D:\MyKB" --install-profile student --dry-run
+python scripts/skill_manager.py --target "D:\MyKB" --audit
 
 # 或在 Claude Code 中
 /project:skills                       # 查看状态和可用配置预设

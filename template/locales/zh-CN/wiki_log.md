@@ -6,6 +6,8 @@ type: log
 
 # 知识更新日志
 
+> 文件名建议使用英文 slug（如 `personal-knowledge-base.md`），页面 title 和正文可以使用中文。这样更利于 Git、脚本处理、跨平台同步和 Obsidian 兼容。
+
 本日志记录 wiki 知识库中的所有变更，包括概念创建、来源更新、项目变更及双链修改。
 
 ---

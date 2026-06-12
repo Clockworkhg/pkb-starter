@@ -8,6 +8,8 @@ type: index
 # 知识索引
 
 > 知识层入口。项目级导航请见：[[../index|项目首页]]。
+>
+> **关于文件命名**：文件名建议使用英文 slug（如 `personal-knowledge-base.md`），页面 title 和正文可以使用中文。这样更利于 Git、脚本处理、跨平台同步和 Obsidian 兼容。
 
 ## 概念
 

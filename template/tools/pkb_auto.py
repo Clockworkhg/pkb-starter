@@ -426,7 +426,7 @@ def _get_wiki_targets(ctype: str) -> List[str]:
         "coursework": ["wiki/sources/", "wiki/outputs/"],
         "school_policy": ["wiki/sources/", "wiki/concepts/"],
         "project_ppt": ["wiki/sources/", "wiki/projects/"],
-        "methodology": ["wiki/concepts/", "wiki/projects/PKB个人知识库/"],
+        "methodology": ["wiki/concepts/", "wiki/projects/pkb-knowledge-base/"],
         "unknown": ["wiki/sources/"],
     }
     return targets.get(ctype, ["wiki/sources/"])

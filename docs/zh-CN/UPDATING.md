@@ -127,8 +127,8 @@ cat pkb.config.json | grep starter_version
 ```bash
 cd D:\pkb-starter
 git pull
-python scripts/update_pkb.py "D:\我的知识库" --dry-run
-python scripts/update_pkb.py "D:\我的知识库"
+python scripts/update_pkb.py "D:\MyKB" --dry-run
+python scripts/update_pkb.py "D:\MyKB"
 ```
 
 ---

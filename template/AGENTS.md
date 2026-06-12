@@ -297,6 +297,8 @@ When `wiki_language` is `"zh-CN"`:
 5. `[[wikilink]]` targets use the page title language (Chinese for Chinese-titled pages).
 6. Technical commands, file paths, and code remain in English.
 7. Filenames use safe slugs (ASCII) but page titles use Chinese.
+8. Do not generate Chinese filenames unless the user explicitly requests them.
+9. Markdown filenames, directory names, slugs, and source note filenames default to ASCII-safe English slugs (e.g., `personal-knowledge-base.md`, not `个人知识库.md`).
 
 ### 14.4 Report Generation Rules (zh-CN mode)
 
