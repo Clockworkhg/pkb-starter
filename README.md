@@ -22,14 +22,14 @@ PKB: [auto-collects → extracts → classifies → creates wiki page → links 
 - 🧠 **LLM-organized**: AI classifies, links, and maintains your knowledge
 - 📄 **Rich collection**: Web pages, PDFs, DOCX, PPTX, GitHub repos, videos
 - 🔗 **Obsidian-compatible**: `[[wikilink]]` graph, open wiki/ as vault
-- 🔒 **Local-first**: Nothing leaves your machine
+- 🔒 **本地文件优先、无云同步、无遥测**；使用 Claude Code 整理时，进入模型上下文的内容按模型服务商规则处理
 - 🩺 **Self-healing**: Health checks find broken links, stale content, orphans
 - 💾 **Git-native**: Every change is a commit, full rollback support
 
 ## Quick Install
 
 ```bash
-git clone https://github.com/pkb-starter/pkb-starter.git
+git clone https://github.com/Clockworkhg/pkb-starter.git
 cd pkb-starter
 python scripts/install.py "D:\MyKB"
 cd "D:\MyKB"
@@ -260,12 +260,12 @@ Every update creates a timestamped backup in `.pkb_backup/`. User data (`raw/`, 
 
 [Update Guide →](docs/UPDATING.md)
 
-## Safety
+## Privacy
 
-- Nothing uploaded by default
+- **Local-first**, no cloud sync, no telemetry — files stay on your machine
+- When using Claude Code for organization, content that enters model context is handled per the model provider's data usage policies
 - Sensitive info detection (API keys, tokens, PII)
 - `.gitignore` with comprehensive security rules
-- Safe/full collection modes
 - [Security Guide →](docs/SECURITY.md)
 
 ## Requirements

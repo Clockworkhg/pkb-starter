@@ -22,14 +22,14 @@ PKB: [自动采集 -> 提取 -> 分类 -> 创建 wiki 页面 -> 关联概念 -> 
 - **LLM 整理**: AI 自动分类、链接、维护你的知识
 - **丰富采集**: 网页、PDF、DOCX、PPTX、GitHub 仓库、视频
 - **Obsidian 兼容**: `[[wikilink]]` 知识图谱，打开 wiki/ 即 vault
-- **本地优先**: 一切都在你的机器上，不上传任何内容
+- **本地文件优先、无云同步、无遥测**；使用 Claude Code 整理时，进入模型上下文的内容按模型服务商规则处理
 - **自愈能力**: 健康检查发现断链、过期内容、孤立页面
 - **Git 原生**: 每次变更即一次 commit，完整回滚支持
 
 ## 快速安装
 
 ```bash
-git clone https://github.com/pkb-starter/pkb-starter.git
+git clone https://github.com/Clockworkhg/pkb-starter.git
 cd pkb-starter
 python scripts/install.py "D:\MyKB"
 cd "D:\MyKB"
@@ -267,12 +267,12 @@ python scripts/update_pkb.py "D:\MyKB" --dry-run
 
 [更新指南 ->](docs/zh-CN/UPDATING.md)
 
-## 安全
+## 隐私
 
-- 默认不上传任何内容
+- **本地文件优先、无云同步、无遥测** — 文件留在你的机器上
+- 使用 Claude Code 整理时，进入模型上下文的内容按模型服务商规则处理
 - 敏感信息检测（API key、token、个人身份信息）
 - `.gitignore` 包含全面的安全规则
-- 安全/完整采集模式
 - [安全指南 ->](docs/zh-CN/SECURITY.md)
 
 ## 环境要求
