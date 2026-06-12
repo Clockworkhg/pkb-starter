@@ -70,15 +70,18 @@ tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 
 ## Optional Skills
 
-PKB Starter ships with zero external dependencies. Extend it with **optional skill packs**:
+PKB Starter ships with zero external dependencies. Extend it with **optional skill packs** from a catalog of 42 entries across 18 tracked external repositories:
 
 ```bash
-python scripts/install.py "D:\MyKB" --profile student    # academic research
-python scripts/install.py "D:\MyKB" --profile developer  # docs + projects
-python scripts/install.py "D:\MyKB" --profile full       # everything
+python scripts/install.py "D:\MyKB" --profile student    # 8 skills — academic essentials
+python scripts/install.py "D:\MyKB" --profile developer  # 7 skills — docs + projects
+python scripts/install.py "D:\MyKB" --profile research   # 12 skills — full pipeline
+python scripts/install.py "D:\MyKB" --profile full       # 24 skills — everything
 ```
 
-Profiles: **Core** (none) | **Student** | **Research** | **Developer** | **Creator** | **Full** | **Custom**
+Profiles: **Core** | **Student** | **Research** | **Developer** | **Creator** | **Output** | **Security** | **Full** | **Custom**
+
+See the full catalog: `python scripts/install_skills.py --list`
 
 [Optional Skills Guide →](docs/OPTIONAL_SKILLS.md)
 

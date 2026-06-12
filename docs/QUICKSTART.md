@@ -57,19 +57,26 @@ In Claude Code (project mode):
 
 ## Optional: Install Skill Packs
 
-Extend PKB with domain-specific skills (academic research, document processing, etc.):
+Extend PKB with domain-specific skills from a catalog of 42 entries:
 
 ```bash
+# List all available skills
+python scripts/install_skills.py --list
+
 # Install a skill profile (from pkb-starter directory)
 python scripts/install_skills.py --target "D:\MyKnowledgeBase" --profile student
 
+# Preview what would be installed
+python scripts/install_skills.py --target "D:\MyKnowledgeBase" --profile research --dry-run
+
 # Or from Claude Code
 /project:skills --install student
+/project:skills --list
 ```
 
-Profiles: `core` (none) | `student` | `research` | `developer` | `creator` | `full` | `custom`
+Profiles: `core` (built-in only) | `student` (8 skills) | `research` (12) | `developer` (7) | `creator` (7) | `output` (7) | `security` (3) | `full` (24) | `custom`
 
-[Full skill catalog →](OPTIONAL_SKILLS.md)
+[Full skill catalog and ecosystem →](OPTIONAL_SKILLS.md)
 
 ## Step 5: Add Your First Knowledge
 

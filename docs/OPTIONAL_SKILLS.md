@@ -1,30 +1,60 @@
-# PKB Starter -- Optional Skills
+# PKB Starter — Optional Skills
 
-> Skill packs extend PKB with third-party Claude Code skills. None are bundled -- you choose what to install.
+> Comprehensive skill ecosystem: 42 catalog entries, 9 profiles, 18 external repos tracked. None are bundled — you choose what to install.
 
 ## Philosophy
 
 PKB Starter is a **core framework** that works out of the box with zero external skills.
 Optional skills add domain-specific capabilities: academic research, document processing,
-semantic search, project management.
+semantic search, project management, security hardening.
 
 We do NOT bundle third-party code because:
-1. **License clarity** -- each skill has its own LICENSE. Bundling would mix licenses.
-2. **User choice** -- you decide which external code runs on your machine.
-3. **Update independence** -- skills update on their own schedule from their repos.
-4. **Security** -- you audit what you install, not what we pre-installed.
+1. **License clarity** — each skill has its own LICENSE. Bundling would mix licenses.
+2. **User choice** — you decide which external code runs on your machine.
+3. **Update independence** — skills update on their own schedule from their repos.
+4. **Security** — you audit what you install, not what we pre-installed.
+
+## Ecosystem at a Glance
+
+| Metric | Count |
+|--------|-------|
+| Total catalog entries | 42 |
+| External GitHub repos tracked | 9 |
+| PKB self-built skills (bundled) | 12 |
+| Claude Code plugin marketplace | 2 |
+| MCP servers | 2 |
+| Reference only (never installed) | 5 |
+| Core built-in tools | 5 |
 
 ## Profiles
 
+9 preset profiles for different use cases:
+
 | Profile | Skills | Best For |
 |---------|--------|----------|
-| **Core** | (none) | Minimal PKB. Just the tools. |
-| **Student** | obsidian-skills, academic-research-skills, deep-research-skills | Learning, paper analysis, literature review |
-| **Research** | Student + agent-research-skills + qmd | Deep multi-source research, semantic search |
-| **Developer** | obsidian-skills, anthropic-skills, qmd, kanban-skill | Coding docs, project tracking, code search |
-| **Creator** | obsidian-skills, kanban-skill | Writing, content creation, task management |
-| **Full** | All 7 recommended skills | Power users who want everything |
-| **Custom** | Interactive pick | You choose exactly which skills |
+| **Core** | 0 external (10 built-in) | Minimalists — pure PKB workflow |
+| **Student** | 8 | Undergraduates, coursework, paper writing |
+| **Research** | 12 | Graduate students, academics, deep research |
+| **Developer** | 7 | Software engineers, project documentation |
+| **Creator** | 7 | Writers, musicians, filmmakers, content creators |
+| **Output** | 7 | Document/report/presentation producers |
+| **Security** | 3 | Privacy audits, pre-publish hardening |
+| **Full** | 24 | Power users — complete ecosystem |
+| **Custom** | Interactive | Advanced — hand-pick from 42 entries |
+
+### Core Profile (always present)
+
+These skills are built into the PKB template:
+- `web-pack` — Web content collector (requests + BeautifulSoup + markdownify)
+- `pkb-auto` — Full autopilot ingest pipeline
+- `import-to-inbox` — File import with secret detection
+- `sanitize-tool` — Privacy scanner (regex patterns)
+- `docs-update` — Documentation freshness checker
+- `git-versioning` — Enhanced git save/rollback + secret scan
+- `secret-scan` — Pre-commit sensitive data detection
+- `document-converter` — DOCX/PDF/PPTX ↔ Markdown
+- `skill-creator` — New skill creation wizard
+- `skill-lint` — Skill health check
 
 ## Installation
 
@@ -37,8 +67,22 @@ python scripts/install.py "D:\MyKB" --skip-skills   # core only
 
 ### With install_skills.py (standalone)
 ```bash
+# List the full catalog
+python scripts/install_skills.py --list
+
+# List all profiles
+python scripts/install_skills.py --list-profiles
+
+# Dry run to preview
 python scripts/install_skills.py --target "D:\MyKB" --profile research --dry-run
+
+# Install with risky skills
 python scripts/install_skills.py --target "D:\MyKB" --profile full --enable-risky
+
+# Interactive custom selection
+python scripts/install_skills.py --target "D:\MyKB" --profile custom
+
+# Audit installed skills
 python scripts/install_skills.py --target "D:\MyKB" --audit-only
 ```
 
@@ -53,91 +97,169 @@ python scripts/install_skills.py --target "D:\MyKB" --audit-only
 
 Skills are classified by risk to help you make informed decisions:
 
-| Level | Policy | Examples |
-|-------|--------|----------|
-| `low` | Auto-install. No external dependencies. | obsidian-skills, kanban-skill, index skills |
-| `medium` | Install with warning. Review adapter before use. | academic-research-skills, deep-research-skills, qmd |
-| `high` | Requires `--enable-risky`. MCP or external runtime needed. | zotero-mcp, zotero-mcp-skill |
-| `reference_only` | Never installed. Catalog entry for design reference. | z-skills (Anthropic copyrighted) |
+| Level | Policy | Count | Examples |
+|-------|--------|-------|----------|
+| `low` | Auto-install. No external dependencies. | 18 | obsidian-skills, kanban-skill, prompt-library, article-extractor |
+| `medium` | Install with warning. Review deps/token usage. | 15 | academic-research-skills, deep-research-skills, qmd, data-analysis |
+| `high` | Requires `--enable-risky`. MCP or external runtime. | 7 | cnki-skills, zotero-mcp, zotero-mcp-skill, ocr-helper |
+| `reference_only` | Never installed. Design reference only. | 5 | z-skills (Anthropic copyrighted) |
+
+## Source Types
+
+| Type | Meaning | Install Method |
+|------|---------|---------------|
+| `built_in` | PKB core template tool | Always present |
+| `local_template` | PKB self-built skill | Bundled in template |
+| `external_repo` | Third-party GitHub repo | `git clone --depth 1` |
+| `plugin_marketplace` | Claude Code plugin marketplace | `/plugin marketplace add` + `/plugin install` |
+| `mcp_server` | MCP server | Manual `.claude/mcp.json` config |
+| `reference_only` | Design reference | NEVER installed |
+
+## Skill Catalog (v0.3.0)
+
+### Knowledge Capture (6 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| web-pack | built_in | low | — | Core web collector, always enabled |
+| pkb-auto | built_in | low | — | Auto ingest pipeline |
+| import-to-inbox | built_in | low | — | File import + secret detection |
+| article-extractor | tapestry-skills (MIT) | low | — | Single article fast extraction |
+| ocr-helper | local_template (MIT) | medium | — | OCR via Windows API/Tesseract |
+| web-clipper-helper | local_template (MIT) | low | — | Browser clipping assistant |
+
+### Academic Research (10 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| academic-research-skills | plugin marketplace | medium | 14 (ars-*) | Full ARS pipeline |
+| deep-research-skills | Weizhena (MIT) | medium | 5 | Structured multi-turn research |
+| agent-research-skills | lingzhi227 (NO LICENSE) | medium | 31 | Comprehensive agent-based pipeline |
+| literature-search | agent-research (Tier 1) | low | — | Multi-source lit search |
+| literature-review | agent-research (Tier 1) | low | — | Dialogic lit review |
+| paper-writing-section | agent-research (Tier 1) | low | — | Academic paper drafting |
+| citation-management | agent-research (Tier 2) | low | — | GB/T 7714, APA, IEEE |
+| data-analysis | agent-research (Tier 2) | medium | — | Statistical analysis with 4-round review |
+| cnki-skills | cookjohn (check LICENSE) | high | 10 | CNKI database (requires MCP + login) |
+| zotero-mcp | 54yyyu (check LICENSE) | high | — | MCP server (requires Zotero running) |
+| zotero-mcp-skill | kerim (check LICENSE) | high | — | Companion skill for zotero-mcp |
+
+### Document Processing (2 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| anthropic-skills | anthropics (Apache 2.0) | medium | 17 | Official doc processing skills |
+| document-converter | local_template (MIT) | low | — | DOCX/PDF/PPTX ↔ MD |
+
+### Knowledge Management (3 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| obsidian-skills | plugin marketplace | low | 4 | Obsidian vault management |
+| qmd | tobi (MIT) | medium | — | Semantic search (BM25+vector+LLM) |
+| kanban-skill | mattjoyce (Apache 2.0) | low | — | Markdown file-based kanban |
+
+### Security & Privacy (2 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| sanitize-tool | built_in | low | — | Core privacy scanner |
+| sanitize-skill | wan-huiyan (MIT) | low | — | Enhanced anonymizer |
+
+### Creation & Output (4 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| prompt-library | local_template (MIT) | low | — | AI prompt library management |
+| song-archive | local_template (MIT) | low | — | Lyrics/Suno style versions |
+| script-breakdown | local_template (MIT) | low | — | Script → storyboard → prompts |
+| tapestry-skills | michalparkola (MIT) | low | 7 | Creative + tools collection |
+
+### Meta Tooling (3 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| git-versioning | local_template (MIT) | low | — | Enhanced git + secret scan |
+| skill-creator | local_template (MIT) | low | — | New skill creation wizard |
+| skill-lint | local_template (MIT) | low | — | Skill health check |
+
+### Development (2 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| code-debugging | agent-research (Tier 3) | medium | — | Systematic debug workflow |
+| github-research | agent-research (Tier 3) | medium | — | GitHub repo analysis |
+
+### Knowledge Capture — External (2 entries)
+
+| ID | Source | Risk | Sub-Skills | Notes |
+|----|--------|------|------------|-------|
+| youtube-transcript | tapestry-skills (MIT) | low | — | yt-dlp based, no API key |
+| youtube-skills | ZeroPointRepo (MIT) | medium | 12 | Some need TranscriptAPI key |
+
+### Reference Only (5 entries)
+
+| ID | Source | Risk | Notes |
+|----|--------|------|-------|
+| z-skills | tjxj (NO LICENSE) | reference_only | (c) Anthropic — ALL RIGHTS RESERVED |
+| awesome-agent-skills | VoltAgent | reference | Skill discovery index |
+| awesome-claude-skills | ComposioHQ | reference | Skill discovery index |
+| obsidian-claude-pkm | ballred | reference | PKM workflow reference |
+| daily-patterns-pack | aplaceforallmystuff | reference | Daily note templates reference |
 
 ## How Adapters Work
 
-Every installed skill gets an **adapter** -- a markdown document that tells Claude Code
+Every external skill gets an **adapter** — a markdown document that tells Claude Code
 where to route the skill's output within PKB:
 
 ```
 External Skill Output          Adapter Routes To
 ----------------------         -------------------------
 Research report       --->     wiki/outputs/research/
-Paper analysis        --->     wiki/papers/
+Paper analysis        --->     wiki/sources/
 Literature sources    --->     wiki/sources/
 Extracted concept     --->     wiki/concepts/
 Project task          --->     wiki/tasks/
 Search result         --->     (read-only, not persisted)
 Document conversion   --->     wiki/outputs/ (+ raw/imported_processed/)
+Web collection        --->     raw/webpacks/
+Academic paper        --->     raw/papers/ + wiki/sources/
+YouTube transcript    --->     raw/media/transcripts/
+Kanban board          --->     wiki/tasks/
 ```
 
 Adapters are NOT executable code. They are reference documents for the LLM to follow
-when integrating skill output into your knowledge base.
+when integrating skill output into your knowledge base. Adapters live in
+`template/skill_adapters/` and are copied to your PKB during skill installation.
 
-## Skill Catalog (v0.2.0)
+## External Repos Tracked
 
-### wiki
-| ID | Description | Risk |
-|----|-------------|------|
-| obsidian-skills | Obsidian vault management from Claude Code | low |
-
-### academic
-| ID | Description | Risk |
-|----|-------------|------|
-| academic-research-skills | Research architect, synthesis, report compilation | medium |
-| agent-research-skills | Agent-based literature search and paper analysis | medium |
-| zotero-mcp | Zotero MCP server for reference management | high |
-| zotero-mcp-skill | Claude Code skill for Zotero MCP | high |
-
-### research
-| ID | Description | Risk |
-|----|-------------|------|
-| deep-research-skills | Multi-turn deep research with source tracking | medium |
-
-### document
-| ID | Description | Risk |
-|----|-------------|------|
-| anthropic-skills | Official Anthropic document processing skills | medium |
-
-### search
-| ID | Description | Risk |
-|----|-------------|------|
-| qmd | Semantic search over local markdown knowledge | medium |
-
-### project
-| ID | Description | Risk |
-|----|-------------|------|
-| kanban-skill | Kanban board management for task tracking | low |
-
-### pkm-reference
-| ID | Description | Risk |
-|----|-------------|------|
-| obsidian-claude-pkm | Reference Claude + Obsidian PKM workflow | low |
-| daily-patterns-pack | Daily note templates and patterns | low |
-
-### index
-| ID | Description | Risk |
-|----|-------------|------|
-| awesome-agent-skills | Curated index of agent skills | low |
-| awesome-claude-skills | Composio-curated Claude skills index | low |
-
-### reference
-| ID | Description | Risk |
-|----|-------------|------|
-| z-skills | Comprehensive skill collection (Anthropic copyright) | reference_only |
+| Repository | Skills | License | Risk |
+|-----------|--------|---------|------|
+| kepano/obsidian-skills | 4 | Check repo | low |
+| Imbad0202/academic-research-skills | 14 | Check repo | medium |
+| Weizhena/Deep-Research-skills | 5 | MIT | medium |
+| lingzhi227/agent-research-skills | 31 | NO LICENSE | medium |
+| anthropics/skills | 17 | Apache 2.0 / source-available | medium |
+| tobi/qmd | 1 (CLI+MCP) | MIT | medium |
+| mattjoyce/kanban-skill | 1 | Apache 2.0 | low |
+| wan-huiyan/skill-anonymizer | 1 | MIT | low |
+| michalparkola/tapestry-skills | 7 | MIT | low |
+| ZeroPointRepo/youtube-skills | 12 | MIT | medium |
+| cookjohn/cnki-skills | 10 | Check repo | high |
+| 54yyyu/zotero-mcp | 1 (MCP) | Check repo | high |
+| kerim/zotero-mcp-skill | 1 | Check repo | high |
+| tjxj/z-skills | 5 (REF ONLY) | NO LICENSE | reference_only |
+| VoltAgent/awesome-agent-skills | index | Check repo | reference |
+| ComposioHQ/awesome-claude-skills | index | Check repo | reference |
 
 ## Adding a New Skill
 
-1. Add entry to `skills_registry/skill_catalog.json`
-2. Create adapter in `template/skill_adapters/<adapter>.md`
-3. Optionally add to profiles in `skills_registry/profiles.json`
-4. Test: `python scripts/install_skills.py --target . --profile custom --dry-run`
+1. Add entry to `skills_registry/skill_catalog.json` following the schema
+2. Create adapter in `template/skill_adapters/<adapter>.md` if the skill produces output
+3. Add to relevant profiles in `skills_registry/profiles.json`
+4. Update this document's stats and tables
+5. Test: `python scripts/install_skills.py --target . --profile custom --dry-run`
 
 ## Removing a Skill
 
@@ -156,11 +278,13 @@ rm -rf skills/_vendor/<skill-id>/
 ## Security
 
 - Skills are cloned to `skills/_vendor/` (gitignored by default).
-- No skill code is auto-executed -- installation = `git clone --depth 1`.
+- No skill code is auto-executed — installation = `git clone --depth 1`.
 - MCP-requiring skills need manual `.claude/mcp.json` configuration.
 - PKB never reads or stores API keys for third-party skills.
 - Review each skill's LICENSE before use (check the cloned repo for LICENSE file).
+- High-risk skills (CNKI, Zotero) require explicit `--enable-risky` opt-in.
+- Reference-only skills (z-skills) are NEVER downloaded — catalog entry only.
 - Remove a skill by deleting its `skills/_vendor/<id>/` directory.
 
 ---
-*PKB Starter v0.2.0*
+*PKB Starter v0.3.0. Updated: 2026-06-12.*

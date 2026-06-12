@@ -1,83 +1,168 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "updated": "2026-06-12",
-  "description": "PKB Starter -- Skill installation profiles. Each profile selects a subset of skills from skill_catalog.json.",
+  "description": "PKB Starter — Skill installation profiles. Each profile selects a curated subset of skills from skill_catalog.json. Profiles are starting points; users can add/remove skills anytime.",
   "profiles": {
     "core": {
       "name": "Core",
-      "description": "No external skills. Pure PKB Starter with basic web collector and wiki tools.",
+      "description": "Zero external skills. Pure PKB Starter with 5 built-in tools: web_pack, pkb_auto, import_to_inbox, sanitize, docs_update. Plus 5 self-built meta skills: git-versioning, secret-scan, document-converter, skill-creator, skill-lint. Ideal for minimalists who want the base PKB workflow.",
       "skills": [],
-      "default_for": "minimal"
+      "default_for": "minimal",
+      "built_in_included": ["web-pack", "pkb-auto", "import-to-inbox", "sanitize-tool", "docs-update", "git-versioning", "secret-scan", "document-converter", "skill-creator", "skill-lint"]
     },
     "student": {
       "name": "Student",
-      "description": "Academic research skills for paper analysis, literature review, and note-taking.",
+      "description": "Academic essentials for coursework and paper writing. Literature search + review, paper section writing, citation management, article extraction for research sources. Ideal for undergraduates and coursework-focused grad students.",
       "skills": [
         "obsidian-skills",
         "academic-research-skills",
-        "deep-research-skills"
+        "literature-search",
+        "literature-review",
+        "paper-writing-section",
+        "citation-management",
+        "article-extractor",
+        "youtube-transcript"
       ],
       "default_for": "learning"
     },
     "research": {
       "name": "Research",
-      "description": "Full research pipeline: literature search, deep research, agent-based analysis, semantic search.",
+      "description": "Full research pipeline for graduate students and academics. Deep research + agent research skills, literature tools, experiment design, data analysis, figure/table generation, citation management, peer review tools. Comprehensive academic workflow.",
       "skills": [
         "obsidian-skills",
         "academic-research-skills",
         "deep-research-skills",
         "agent-research-skills",
-        "qmd"
+        "literature-search",
+        "literature-review",
+        "paper-writing-section",
+        "citation-management",
+        "data-analysis",
+        "qmd",
+        "article-extractor",
+        "youtube-transcript"
       ],
       "default_for": "deep_research"
     },
     "developer": {
       "name": "Developer",
-      "description": "Document processing, semantic code search, and project kanban management.",
+      "description": "Development-focused: document processing for technical docs, semantic code search, project kanban, GitHub research, code debugging. Ideal for software engineers documenting projects and research.",
       "skills": [
         "obsidian-skills",
         "anthropic-skills",
         "qmd",
-        "kanban-skill"
+        "kanban-skill",
+        "code-debugging",
+        "github-research",
+        "article-extractor"
       ],
       "default_for": "coding"
     },
     "creator": {
       "name": "Creator",
-      "description": "Content creation with wiki management and project tracking.",
+      "description": "Content creation: prompt library, song archive, script breakdown, article extraction, YouTube transcripts. Ideal for writers, musicians, filmmakers, and content creators.",
       "skills": [
         "obsidian-skills",
+        "prompt-library",
+        "song-archive",
+        "script-breakdown",
+        "article-extractor",
+        "youtube-transcript",
         "kanban-skill"
       ],
       "default_for": "writing"
     },
+    "output": {
+      "name": "Output & Publishing",
+      "description": "Output-focused: document conversion, academic writing, slide/presentation generation, figure/table generation, prompt library. For users who primarily produce documents, reports, and presentations.",
+      "skills": [
+        "obsidian-skills",
+        "anthropic-skills",
+        "document-converter",
+        "paper-writing-section",
+        "citation-management",
+        "prompt-library",
+        "academic-research-skills"
+      ],
+      "default_for": "publishing"
+    },
+    "security": {
+      "name": "Security & Privacy",
+      "description": "Security-hardened: enhanced sanitizer, secret scanning, git versioning with pre-commit checks. Minimal skill set focused on keeping your knowledge base clean of sensitive data. Ideal before sharing or publishing a PKB.",
+      "skills": [
+        "sanitize-skill",
+        "secret-scan",
+        "git-versioning"
+      ],
+      "default_for": "security_audit",
+      "note": "Built-in sanitize-tool and secret-scan are always active regardless of profile."
+    },
     "full": {
       "name": "Full Stack",
-      "description": "All recommended skills. Academic + document + search + project management.",
+      "description": "All recommended skills across all categories. Academic research + document processing + creation + search + project management. The complete PKB power-user setup. Review risk levels before installing.",
       "skills": [
         "obsidian-skills",
         "academic-research-skills",
         "deep-research-skills",
         "agent-research-skills",
+        "literature-search",
+        "literature-review",
+        "paper-writing-section",
+        "citation-management",
+        "data-analysis",
+        "code-debugging",
+        "github-research",
         "anthropic-skills",
+        "document-converter",
+        "ocr-helper",
+        "web-clipper-helper",
+        "prompt-library",
+        "song-archive",
+        "script-breakdown",
         "qmd",
-        "kanban-skill"
+        "kanban-skill",
+        "sanitize-skill",
+        "article-extractor",
+        "youtube-transcript",
+        "tapestry-skills"
       ],
-      "default_for": "power_users"
+      "default_for": "power_users",
+      "note": "Some skills in this profile have risk_level: high or require MCP/external runtimes. Use --enable-risky to install high-risk skills. CNKI and Zotero are NOT included by default."
     },
     "custom": {
       "name": "Custom",
-      "description": "Interactive selection from the full catalog. Choose exactly which skills to install.",
+      "description": "Interactive selection from the complete 42-entry catalog. Choose exactly which skills to install. Run install_skills.py --profile custom for guided selection.",
       "skills": [],
       "default_for": "advanced",
       "interactive": true
     }
   },
   "risk_policy": {
-    "low": "Auto-install when selected in profile.",
-    "medium": "Install but warn about external dependencies and token usage.",
-    "high": "Require explicit --enable-risky flag. Display MCP/runtime requirements before install.",
-    "reference_only": "Never install. Display as read-only reference in catalog."
+    "low": {
+      "action": "auto_install",
+      "description": "Auto-install when selected in profile. No warnings needed."
+    },
+    "medium": {
+      "action": "warn_and_install",
+      "description": "Install but display warnings about external dependencies, token usage, or API requirements."
+    },
+    "high": {
+      "action": "require_flag",
+      "description": "Require explicit --enable-risky flag. Display full MCP/runtime/external requirements before install."
+    },
+    "reference_only": {
+      "action": "never_install",
+      "description": "Never install. Displayed as read-only reference in catalog. License unclear or code is proprietary."
+    }
+  },
+  "install_rules": {
+    "built_in": "Always present in PKB template. No installation needed.",
+    "template_bundled": "Part of PKB template. Copied by install.py automatically.",
+    "git_clone": "Full repo clone to skills/_vendor/<id>/. All sub-skills available.",
+    "git_clone_selective": "Repo cloned to skills/_vendor/<id>/. Only selected sub-skills copied to .claude/skills/.",
+    "plugin_marketplace": "Install via Claude Code plugin marketplace. /plugin marketplace add <repo> then /plugin install <skill>.",
+    "mcp_config": "Configure in .claude/mcp.json. Requires MCP server setup.",
+    "reference_only": "NEVER installed. Listed for design reference only."
   }
 }

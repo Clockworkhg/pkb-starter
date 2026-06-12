@@ -121,26 +121,38 @@
 2. Verify you can access the repo in a browser
 3. For private repos, ensure git is authenticated
 4. Try installing skills individually: `python scripts/install_skills.py --target . --profile custom`
+5. View the full catalog first: `python scripts/install_skills.py --list`
 
 ### High-risk skill won't install
 
-**Cause**: Skills with `risk_level: high` or `reference_only` are blocked by default.
+**Cause**: Skills with `risk_level: high` or `reference_only` are blocked by default (7 high-risk, 5 reference-only in catalog).
 
 **Fix**: Use `--enable-risky` to install high-risk skills:
 ```
 python scripts/install_skills.py --target "D:\MyKB" --profile full --enable-risky
 ```
-Reference-only skills (like z-skills) can NEVER be installed -- they are catalog entries for design reference only.
+Reference-only skills (like z-skills, awesome-* indexes) can NEVER be installed -- they are catalog entries for design reference only.
+
+### Plugin marketplace skill not installing
+
+**Cause**: Skills with `install_method: plugin_marketplace` (obsidian-skills, academic-research-skills) cannot be git-cloned.
+
+**Fix**: Install manually via Claude Code:
+```
+/plugin marketplace add kepano/obsidian-skills
+/plugin install obsidian@obsidian-skills
+```
+These skills appear in catalog for reference. install_skills.py skips them with a manual-install note.
 
 ### Skill adapter not working
 
 **Cause**: Adapter wasn't copied to target PKB, or skill output is going to wrong directory.
 
 **Fix**:
-1. Verify adapter exists: `ls templates/skill_adapters/`
+1. Verify adapter exists: `ls template/skill_adapters/`
 2. Re-install the skill to copy its adapter
 3. Check `SKILL_LINKS.md` for adapter mappings
-4. Manually copy: `cp template/skill_adapters/<adapter>.md "D:\MyKB\templates\skill_adapters\"`
+4. Manually copy the adapter to your PKB's `templates/skill_adapters/`
 
 ### /project:skills says "unknown command"
 
@@ -150,6 +162,16 @@ Reference-only skills (like z-skills) can NEVER be installed -- they are catalog
 1. Verify `.claude/commands/skills.md` exists in your PKB directory
 2. Re-install PKB template: `python scripts/install.py "D:\MyKB" --force`
 3. Or create the command file manually from the pkb-starter template
+
+### Skill has NO LICENSE in catalog
+
+**Cause**: Some repos (e.g., agent-research-skills, z-skills) lack a LICENSE file.
+
+**Fix**:
+1. Check the cloned repo's root for any license file: `ls skills/_vendor/<skill-id>/LICENSE*`
+2. Check the repo's GitHub page for license info
+3. If no license found, treat as "all rights reserved" — use for personal reference only
+4. Run `python scripts/install_skills.py --target . --audit-only` to see license status of all installed skills
 
 ---
 

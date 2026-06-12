@@ -127,16 +127,17 @@ The `wiki/` directory structure and `[[wikilink]]` syntax are fully Obsidian-com
 
 ### 6. Optional Skill Architecture
 
-PKB's skill system follows a **registry + adapter** pattern:
+PKB's skill system follows a **registry + adapter** pattern, cataloging the full PKB ecosystem:
 
 ```
 skills_registry/           pkb-starter (catalog, not bundled)
-  skill_catalog.json       14 known skills with metadata
-  profiles.json           7 preset profiles (core/student/...)
+  skill_catalog.json       42 catalog entries with full metadata
+  profiles.json            9 preset profiles (core/student/.../custom)
 
 skills/_vendor/            target PKB (installed on demand)
   obsidian-skills/         cloned via git, never auto-executed
-  academic-research-skills/
+  agent-research-skills/   31 sub-skills, selective activation
+  deep-research-skills/    5 sub-skills, prompt-only (safe)
   ...
 
 template/skill_adapters/   pkb-starter (routing rules)
@@ -144,10 +145,12 @@ template/skill_adapters/   pkb-starter (routing rules)
 ```
 
 Key principles:
+- **Catalog-driven**: 42 entries across 18 external repos. Extracted from live PKB installation.
 - **No bundling**: Skills are cloned from their own repos, not copied from pkb-starter.
 - **Adapter pattern**: Each skill gets a markdown adapter telling the LLM where to route output.
-- **Risk classification**: low (auto-install), medium (warn), high (require --enable-risky), reference_only (never install).
+- **Risk classification**: low (auto-install, 18 skills), medium (warn, 15 skills), high (require --enable-risky, 7 skills), reference_only (never install, 5 skills).
 - **No auto-execution**: Installation = `git clone --depth 1`. Nothing runs until you invoke the skill in Claude Code.
+- **Source diversity**: external_repo (9), local_template (12), plugin_marketplace (2), mcp_server (2), reference_only (5), built_in (5).
 
 ## Tools
 

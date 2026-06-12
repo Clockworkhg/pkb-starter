@@ -108,16 +108,22 @@ Set in frontmatter. The `/ask` skill respects this and won't expose `internal` c
 
 ## Optional Skills Security
 
-PKB's optional skill system uses the following safety measures:
+PKB's optional skill system (42 catalog entries, 18 external repos) uses the following safety measures:
 
 1. **No auto-execution**: Skills are installed via `git clone --depth 1` only. No install scripts, no post-clone hooks, no npm/pip install.
 2. **Vendored isolation**: Skills live in `skills/_vendor/` (gitignored). They do not modify PKB core files.
 3. **Adapter routing**: All skill output goes through PKB adapters that enforce `raw/`/`wiki/` placement. Skills cannot scatter files in the project root.
 4. **No MCP auto-config**: Skills requiring MCP servers need manual `.claude/mcp.json` configuration. PKB never touches MCP config.
 5. **No API key storage**: PKB never reads, stores, or passes API keys for third-party skills.
-6. **Risk classification**: High-risk and reference-only skills are blocked from auto-install. Users must opt in with `--enable-risky`.
-7. **LICENSE review**: Each skill repo should have a LICENSE file. Review it before use. PKB Starter does not verify third-party licenses.
-8. **Removal = delete directory**: To remove a skill, delete `skills/_vendor/<skill-id>/`. No lingering state.
+6. **Risk classification**: 
+   - 18 low-risk (auto-install)
+   - 15 medium-risk (warn before install)
+   - 7 high-risk (require `--enable-risky`)
+   - 5 reference-only (never installed)
+7. **LICENSE review**: Each skill entry records its license status. Skills with NO LICENSE are flagged. Reference-only entries (z-skills) are blocked from installation because of Anthropic copyright.
+8. **Plugin marketplace**: 2 skills are only installable via Claude Code's official plugin marketplace, not via git clone.
+9. **Removal = delete directory**: To remove a skill, delete `skills/_vendor/<skill-id>/`. No lingering state.
+10. **Audit trail**: `install_skills.py --audit-only` reports all installed skills with risk levels, license status, and INSTALL_NOTE.md presence.
 
 ## Reporting Security Issues
 
