@@ -6,6 +6,7 @@ Creates a new PKB directory from the pkb-starter template.
 Usage:
     python scripts/install.py "<target_directory>"
     python scripts/install.py "<target_directory>" --profile student
+    python scripts/install.py "<target_directory>" --profile student --dry-run
     python scripts/install.py "<target_directory>" --interactive-skills
     python scripts/install.py "<target_directory>" --skip-skills
     python scripts/install.py "<target_directory>" --no-git
@@ -87,8 +88,67 @@ def create_directories(target: Path) -> list[str]:
     return created
 
 
+# Profile descriptions for display during interactive selection
+PROFILE_DESCRIPTIONS = {
+    "core": {
+        "title": "Core",
+        "tagline": "Pure PKB. Zero external skills.",
+        "desc": "Basic personal knowledge base with PKB's built-in tools only: web collection, auto ingest, file import, health checks, privacy scanning, document conversion, git versioning. Start here and add skills later.",
+        "skills": 0,
+    },
+    "student": {
+        "title": "Student",
+        "tagline": "Coursework, papers, literature review.",
+        "desc": "Academic essentials for students: literature search and review, paper section writing, citation management (APA/GB/T 7714/IEEE), article extraction for research sources, YouTube transcript capture. Ideal for undergraduates and coursework-focused grad students.",
+        "skills": 8,
+    },
+    "research": {
+        "title": "Research",
+        "tagline": "Full academic pipeline. Graduate-level.",
+        "desc": "Comprehensive academic workflow: deep multi-turn research, agent-based research pipeline (31 sub-skills), literature tools, experiment design, data analysis, figure/table generation, Zotero integration, CNKI Chinese database access. For systematic academic research.",
+        "skills": 12,
+    },
+    "developer": {
+        "title": "Developer",
+        "tagline": "Code projects, docs, GitHub research.",
+        "desc": "Software engineering focused: document processing for technical docs, semantic code search (QMD), project kanban boards, GitHub repository analysis, code debugging, article extraction. For developers documenting projects and researching code.",
+        "skills": 7,
+    },
+    "creator": {
+        "title": "Creator",
+        "tagline": "Writers, musicians, filmmakers.",
+        "desc": "Content creation toolkit: AI prompt library management, song/lyrics archive with version tracking, script breakdown and storyboard generation, article extraction, YouTube transcripts, kanban project management. For creative professionals building a reference library.",
+        "skills": 7,
+    },
+    "output": {
+        "title": "Output & Publishing",
+        "tagline": "Reports, papers, presentations.",
+        "desc": "Output-focused: document conversion (DOCX/PDF/PPTX/MD), academic paper writing with evidence support, citation management, prompt library, slide generation. For users who primarily produce documents and reports.",
+        "skills": 7,
+    },
+    "security": {
+        "title": "Security & Privacy",
+        "tagline": "Audit, sanitize, harden.",
+        "desc": "Security-hardened minimal setup: enhanced secret scanning, privacy sanitization, git versioning with pre-commit checks. For auditing your knowledge base before sharing or publishing. Built-in sanitize-tool is always active regardless of profile.",
+        "skills": 3,
+    },
+    "full": {
+        "title": "Full Stack",
+        "tagline": "All 24 recommended skills. Power user.",
+        "desc": "Complete PKB ecosystem: academic research, document processing, creation tools, semantic search, project management, security hardening. High-risk skills (CNKI, Zotero) are NOT auto-enabled -- use --enable-risky to add them. Review risk levels before installing.",
+        "skills": 24,
+    },
+    "custom": {
+        "title": "Custom",
+        "tagline": "Hand-pick from 42 entries.",
+        "desc": "Interactive selection: browse the full 42-entry catalog and choose exactly which skills to install. See descriptions and risk levels before selecting. Best for advanced users who know what they need.",
+        "skills": "interactive",
+    },
+}
+
+
 def generate_config(target: Path) -> Path:
-    """Generate pkb.config.json."""
+    """Generate pkb.config.json with full skills state model."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     config = {
         "name": target.name,
@@ -107,6 +167,16 @@ def generate_config(target: Path) -> Path:
             "autopilot": True,
             "auto_commit": True,
             "privacy_level": "local",
+        },
+        "skills": {
+            "catalog_version": "0.4.0",
+            "installed_profiles": [],
+            "installed_skills": [],
+            "enabled_skills": [],
+            "disabled_skills": [],
+            "vendor_downloads": [],
+            "enabled_adapters": [],
+            "pending_audit": [],
         },
     }
     config_path = target / "pkb.config.json"
@@ -209,6 +279,7 @@ def main():
     skip_deps = "--no-deps" in sys.argv
     skip_skills = "--skip-skills" in sys.argv
     interactive_skills = "--interactive-skills" in sys.argv
+    dry_run = "--dry-run" in sys.argv
 
     # Parse --profile
     profile = "core"
@@ -219,8 +290,13 @@ def main():
 
     target = Path(target_dir).resolve()
 
-    print(f"=== PKB Starter Installer ===")
+    if interactive_skills:
+        profile = "custom"
+
+    print(f"=== PKB Starter Installer v0.4.0 ===")
     print(f"Target: {target}")
+    if dry_run:
+        print(f"Mode: DRY RUN -- no files will be written")
     print()
 
     # Pre-flight checks
@@ -278,11 +354,42 @@ def main():
     if not skip_skills:
         if interactive_skills:
             profile = "custom"
-        print(f"[7/{total_steps}] Installing optional skills (profile: {profile})...")
-        _run_skill_installer(target, profile)
+
+        # Show profile description
+        if profile in PROFILE_DESCRIPTIONS:
+            pd = PROFILE_DESCRIPTIONS[profile]
+            print(f"[7/{total_steps}] Optional Skills: {pd['title']} Profile")
+            print()
+            print(f"  {pd['tagline']}")
+            print(f"  {pd['desc']}")
+            print()
+            if pd['skills'] != "interactive" and pd['skills'] > 0:
+                print(f"  Skills in this profile: {pd['skills']}")
+                print()
+            if profile == "full":
+                print(f"  [NOTE] Full profile installs all recommended skills.")
+                print(f"         High-risk skills (CNKI, Zotero) are NOT auto-enabled.")
+                print(f"         Start with a smaller profile if unsure.")
+                print(f"         Recommended: install Core first, add skills later via /project:skills.")
+                print()
+            if profile == "custom":
+                print(f"  [NOTE] Custom profile lets you pick individual skills.")
+                print(f"         You will see the full catalog with descriptions and risks.")
+                print()
+        else:
+            print(f"[7/{total_steps}] Optional Skills: profile '{profile}'")
+
+        if dry_run:
+            print(f"  [DRY RUN] Would install skills for profile: {profile}")
+            print(f"  Run without --dry-run to actually install.")
+        else:
+            print(f"  Installing optional skills (profile: {profile})...")
+            _run_skill_installer(target, profile)
     else:
         if interactive_skills:
             print(f"[WARN] --interactive-skills ignored (--skip-skills is set)")
+        if profile != "core":
+            print(f"[WARN] --profile {profile} ignored (--skip-skills is set)")
         print(f"[7/{total_steps}] Skills -- skipped (--skip-skills)")
         total_steps = 6  # correction for display
 

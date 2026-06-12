@@ -58,40 +58,105 @@ These skills are built into the PKB template:
 
 ## Installation
 
-### With install.py (recommended)
+Skills can be installed during initial PKB setup OR anytime later. The runtime skill manager (`skill_manager.py` and `/project:skills`) works on a live PKB installation.
+
+### During initial setup (with install.py)
 ```bash
 python scripts/install.py "D:\MyKB" --profile student
-python scripts/install.py "D:\MyKB" --interactive-skills
-python scripts/install.py "D:\MyKB" --skip-skills   # core only
+python scripts/install.py "D:\MyKB" --profile student --dry-run   # preview only
+python scripts/install.py "D:\MyKB" --interactive-skills          # pick individually
+python scripts/install.py "D:\MyKB" --skip-skills                 # core only, add later
 ```
 
-### With install_skills.py (standalone)
+### Anytime after installation (with skill_manager.py)
 ```bash
-# List the full catalog
+# Browse and explore
+python scripts/skill_manager.py --target "D:\MyKB" --list
+python scripts/skill_manager.py --target "D:\MyKB" --describe deep-research-skills
+python scripts/skill_manager.py --target "D:\MyKB" --enabled
+
+# Install
+python scripts/skill_manager.py --target "D:\MyKB" --install deep-research-skills
+python scripts/skill_manager.py --target "D:\MyKB" --install-profile research --dry-run
+python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
+
+# Manage
+python scripts/skill_manager.py --target "D:\MyKB" --audit
+python scripts/skill_manager.py --target "D:\MyKB" --enable kanban-skill
+python scripts/skill_manager.py --target "D:\MyKB" --disable kanban-skill
+python scripts/skill_manager.py --target "D:\MyKB" --update-catalog
+```
+
+### With install_skills.py (legacy, during setup only)
+```bash
 python scripts/install_skills.py --list
-
-# List all profiles
 python scripts/install_skills.py --list-profiles
-
-# Dry run to preview
 python scripts/install_skills.py --target "D:\MyKB" --profile research --dry-run
-
-# Install with risky skills
-python scripts/install_skills.py --target "D:\MyKB" --profile full --enable-risky
-
-# Interactive custom selection
 python scripts/install_skills.py --target "D:\MyKB" --profile custom
-
-# Audit installed skills
 python scripts/install_skills.py --target "D:\MyKB" --audit-only
 ```
 
-### From Claude Code
+### From Claude Code (anytime)
 ```
-/project:skills --install student
-/project:skills --list
-/project:skills --audit
+/project:skills                       # Status overview
+/project:skills --list                # Browse catalog
+/project:skills --describe <id>       # Full details
+/project:skills --install <id>        # Single skill
+/project:skills --install-profile student
+/project:skills --audit               # Health check
+/project:skills --enabled             # What's active
+/project:skills --enable <id>         # Activate
+/project:skills --disable <id>        # Deactivate
+/project:skills --update-catalog      # Refresh
 ```
+
+## Runtime Skill Management
+
+PKB's skill system is designed for incremental adoption. You don't need to decide everything during setup:
+
+1. **Start with Core** — Pure PKB, zero external skills. All built-in tools work.
+2. **Add as needed** — `/project:skills --list` to browse, `--describe` to learn, `--install` to add.
+3. **Audit before enabling** — `--audit` checks LICENSE, .git, adapters. Then `--enable` activates.
+4. **Disable, don't delete** — `--disable` deactivates without removing source code.
+5. **Always reversible** — Delete `skills/_vendor/<id>/` to fully remove. Remove from config.
+
+### Skill Lifecycle
+
+```
+catalog entry  --install-->  skills/_vendor/<id>/  (downloaded, not active)
+                             |
+                             +--audit-->  review LICENSE, code, adapter
+                             |
+                             +--enable-->  adapter active, skill usable
+                             |
+                             +--disable-->  adapter inactive, code kept
+                             |
+                             +--delete directory-->  fully removed
+```
+
+### State Model (in pkb.config.json)
+
+```json
+"skills": {
+  "catalog_version": "0.4.0",
+  "installed_profiles": ["student"],
+  "installed_skills": ["deep-research-skills", "kanban-skill"],
+  "enabled_skills": ["kanban-skill"],
+  "disabled_skills": ["deep-research-skills"],
+  "vendor_downloads": ["deep-research-skills", "kanban-skill"],
+  "enabled_adapters": ["kanban_adapter.md"],
+  "pending_audit": []
+}
+```
+
+### Every Skill Shows Before Installation
+
+- **Short description** — one sentence summary
+- **Long description** — 2-4 sentences about use cases
+- **Best for** — typical scenarios
+- **Not for** — what to avoid
+- **Risk explanation** — plain language risk description
+- **Requirements** — API keys, MCP, external runtimes
 
 ## Risk Levels
 

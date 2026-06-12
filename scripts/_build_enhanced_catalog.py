@@ -1,0 +1,374 @@
+#!/usr/bin/env python3
+"""One-shot: read skill_catalog.json, add user-facing description fields, write enhanced version."""
+
+import json
+from pathlib import Path
+
+CATALOG_PATH = Path(__file__).resolve().parent.parent / "skills_registry" / "skill_catalog.json"
+
+catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+
+# -- Description data keyed by skill ID ---------------------------------
+# Fields: short_description, long_description, best_for, not_for,
+#         risk_explanation, recommended_profiles
+
+DESCRIPTIONS = {
+    "web-pack": {
+        "short_description": "Core web content collector that saves complete webpages with images, metadata, and structured inventories to your knowledge base.",
+        "long_description": "The primary web capture engine of PKB. It fetches URLs, extracts readable content via readability-lxml + trafilatura + BeautifulSoup fallback chain, downloads images with SHA256 dedup, and produces a structured webpack directory with README, manifest, and 5 inventory files. Handles GitHub repos specially via API + git clone.",
+        "best_for": ["Collecting web articles for research", "Archiving blog posts and tutorials", "Capturing GitHub repos and README docs", "Building a personal web archive"],
+        "not_for": ["Password-protected pages", "JavaScript-heavy SPAs that require browser rendering", "Real-time streaming content", "Sites that block all automated requests"],
+        "risk_explanation": "No external API calls or data uploads. Reads only public web content. Safe to use on any page. Does not read browser cookies or authentication state in safe mode.",
+        "recommended_profiles": ["core", "student", "research", "developer", "creator", "output", "full"]
+    },
+    "pkb-auto": {
+        "short_description": "Full autopilot ingest pipeline that takes anything (file, URL, text) and auto-classifies, compiles wiki pages, archives, and commits without asking.",
+        "long_description": "The central orchestration engine of PKB. Invoked by /project:pkb <anything>, it auto-detects input type (file/URL/GitHub/WeChat/text), runs the appropriate collector, classifies content by domain, creates structured wiki pages with proper frontmatter and [[wikilinks]], updates indices and logs, archives processed files, runs health checks, and git commits. Designed to be zero-interaction by default.",
+        "best_for": ["Daily knowledge capture workflow", "Batch processing multiple inputs", "Users who want zero-friction knowledge management"],
+        "not_for": ["Cases where you need to manually review every ingested item", "Extremely sensitive documents that need human classification", "When you want to customize every wiki page layout"],
+        "risk_explanation": "Runs entirely locally. Automatically scans for API keys/tokens/PII before commit. Will block and warn if sensitive data is detected. The autopilot never deletes files from raw/.",
+        "recommended_profiles": ["core", "student", "research", "developer", "creator", "output", "full"]
+    },
+    "import-to-inbox": {
+        "short_description": "Safe file import tool that copies files to _INBOX while scanning for API keys, tokens, passwords, and PII before ingest.",
+        "long_description": "The gatekeeper for all file imports into PKB. Copies files (never moves originals) to _INBOX/imported/, generates manifest.json with source tracking, and runs sensitive data detection before anything enters the knowledge base. Handles individual files and directory imports with smart filtering (.git, node_modules, __pycache__ auto-skipped).",
+        "best_for": ["Importing downloaded papers and documents", "Adding project files and notes", "Batch importing course materials"],
+        "not_for": ["Files containing API keys or secrets (blocked)", "System directories or application bundles", "Extremely large files (>1GB without review)"],
+        "risk_explanation": "No external data transmission. Scans file content for sensitive patterns before import. Blocks files with detected API keys/tokens/passwords and warns the user. Original files are never modified.",
+        "recommended_profiles": ["core", "student", "research", "developer", "creator", "output", "full"]
+    },
+    "sanitize-tool": {
+        "short_description": "Privacy scanner that detects API keys, tokens, passwords, ID numbers, phone, email, and other sensitive patterns in your knowledge base.",
+        "long_description": "Built-in privacy protection for PKB. Uses regex patterns to scan your knowledge base for sensitive information: API keys, tokens, passwords, private keys, OAuth secrets, connection strings, Chinese ID numbers, phone numbers, and email addresses. Can run in read-only scan mode or fix mode that redacts detected patterns. Automatically invoked before every git commit by /project:save.",
+        "best_for": ["Pre-commit privacy scanning", "Auditing knowledge base before sharing", "Checking imported documents for accidental PII", "Regular privacy hygiene"],
+        "not_for": ["Guaranteed removal of all PII (no regex is perfect)", "Encrypted or obfuscated content", "Non-text files (PDFs, images)"],
+        "risk_explanation": "Reads your local files only. Never uploads data. Operates on disk only. The scan patterns are regex-based and may have false positives or negatives.",
+        "recommended_profiles": ["core", "student", "research", "developer", "creator", "output", "security", "full"]
+    },
+    "docs-update": {
+        "short_description": "Documentation freshness checker that detects stale references in project docs and auto-fixes them.",
+        "long_description": "Maintains consistency between your filesystem and project documentation. Detects drift in index.md, COMMANDS.md, SKILL_LINKS.md, and log.md — missing tool references, unregistered commands, undocumented skills, stale timestamps. Called automatically by /project:save and available standalone as /project:docs-update.",
+        "best_for": ["Maintaining documentation consistency", "Ensuring new tools are registered", "Keeping command references accurate"],
+        "not_for": ["Writing new documentation from scratch", "Fixing content in wiki/ pages (only touches project-level docs)", "Spell-checking or grammar correction"],
+        "risk_explanation": "Reads and writes project-level markdown files only. Never touches wiki/ content or raw/ data. Changes are limited to adding missing entries and updating timestamps.",
+        "recommended_profiles": ["core", "student", "research", "developer", "creator", "output", "full"]
+    },
+    "obsidian-skills": {
+        "short_description": "Claude Code skills for Obsidian vault management: create, rename, move notes, manage wikilinks, Canvas whiteboards, and Bases databases.",
+        "long_description": "Integrates Claude Code with Obsidian's vault system. Lets you create and organize notes with proper [[wikilinks]], manage Canvas whiteboards visually, work with Bases (database-like tables), and use the Obsidian Web Clipper extension. Enhances the wiki/ browsing experience when you open your PKB as an Obsidian vault.",
+        "best_for": ["Users who browse their PKB wiki/ in Obsidian", "Visual knowledge graph exploration", "Managing complex note structures", "Canvas-based brainstorming"],
+        "not_for": ["Users who don't use Obsidian", "Non-Markdown file management", "Replacing PKB's core ingest pipeline"],
+        "risk_explanation": "Official plugin by Obsidian's creator (kepano). Installed via Claude Code plugin marketplace. Operates on your local markdown files. No data leaves your machine. Requires Obsidian desktop app for full functionality.",
+        "recommended_profiles": ["student", "research", "developer", "creator", "output", "full"]
+    },
+    "academic-research-skills": {
+        "short_description": "Full academic research pipeline: paper planning, literature review, outline generation, abstract writing, citation checking, peer review simulation, and format conversion.",
+        "long_description": "A comprehensive Claude Code plugin (14 sub-skills) covering the complete academic workflow. Includes research planning (research_architect_agent), literature review synthesis (synthesis_agent), paper outline generation, abstract writing, citation validation, format conversion between LaTeX/Word/Markdown, peer review simulation, and revision coaching. Output routes to wiki/outputs/research/ and wiki/sources/.",
+        "best_for": ["Graduate students writing papers", "Academic researchers preparing manuscripts", "Systematic literature reviews", "Peer review preparation and response"],
+        "not_for": ["Undergraduate homework assignments (overkill)", "Non-academic writing", "Users who don't need structured academic output"],
+        "risk_explanation": "Installed via Claude Code plugin marketplace. Prompt-based (no executable scripts). May consume significant tokens for multi-agent research pipelines. Does not require API keys or external runtimes beyond Claude. Output is saved locally.",
+        "recommended_profiles": ["student", "research", "output", "full"]
+    },
+    "deep-research-skills": {
+        "short_description": "Structured multi-turn deep research: topic scoping, multi-source information gathering, evidence synthesis, and structured report generation.",
+        "long_description": "A prompt-only skill set (5 sub-skills) designed for thorough multi-turn research. Starts with topic scoping and question decomposition, searches multiple sources iteratively, synthesizes findings with evidence tracking, and generates structured reports. Unlike single-pass search, it can go deeper on specific aspects and cross-reference across sources.",
+        "best_for": ["Complex research questions requiring multiple angles", "Generating comprehensive research reports", "Evidence-based writing with source tracking"],
+        "not_for": ["Quick factual lookups (use /project:ask)", "Real-time news (training data cutoff applies)", "Highly specialized domain research needing expert verification"],
+        "risk_explanation": "MIT licensed. Prompt-only design — no executable code, no external API calls, no data upload. The main cost is token usage: deep multi-turn research can consume significant tokens. Output is saved locally to your wiki/.",
+        "recommended_profiles": ["research", "full"]
+    },
+    "agent-research-skills": {
+        "short_description": "Comprehensive agent-based research pipeline with 31 sub-skills covering literature search, paper writing, experiment design, data analysis, and peer review rebuttal.",
+        "long_description": "The most comprehensive academic research skill collection available. Organized in 4 tiers: Tier 1 (essential) covers literature search, review, paper section writing, and idea generation. Tier 2 (writing) adds algorithm design, experiment design, data analysis, figure/table generation, citation management, and paper revision. Tier 3 (advanced) includes code debugging, GitHub research, survey generation, and slide creation. Tier 4 (specialized) handles paper-to-code, LaTeX formatting, novelty assessment, and paper assembly. Selective activation recommended.",
+        "best_for": ["PhD researchers and advanced academics", "Systematic paper writing from idea to camera-ready", "Complex experiment design and data analysis", "Peer review rebuttal writing"],
+        "not_for": ["Quick note-taking or simple literature searches", "Undergraduate coursework (Tier 1 may be sufficient)", "Users uncomfortable with NO LICENSE repos"],
+        "risk_explanation": "NO LICENSE FILE — treat as all rights reserved. Use for personal reference only. 31 sub-skills across 4 tiers; selective activation recommended to manage complexity. Prompt-based design: no executable code beyond Claude Code skill invocations. Tier 2+ sub-skills generate analysis code — review before executing.",
+        "recommended_profiles": ["research", "full"]
+    },
+    "literature-search": {
+        "short_description": "Multi-source academic literature search across Semantic Scholar, arXiv, and OpenAlex with structured results including titles, authors, abstracts, and citation counts.",
+        "long_description": "Part of agent-research-skills (Tier 1). Searches multiple academic databases simultaneously: Semantic Scholar for broad coverage, arXiv for preprints, OpenAlex for open-access papers. Returns structured results with titles, authors, abstracts, publication dates, citation counts, and direct links. Can filter by date range and sort by relevance or citations.",
+        "best_for": ["Initial literature survey for a new research topic", "Finding recent papers in a specific area", "Checking what exists before starting a project"],
+        "not_for": ["Paywalled content behind academic publisher walls", "CNKI Chinese-language papers (use cnki-skills)", "Full-text search inside papers"],
+        "risk_explanation": "Part of agent-research-skills (NO LICENSE). Uses public academic APIs — no authentication needed. Search queries are sent to Semantic Scholar/arXiv/OpenAlex. Results are saved locally.",
+        "recommended_profiles": ["student", "research", "full"]
+    },
+    "literature-review": {
+        "short_description": "Multi-perspective dialogic literature review that synthesizes papers through contrasting viewpoints, identifies research gaps and tensions.",
+        "long_description": "Part of agent-research-skills (Tier 1). Goes beyond simple paper summarization by creating a dialogic review: presents findings through contrasting perspectives, maps the research landscape, identifies gaps and tensions between papers, and suggests promising research directions. Produces structured literature review documents ready for paper introduction sections.",
+        "best_for": ["Writing paper introduction and related work sections", "Identifying research gaps", "Understanding conflicting findings in a field"],
+        "not_for": ["Simple paper summaries (use /project:ask)", "Systematic reviews requiring exhaustive coverage", "Meta-analyses requiring statistical synthesis"],
+        "risk_explanation": "Part of agent-research-skills (NO LICENSE). Prompt-only — no external API calls. Synthesizes from papers you provide or that literature-search finds. Review the generated synthesis before citing in formal publications.",
+        "recommended_profiles": ["student", "research", "full"]
+    },
+    "paper-writing-section": {
+        "short_description": "Academic paper section drafting with structured writing, evidence support, citation placement, and academic tone.",
+        "long_description": "Part of agent-research-skills (Tier 1). Helps draft individual paper sections (introduction, methods, results, discussion, conclusion) with proper academic structure. Incorporates evidence from your literature sources, suggests citation placements, maintains consistent academic tone, and ensures logical flow between sections.",
+        "best_for": ["Drafting paper sections with evidence integration", "Overcoming writer's block with structured outlines", "Ensuring consistent academic tone across sections"],
+        "not_for": ["Final camera-ready writing without human revision", "Creative or journalistic writing", "Generating content without supporting evidence"],
+        "risk_explanation": "Part of agent-research-skills (NO LICENSE). Generates draft text based on provided sources. Always review and revise generated content before submission. Does not access external databases during writing.",
+        "recommended_profiles": ["student", "research", "output", "full"]
+    },
+    "citation-management": {
+        "short_description": "Citation collection, validation, and formatting supporting GB/T 7714, APA 7.0, IEEE, MLA. Harvests missing citations from drafts using Semantic Scholar.",
+        "long_description": "Part of agent-research-skills (Tier 2). Manages academic citations end-to-end: extracts citation keys from your draft, searches for complete metadata via Semantic Scholar, validates author names/dates/venues, formats citations in your chosen style (GB/T 7714 for Chinese journals, APA 7.0, IEEE, MLA), and generates formatted reference lists. Can also check existing citations for completeness.",
+        "best_for": ["Formatting reference lists for paper submission", "Validating citation completeness before submission", "Converting between citation styles"],
+        "not_for": ["Managing a personal reference library (use Zotero)", "Bulk PDF metadata extraction", "Non-academic citation formats"],
+        "risk_explanation": "Part of agent-research-skills (NO LICENSE). Uses Semantic Scholar API for metadata lookup — no authentication needed. Always verify generated citations against the actual papers before submission.",
+        "recommended_profiles": ["student", "research", "output", "full"]
+    },
+    "data-analysis": {
+        "short_description": "Statistical analysis code generation with 4-round review: selects appropriate tests, interprets results, produces reports with p-values, effect sizes, and confidence intervals.",
+        "long_description": "Part of agent-research-skills (Tier 2). Generates statistical analysis code in Python with a rigorous 4-round self-review process: (1) test selection based on data characteristics, (2) assumption checking and data preparation, (3) execution and result interpretation, (4) report generation with p-values, effect sizes, confidence intervals, and visualization recommendations. Supports common tests: t-tests, ANOVA, regression, chi-square, non-parametric alternatives.",
+        "best_for": ["Researchers who need statistical analysis but aren't statisticians", "Validating analysis approach with multiple review rounds", "Generating publication-ready statistical reports"],
+        "not_for": ["Replacing consultation with a statistician for critical studies", "Real-time data analysis or streaming data", "Proprietary statistical software workflows"],
+        "risk_explanation": "Part of agent-research-skills (NO LICENSE). Generates Python analysis code — ALWAYS review before executing. The 4-round review improves reliability but does not guarantee correctness. Statistical results should be verified independently for publication.",
+        "recommended_profiles": ["research", "full"]
+    },
+    "code-debugging": {
+        "short_description": "Systematic code debugging with root cause analysis, fix generation, and regression testing guidance.",
+        "long_description": "Part of agent-research-skills (Tier 3). Provides structured debugging for research code: reproduces the error, traces root cause through systematic hypothesis testing, generates targeted fixes with explanation, and suggests regression tests. Designed for the messy reality of research code where errors may be in logic, data processing, or library usage.",
+        "best_for": ["Debugging research code and analysis scripts", "Understanding unexpected results in data pipelines", "Fixing reproducible errors with systematic approach"],
+        "not_for": ["Production system debugging (use proper debugging tools)", "Heisenbugs requiring runtime inspection", "Performance profiling and optimization"],
+        "risk_explanation": "Part of agent-research-skills (NO LICENSE). Guides debugging — does not auto-execute code. Always review suggested fixes before applying. For safety, test fixes in an isolated environment first.",
+        "recommended_profiles": ["developer", "full"]
+    },
+    "github-research": {
+        "short_description": "GitHub repository research: code structure analysis, dependency mapping, contributor tracking, and release history.",
+        "long_description": "Part of agent-research-skills (Tier 3). Analyzes GitHub repositories for research purposes: maps code structure and architecture, identifies key dependencies, tracks contributor activity and release history, assesses project maturity and maintenance status. Useful for evaluating research code repositories before building on them.",
+        "best_for": ["Evaluating research code repos before adoption", "Understanding open-source project architecture", "Assessing project maintenance and community health"],
+        "not_for": ["Security vulnerability scanning", "License compliance auditing", "Real-time repository monitoring"],
+        "risk_explanation": "Part of agent-research-skills (NO LICENSE). Uses public GitHub API — may hit rate limits without authentication. Only analyzes public repository metadata and structure, not private code.",
+        "recommended_profiles": ["developer", "full"]
+    },
+    "anthropic-skills": {
+        "short_description": "Official Anthropic skill collection: document processing (DOCX/PDF/PPTX/XLSX), creative tools, MCP builder, webapp testing, and enterprise brand guidelines.",
+        "long_description": "Anthropic's official Claude Code skill repository with 17+ skills. Document processing skills handle DOCX creation/editing, PDF generation, PPTX presentations, and XLSX spreadsheets. Creative tools include algorithmic art, canvas design, and theme factories. Development tools include MCP server builder and webapp testing. Enterprise tools cover brand guidelines and internal communications. Most skills are Apache 2.0 licensed; docx/pdf/pptx/xlsx are source-available.",
+        "best_for": ["Programmatic document generation", "Creating branded presentations and designs", "Building MCP servers", "Enterprise documentation workflows"],
+        "not_for": ["Users who only need basic document conversion (use document-converter)", "Production document pipelines without review", "Replacing desktop office suites entirely"],
+        "risk_explanation": "Apache 2.0 for most skills; docx/pdf/pptx/xlsx are source-available (not open source). Prompt-based design. Document processing skills generate files locally — no cloud upload. Review generated documents before sharing. Selective installation recommended.",
+        "recommended_profiles": ["developer", "output", "full"]
+    },
+    "document-converter": {
+        "short_description": "Document format conversion: DOCX/PDF/PPTX to and from Markdown with text extraction and structure preservation.",
+        "long_description": "PKB self-built document conversion skill. Converts common academic and office formats to Markdown for wiki integration. Handles DOCX (Word) text extraction with heading structure, PDF text extraction with page awareness, PPTX (PowerPoint) slide-to-markdown conversion with speaker notes. Also supports Markdown-to-DOCX for output generation. Requires python-docx, python-pptx, and PyPDF2 packages.",
+        "best_for": ["Converting course handouts to wiki pages", "Extracting text from PDF papers for search", "Converting presentations to searchable notes"],
+        "not_for": ["Complex PDF layouts with columns/tables", "Scanned PDFs without OCR (use ocr-helper)", "Preserving exact visual formatting"],
+        "risk_explanation": "PKB self-built (MIT). Runs entirely locally. Reads files you provide, writes Markdown to your wiki/. Does not modify original files. Requires Python packages listed in requirements.txt.",
+        "recommended_profiles": ["core", "student", "research", "developer", "output", "full"]
+    },
+    "ocr-helper": {
+        "short_description": "OCR processing for images and scanned PDFs using Windows OCR API, Tesseract, or xparse-cli fallback chain.",
+        "long_description": "PKB self-built OCR skill for extracting text from images and scanned documents. Uses a fallback chain: Windows OCR API (built-in, no install) on Windows, Tesseract OCR (open source, cross-platform), or xparse-cli (third-party tool). Output is routed to raw/imported_processed/ as extracted text files ready for wiki compilation.",
+        "best_for": ["Extracting text from scanned PDFs", "OCR on photos of documents or whiteboards", "Processing image-based course materials"],
+        "not_for": ["Real-time OCR or video OCR", "Handwriting recognition (limited accuracy)", "Production document digitization pipelines"],
+        "risk_explanation": "Medium risk due to external runtime dependency (Tesseract or xparse-cli). PKB self-built (MIT). Requires installing Tesseract OCR separately on non-Windows systems or using xparse-cli. OCR runs entirely locally — no cloud OCR services used.",
+        "recommended_profiles": ["research", "full"]
+    },
+    "web-clipper-helper": {
+        "short_description": "Browser clipping assistant that integrates with MarkDownload and Obsidian Web Clipper browser extensions for rich content capture.",
+        "long_description": "PKB self-built helper for browser-based content clipping. Works with the MarkDownload extension (converts web pages to clean Markdown) and Obsidian Web Clipper (captures structured content directly to Obsidian vault). Enhances the /project:clip command with richer metadata extraction and proper PKB directory routing.",
+        "best_for": ["Quick web page clipping while browsing", "Capturing content behind login walls", "Research sessions with many pages to save"],
+        "not_for": ["Full website mirroring", "Automated bulk web scraping", "Users who don't use browser extensions"],
+        "risk_explanation": "PKB self-built (MIT). Requires browser extensions for full functionality. The skill itself only routes and processes content already captured by extensions. No direct web access.",
+        "recommended_profiles": ["student", "research", "creator", "full"]
+    },
+    "prompt-library": {
+        "short_description": "AI prompt library management: save, search, reuse, and version your best prompts with tags and categories.",
+        "long_description": "PKB self-built prompt management skill. Stores your best AI prompts in a searchable, tagged library under wiki/prompts/. Tracks prompt versions, use cases, and effectiveness notes. Lets you quickly retrieve prompts by category or keyword. Useful for anyone who works extensively with AI models and wants to build a reusable prompt collection.",
+        "best_for": ["AI power users building prompt collections", "Creative professionals iterating on AI image/text prompts", "Teams sharing effective prompts", "Version tracking for prompt engineering"],
+        "not_for": ["Storing API keys or credentials in prompts (blocked)", "Sharing prompts publicly (privacy scan applies)", "Real-time prompt optimization or A/B testing"],
+        "risk_explanation": "PKB self-built (MIT). Stores prompts as local markdown files. The sanitize-tool scans prompt content for accidentally included API keys. No prompts are uploaded anywhere.",
+        "recommended_profiles": ["creator", "output", "full"]
+    },
+    "song-archive": {
+        "short_description": "Lyrics and Suno AI style version management: track song versions, style prompts, and generation metadata.",
+        "long_description": "PKB self-built archive for AI-generated music. Manages song lyrics, Suno AI style prompts, version history, and generation metadata. Organizes songs by genre, mood, and style. Tracks which prompts produced which results for iterative refinement. Output stored in wiki/creation/songs/.",
+        "best_for": ["AI music creators using Suno/Udio", "Lyrics writers tracking versions", "Building a personal AI music catalog"],
+        "not_for": ["Copyrighted lyrics management (respect copyright)", "Professional music production", "Audio file storage (stores metadata, not audio)"],
+        "risk_explanation": "PKB self-built (MIT). Stores text metadata only — not audio files. Be mindful of copyright when archiving lyrics from existing songs. Generated content stays local.",
+        "recommended_profiles": ["creator", "full"]
+    },
+    "script-breakdown": {
+        "short_description": "Script/screenplay breakdown: scene analysis, storyboard generation, and AI image generation prompts for film/video pre-production.",
+        "long_description": "PKB self-built creative pre-production tool. Takes a script or screenplay and breaks it down scene by scene: identifies characters, locations, props, mood, and visual requirements. Generates storyboard descriptions and AI image generation prompts (Midjourney/DALL-E/Stable Diffusion format) for each scene. Output organized in wiki/creation/scripts/.",
+        "best_for": ["Filmmakers and video creators in pre-production", "Generating consistent AI image prompts from scripts", "Organizing scene-by-scene production requirements"],
+        "not_for": ["Final storyboard artwork generation (generates prompts, not images)", "Live-action production scheduling", "Budget estimation or line production"],
+        "risk_explanation": "PKB self-built (MIT). Text processing only — reads scripts, generates text prompts. No image generation. Does not require API keys for image services (you use the prompts separately).",
+        "recommended_profiles": ["creator", "full"]
+    },
+    "git-versioning": {
+        "short_description": "Enhanced git save/rollback with smart commit message generation, pre-commit secret scan, and safe rollback with diff preview.",
+        "long_description": "PKB self-built meta skill that extends git operations with PKB-specific intelligence. Generates descriptive commit messages based on changed files and wiki page types. Runs secret-scan before every commit and blocks on critical findings. Provides safe rollback with diff preview before reverting. Supports viewing recent commit history formatted for knowledge base workflow.",
+        "best_for": ["Daily knowledge base versioning", "Safe rollback of accidental changes", "Ensuring no secrets are committed"],
+        "not_for": ["Complex git workflows (rebasing, cherry-picking)", "Collaborative git with multiple remotes", "Replacing a full git GUI"],
+        "risk_explanation": "PKB self-built (MIT). Runs standard git commands with safety checks. Never force-pushes. The rollback shows diff before reverting. Does not modify git configuration.",
+        "recommended_profiles": ["core", "student", "research", "developer", "creator", "output", "security", "full"]
+    },
+    "skill-creator": {
+        "short_description": "New skill creation wizard: guided workflow for creating Claude Code skills with proper SKILL.md frontmatter and command registration.",
+        "long_description": "PKB self-built tool for extending your knowledge base with custom skills. Provides a guided wizard that creates properly structured skill directories under skills/<category>/, generates SKILL.md with correct frontmatter, registers commands in .claude/commands/, and sets up adapter routing if needed. Ensures new skills follow PKB conventions and are properly documented.",
+        "best_for": ["Creating custom PKB automation skills", "Extending PKB with domain-specific workflows", "Learning Claude Code skill development"],
+        "not_for": ["Creating skills for distribution (use Anthropic's skill-creator)", "Modifying existing skills (use skill-lint)", "Quick one-off scripts (use tools/ instead)"],
+        "risk_explanation": "PKB self-built (MIT). Creates markdown and configuration files only. Does not execute any code. New skills are inert until explicitly invoked in Claude Code.",
+        "recommended_profiles": ["core", "developer", "full"]
+    },
+    "skill-lint": {
+        "short_description": "Skill health check: validates SKILL.md frontmatter, checks command registrations, verifies script references, and ensures .gitignore coverage.",
+        "long_description": "PKB self-built quality assurance tool for the skill ecosystem. Validates that all skills have proper SKILL.md with required frontmatter fields, checks that every registered command has a corresponding .md file and vice versa, verifies that scripts referenced in skills actually exist, and ensures vendored skills are covered by .gitignore. Keeps your skill collection consistent and maintainable.",
+        "best_for": ["Auditing skill ecosystem health", "After installing multiple skills", "Before committing skill changes", "Debugging broken commands"],
+        "not_for": ["Testing skill functionality (skills are prompt-based)", "Performance benchmarking", "Security auditing of third-party skill code"],
+        "risk_explanation": "PKB self-built (MIT). Read-only analysis of markdown and configuration files. Does not execute any skill code. Reports issues for human resolution.",
+        "recommended_profiles": ["core", "developer", "full"]
+    },
+    "secret-scan": {
+        "short_description": "Pre-commit secret scanning: detects API keys, tokens, passwords, private keys, OAuth secrets, connection strings, and PII patterns in staged files.",
+        "long_description": "PKB self-built security scanner that runs automatically before every git commit. Uses regex patterns to detect: API keys (various formats), authentication tokens, database connection strings, private keys (SSH, PGP, SSL), OAuth client secrets, and PII patterns (Chinese ID numbers, phone numbers, email addresses). Blocks the commit if critical patterns are found and warns on potential PII. Also available as standalone scan.",
+        "best_for": ["Pre-commit safety check (automatic)", "Auditing knowledge base before sharing", "Regular security hygiene scans"],
+        "not_for": ["Guaranteed detection of all secrets (no regex is perfect)", "Encrypted or encoded secrets", "Binary file scanning"],
+        "risk_explanation": "PKB self-built (MIT). Reads staged git files only. Never uploads data. False positives may block commits — review and adjust. False negatives are possible for obfuscated secrets.",
+        "recommended_profiles": ["core", "student", "research", "developer", "creator", "output", "security", "full"]
+    },
+    "qmd": {
+        "short_description": "Hybrid semantic search over local markdown knowledge bases: BM25 + vector embeddings + LLM reranking with optional MCP server mode.",
+        "long_description": "QMD (Query Markdown) provides powerful local semantic search across your markdown knowledge base. Combines three search strategies: BM25 for keyword matching, vector embeddings for semantic similarity, and LLM reranking for result quality. Can run as a CLI tool for one-off searches or as an MCP server for continuous availability in Claude Code. Auto-downloads a GGUF embedding model (~2GB) on first run.",
+        "best_for": ["Finding semantically related notes across your entire wiki/", "Discovering connections between concepts", "Deep search beyond simple keyword matching"],
+        "not_for": ["Web search (searches local files only)", "Small knowledge bases (<50 pages — simple grep may suffice)", "Users with limited disk space (embedding model is ~2GB)"],
+        "risk_explanation": "MIT licensed. Requires Node.js 22+. Auto-downloads ~2GB GGUF embedding model on first run. All processing is local — no data leaves your machine. MCP server mode needs manual .claude/mcp.json configuration. PKB never auto-configures MCP.",
+        "recommended_profiles": ["research", "developer", "full"]
+    },
+    "kanban-skill": {
+        "short_description": "Markdown file-based Kanban board management: cards as .md files, status in YAML frontmatter, columns Backlog/To Do/In Progress/Done.",
+        "long_description": "A lightweight project management skill that uses your PKB file system as a Kanban board. Each task is a markdown file with YAML frontmatter tracking status, priority, and assignments. Columns map to directories under wiki/tasks/. Zero external dependencies — pure local markdown. Invoked via /project:kanban for board operations.",
+        "best_for": ["Personal project task tracking", "Research project milestone management", "Lightweight workflow management without external tools"],
+        "not_for": ["Team project management with multiple contributors", "Complex workflows with automation rules", "Replacing Jira/Linear/Notion for team use"],
+        "risk_explanation": "Apache 2.0 licensed. Operates entirely on local markdown files. No external services, no API calls, no data upload. Cannot accidentally delete tasks — just moves files between directories.",
+        "recommended_profiles": ["developer", "creator", "full"]
+    },
+    "sanitize-skill": {
+        "short_description": "Enhanced sensitive information scanner and anonymizer with additional patterns beyond the built-in sanitize-tool.",
+        "long_description": "An external skill (MIT licensed) that complements PKB's built-in sanitize-tool with additional detection patterns and anonymization capabilities. Detects API keys, tokens, ID numbers, phone numbers, and email addresses in markdown files. Supports read-only scan mode and redaction mode. Integrates with /project:sanitize for an enhanced privacy scanning workflow.",
+        "best_for": ["Pre-publication privacy audit", "Enhanced PII detection beyond built-in patterns", "Redacting sensitive data from wiki pages"],
+        "not_for": ["Real-time privacy monitoring", "Non-text file scanning", "Guaranteed 100% PII removal"],
+        "risk_explanation": "MIT licensed. Reads and potentially modifies local markdown files (in fix mode). Always run in read-only scan mode first to review findings. Make a git commit before running fix mode so you can rollback.",
+        "recommended_profiles": ["security", "full"]
+    },
+    "tapestry-skills": {
+        "short_description": "Collection of 7 practical Claude Code skills: article extraction, YouTube transcripts, learning capture, scrum facilitation, session logging, and more.",
+        "long_description": "A well-rounded skill collection by michalparkola (MIT licensed). Includes: article-extractor (fast single-page extraction with readability-cli→trafilatura→curl fallback), youtube-transcript (transcript extraction via yt-dlp), learn-this (capture learning moments), scrum-sage (scrum facilitation), session-log (session recording), ship-learn-next (continuous improvement workflow), and unblock-action (getting unstuck). Selective installation recommended.",
+        "best_for": ["Users wanting a curated set of general-purpose skills", "Article and transcript collection workflows", "Agile/scrum practitioners", "Continuous learning capture"],
+        "not_for": ["Users who only need one specific skill (install individually)", "Enterprise environments requiring per-skill license review", "Replacing PKB's core web_pack for full web collection"],
+        "risk_explanation": "MIT licensed. 7 independent sub-skills. article-extractor uses external CLI tools (readability-cli, trafilatura). youtube-transcript requires yt-dlp. Other sub-skills are prompt-only. Selective install recommended to minimize dependencies.",
+        "recommended_profiles": ["full"]
+    },
+    "article-extractor": {
+        "short_description": "Single web article fast extraction with three-tier fallback: readability-cli → trafilatura → curl. Complements full web_pack with quick single-page clipping.",
+        "long_description": "Part of tapestry-skills (MIT). Designed for fast extraction of single web articles when you don't need the full web_pack pipeline. Uses a three-tier extraction strategy: readability-cli for best results, trafilatura as Python fallback, curl + basic HTML parsing as last resort. Much faster than a full webpack — ideal for research sessions where you're collecting many individual articles.",
+        "best_for": ["Quick single-article capture during research", "When web_pack full mode is too slow", "Collecting reading materials for later deep processing"],
+        "not_for": ["Full page archival with images (use web_pack)", "JavaScript-heavy sites requiring browser rendering", "Batch URL collection (web_pack is better for this)"],
+        "risk_explanation": "MIT licensed (bundled in tapestry-skills). Uses local CLI tools. No API keys needed. No data upload. Can be slower on sites that block automated requests.",
+        "recommended_profiles": ["student", "research", "developer", "creator", "full"]
+    },
+    "youtube-transcript": {
+        "short_description": "YouTube/Bilibili video transcript extraction via yt-dlp with fallback chain: manual captions → auto-generated captions → Whisper.",
+        "long_description": "Part of tapestry-skills (MIT). Extracts transcripts from YouTube and Bilibili videos for knowledge base integration. Uses yt-dlp for reliable extraction with a fallback chain: first tries manual captions (highest quality), then auto-generated captions, and optionally Whisper for videos without any captions. Output is saved as markdown in your knowledge base for search and reference.",
+        "best_for": ["Extracting speaker notes from conference talks", "Capturing lecture content for study", "Saving tutorial/instructional video content as searchable text"],
+        "not_for": ["Copyrighted content redistribution", "Music videos or content where transcript has no value", "Live streams (need to wait for recording)"],
+        "risk_explanation": "MIT licensed (bundled in tapestry-skills). Requires yt-dlp (external dependency). All processing is local. No API keys needed. Be mindful of copyright when archiving transcripts.",
+        "recommended_profiles": ["student", "research", "creator", "full"]
+    },
+    "youtube-skills": {
+        "short_description": "Comprehensive YouTube skill collection: 12 sub-skills for transcript/caption extraction, channel analysis, playlist management, and search.",
+        "long_description": "A comprehensive YouTube interaction skill set (MIT licensed, 12 sub-skills). Includes: captions and subtitles extraction via yt-dlp, TranscriptAPI.com integration for high-quality transcripts, YouTube Data API integration for channel/playlist/search operations, and bulk video data collection. Some sub-skills require a TranscriptAPI.com API key; the yt-dlp based sub-skills do not.",
+        "best_for": ["YouTube channel analysis and research", "Building a video content archive", "Playlist and channel metadata collection"],
+        "not_for": ["Simple transcript extraction (use youtube-transcript from tapestry)", "Users without YouTube Data API access (some features limited)", "Downloading video files (transcript/text only)"],
+        "risk_explanation": "MIT licensed. 12 sub-skills. Some require TranscriptAPI.com API key or YouTube Data API key — PKB never stores these. Configure API keys yourself. yt-dlp based sub-skills (captions, subtitles) don't need API keys and are safer to start with.",
+        "recommended_profiles": ["full"]
+    },
+    "cnki-skills": {
+        "short_description": "CNKI (China National Knowledge Infrastructure) database interaction via Chrome DevTools MCP: search, browse, download PDF/CAJ, and export citations.",
+        "long_description": "A comprehensive skill collection for interacting with CNKI (中国知网), the largest Chinese academic database. Uses Chrome DevTools MCP to control a browser with your CNKI login session. Includes 10 sub-skills: search, advanced search, paper detail view, PDF/CAJ download, citation export, result parsing, page navigation, journal search, journal index browsing, and table of contents extraction. PKB provides a cnki-researcher orchestrator agent and cnki_setup.py for one-click MCP configuration.",
+        "best_for": ["Chinese-language academic research", "Downloading CNKI papers with institutional access", "Systematic literature collection from Chinese journals", "Building Chinese-language reference lists"],
+        "not_for": ["Users without CNKI institutional access (most content is paywalled)", "Automated bulk downloading (may trigger anti-scraping)", "English-language literature (use Semantic Scholar/arXiv instead)"],
+        "risk_explanation": "HIGH RISK. Requires: (1) Chrome running with --remote-debugging-port=9222, (2) valid CNKI institutional login, (3) Chrome DevTools MCP configured in .claude/mcp.json. Captcha handling requires manual user intervention. CNKI may rate-limit or block automated access. PKB includes cnki_setup.py for safe MCP configuration but never auto-configures it.",
+        "recommended_profiles": ["research", "full"]
+    },
+    "zotero-mcp": {
+        "short_description": "MCP server connecting Claude Code to Zotero reference manager: search local library, import references, access collections and attachments.",
+        "long_description": "An MCP (Model Context Protocol) server that bridges Claude Code with your local Zotero reference manager. Enables searching your Zotero library directly from Claude Code, importing new references, browsing collections, and accessing attachments. Requires Zotero running locally with the Better BibTeX plugin installed. This is infrastructure — not a skill you invoke directly, but a server that skills can use.",
+        "best_for": ["Researchers with established Zotero libraries", "Integrating Zotero references into PKB wiki pages", "Searching personal reference library from Claude Code"],
+        "not_for": ["Users without Zotero installed", "Quick literature search (use literature-search instead)", "Users uncomfortable configuring MCP servers manually"],
+        "risk_explanation": "HIGH RISK. Requires: (1) Zotero desktop running locally, (2) Better BibTeX plugin for Zotero, (3) Node.js environment, (4) manual .claude/mcp.json configuration. PKB never auto-configures MCP servers. This is third-party infrastructure — review the repo's security before installing.",
+        "recommended_profiles": ["research", "full"]
+    },
+    "zotero-mcp-skill": {
+        "short_description": "Claude Code skill companion for zotero-mcp: bibliography management, citation search, and reference import workflows.",
+        "long_description": "A Claude Code skill that works on top of the zotero-mcp server. Provides user-friendly workflows for bibliography management, citation searching, reference importing, and collection organization. Requires zotero-mcp to be installed and configured first — it cannot function independently. Useful for researchers who want to manage their Zotero library through natural language commands in Claude Code.",
+        "best_for": ["Managing Zotero library from Claude Code", "Natural language reference search", "Batch reference operations"],
+        "not_for": ["Users without zotero-mcp already configured", "Standalone reference management (requires zotero-mcp)", "First-time Zotero setup"],
+        "risk_explanation": "HIGH RISK. Depends on zotero-mcp being installed and operational. Both components must be configured correctly. MCP configuration is manual — PKB never auto-configures. Review both repos for security before installing.",
+        "recommended_profiles": ["research", "full"]
+    },
+    "z-skills": {
+        "short_description": "REFERENCE ONLY. Comprehensive skill collection by tjxj including web material pack, Excel editor, markdown table tools, email reader, and document parsing.",
+        "long_description": "A well-designed Claude Code skill collection developed by tjxj. Includes: z-web-pack (comprehensive web material packaging with multi-layer crawling, image download, metadata extraction), z-excel-editor (spreadsheet creation and editing), z-md-excel (markdown table to Excel conversion), z-mail-reader (IMAP email reading), and z-smart-xparse (intelligent document parsing). PKB's web_pack.py is an independent clean-room implementation inspired by z-web-pack's functional design. z-excel-editor and z-md-excel design patterns are documented for future clean-room reimplementation.",
+        "best_for": ["Design reference for PKB tool development", "Understanding web collection best practices", "Studying Claude Code skill architecture patterns"],
+        "not_for": ["Installation (NEVER installed — reference only)", "Production use (no license, Anthropic copyright)", "Direct code reuse (proprietary, all rights reserved)"],
+        "risk_explanation": "REFERENCE ONLY — NEVER INSTALLED. Code is (c) Anthropic, ALL RIGHTS RESERVED. No license found in repository. Installing would be copyright infringement. PKB's web_pack.py is an independent clean-room implementation inspired by functional requirements, not code. Catalog entry exists for design reference only.",
+        "recommended_profiles": []
+    },
+    "awesome-agent-skills": {
+        "short_description": "Curated index of Claude Code agent skills across the ecosystem. Discovery resource for finding new skills.",
+        "long_description": "A community-curated index of Claude Code agent skills maintained by VoltAgent. Browse to discover new skills across categories: research, development, creative, productivity, and more. Not a skill itself — a discovery resource. Useful for finding skills that haven't been added to the PKB catalog yet.",
+        "best_for": ["Discovering new Claude Code skills", "Exploring the skill ecosystem", "Finding alternatives to catalog-listed skills"],
+        "not_for": ["Direct installation (links to individual skill repos)", "Guaranteed quality (community-curated, varying quality)", "Replacing PKB's curated catalog"],
+        "risk_explanation": "Reference index. No executable code. Links to external repos — review each repo's license and security before installing. PKB does not endorse or vet linked skills.",
+        "recommended_profiles": ["full"]
+    },
+    "awesome-claude-skills": {
+        "short_description": "Composio-curated index of Claude Code skills and tools. Discovery resource for finding new skills.",
+        "long_description": "A curated index by ComposioHQ listing Claude Code skills, tools, and integrations across the ecosystem. Browse to discover skills across research, development, content creation, and automation categories. Useful as a second opinion alongside the VoltAgent index.",
+        "best_for": ["Cross-referencing with awesome-agent-skills", "Discovering Composio-integrated tools", "Finding skills with commercial support"],
+        "not_for": ["Direct installation (links to individual skill repos)", "Guaranteed up-to-date listings", "Replacing PKB's curated catalog"],
+        "risk_explanation": "Reference index. No executable code. Links to external repos — review each repo's license and security before installing.",
+        "recommended_profiles": ["full"]
+    },
+    "obsidian-claude-pkm": {
+        "short_description": "Reference implementation of Claude + Obsidian personal knowledge management workflow for workflow design inspiration.",
+        "long_description": "A reference implementation by ballred showing how to combine Claude Code with Obsidian for personal knowledge management. Demonstrates workflow patterns: daily notes, project tracking, research capture, and knowledge synthesis. Study the patterns to improve your own PKB workflow — not a skill to install, but a methodology to learn from.",
+        "best_for": ["Studying PKM workflow patterns", "Inspiration for custom PKB skill design", "Learning how others combine Claude + Obsidian"],
+        "not_for": ["Direct installation (workflow reference, not a skill)", "Replacing PKB's established workflow", "Users looking for plug-and-play functionality"],
+        "risk_explanation": "Reference implementation. Review the workflow patterns for inspiration. No executable code to install. Adapt patterns to PKB's architecture, not the other way around.",
+        "recommended_profiles": []
+    },
+    "daily-patterns-pack": {
+        "short_description": "Daily note templates and recurring patterns for personal knowledge management. Template pack for workflow inspiration.",
+        "long_description": "A collection of daily note templates and recurring knowledge management patterns by aplaceforallmystuff. Includes templates for daily reflection, weekly review, project check-ins, and learning capture. Useful as inspiration for customizing your PKB workflow and wiki page templates.",
+        "best_for": ["Customizing daily note formats", "Designing recurring review workflows", "Template inspiration for wiki page structures"],
+        "not_for": ["Direct installation (template reference, not a skill)", "Replacing PKB's wiki page conventions", "Users who don't customize their workflow"],
+        "risk_explanation": "Reference templates. No executable code. Review and adapt patterns to PKB's frontmatter conventions before using.",
+        "recommended_profiles": []
+    }
+}
+
+# -- Merge new fields into each skill entry ---------------------------------
+
+for skill in catalog["skills"]:
+    sid = skill["id"]
+    desc = DESCRIPTIONS.get(sid, {})
+    skill["short_description"] = desc.get("short_description", skill.get("description", "")[:100])
+    skill["long_description"] = desc.get("long_description", skill.get("description", ""))
+    skill["best_for"] = desc.get("best_for", [])
+    skill["not_for"] = desc.get("not_for", [])
+    skill["risk_explanation"] = desc.get("risk_explanation", "")
+    skill["recommended_profiles"] = desc.get("recommended_profiles", [])
+
+# Update version and stats
+catalog["version"] = "0.4.0"
+catalog["updated"] = "2026-06-12"
+
+# -- Write enhanced catalog --------------------------------------------------
+
+CATALOG_PATH.write_text(json.dumps(catalog, indent=2, ensure_ascii=False), encoding="utf-8")
+print(f"[OK] Written enhanced catalog: {CATALOG_PATH}")
+print(f"     {len(catalog['skills'])} entries with 6 new user-facing fields each")

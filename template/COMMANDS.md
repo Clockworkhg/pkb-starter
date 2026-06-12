@@ -58,13 +58,16 @@ Throw anything at `/pkb`, the Agent auto-decides what to do:
 ### Skill Management Commands
 | Command | Purpose |
 |---------|---------|
-| `/project:skills` | Show installed skills and profiles |
-| `/project:skills --list` | List full skill catalog |
-| `/project:skills --install <profile>` | Install a skill profile (student, research, etc.) |
-| `/project:skills --audit` | Audit installed skills |
-| `/project:skills --enable <id>` | Enable an adapter for a skill |
-| `/project:skills --disable <id>` | Disable an adapter for a skill |
-| `/project:skills --remove <id>` | Remove a skill entirely |
+| `/project:skills` | Show installed skills, enabled status, and available profiles |
+| `/project:skills --list` | List all 42 catalog entries with descriptions and risk levels |
+| `/project:skills --describe <id>` | Show full details for a skill (what, risk, how to install) |
+| `/project:skills --install <id>` | Install a single skill with description + risk shown first |
+| `/project:skills --install-profile <profile>` | Install all skills from a profile (core/student/research/...) |
+| `/project:skills --audit` | Audit installed skills: license, adapter, .git, issues |
+| `/project:skills --enabled` | Show currently enabled skills and adapters |
+| `/project:skills --enable <id>` | Enable an audited skill (activates its adapter) |
+| `/project:skills --disable <id>` | Disable a skill without deleting source code |
+| `/project:skills --update-catalog` | Refresh local catalog version |
 
 ### Research Commands (requires academic-research-skills plugin)
 | Command | Purpose |

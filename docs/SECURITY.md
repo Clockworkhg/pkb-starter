@@ -108,7 +108,7 @@ Set in frontmatter. The `/ask` skill respects this and won't expose `internal` c
 
 ## Optional Skills Security
 
-PKB's optional skill system (42 catalog entries, 18 external repos) uses the following safety measures:
+PKB's optional skill system (42 catalog entries, 9 distinct external repos) uses the following safety measures:
 
 1. **No auto-execution**: Skills are installed via `git clone --depth 1` only. No install scripts, no post-clone hooks, no npm/pip install.
 2. **Vendored isolation**: Skills live in `skills/_vendor/` (gitignored). They do not modify PKB core files.
@@ -116,14 +116,25 @@ PKB's optional skill system (42 catalog entries, 18 external repos) uses the fol
 4. **No MCP auto-config**: Skills requiring MCP servers need manual `.claude/mcp.json` configuration. PKB never touches MCP config.
 5. **No API key storage**: PKB never reads, stores, or passes API keys for third-party skills.
 6. **Risk classification**: 
-   - 18 low-risk (auto-install)
-   - 15 medium-risk (warn before install)
-   - 7 high-risk (require `--enable-risky`)
-   - 5 reference-only (never installed)
+   - 28 low-risk (auto-install)
+   - 10 medium-risk (warn before install)
+   - 3 high-risk (require `--enable-risky`)
+   - 1 reference-only (never installed)
 7. **LICENSE review**: Each skill entry records its license status. Skills with NO LICENSE are flagged. Reference-only entries (z-skills) are blocked from installation because of Anthropic copyright.
 8. **Plugin marketplace**: 2 skills are only installable via Claude Code's official plugin marketplace, not via git clone.
 9. **Removal = delete directory**: To remove a skill, delete `skills/_vendor/<skill-id>/`. No lingering state.
-10. **Audit trail**: `install_skills.py --audit-only` reports all installed skills with risk levels, license status, and INSTALL_NOTE.md presence.
+10. **Audit trail**: `skill_manager.py --audit` and `/project:skills --audit` report all installed skills with risk levels, license status, .git verification, adapter presence, and INSTALL_NOTE.md presence.
+
+### Runtime Safety
+
+Skills can be installed at any time — during setup or months later. The same safety rules apply:
+
+- **Every skill shows its description and risk before installation** — both in CLI and Claude Code.
+- **Installation does NOT equal activation** — skills go through audit before being enabled.
+- **Enable is explicit** — `--enable <id>` is a separate step after audit.
+- **Disable doesn't delete** — `--disable <id>` deactivates the adapter but keeps source code.
+- **Start small** — Core profile (zero external skills) is the safest default. Add skills incrementally.
+- **Full profile warning** — The Full profile lists all 24 recommended skills but does NOT auto-enable high-risk ones.
 
 ## Reporting Security Issues
 

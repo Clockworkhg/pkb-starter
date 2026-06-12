@@ -171,7 +171,54 @@ These skills appear in catalog for reference. install_skills.py skips them with 
 1. Check the cloned repo's root for any license file: `ls skills/_vendor/<skill-id>/LICENSE*`
 2. Check the repo's GitHub page for license info
 3. If no license found, treat as "all rights reserved" — use for personal reference only
-4. Run `python scripts/install_skills.py --target . --audit-only` to see license status of all installed skills
+4. Run `python scripts/skill_manager.py --target . --audit` to see license status of all installed skills
+
+### Can't find a skill after installing
+
+**Cause**: Skills go through three stages: install → audit → enable. A newly installed skill is not yet enabled.
+
+**Fix**:
+1. Run `/project:skills` to see all installed skills and their status
+2. Skills marked [INSTALLED] or [PENDING AUDIT] are downloaded but not active
+3. Run `/project:skills --audit` to verify installation
+4. Run `/project:skills --enable <id>` to activate
+5. Restart Claude Code to load the newly enabled skill
+
+### Want to add skills after initial setup
+
+**Cause**: You installed with `--skip-skills` and now want to add skills.
+
+**Fix**:
+```bash
+# Browse available skills
+python scripts/skill_manager.py --target "D:\MyKB" --list
+
+# Or from Claude Code
+/project:skills --list
+/project:skills --describe deep-research-skills
+/project:skills --install-profile student
+```
+Skills can be added anytime — no need to reinstall PKB.
+
+### skill_manager.py says "Target directory does not exist"
+
+**Cause**: The --target path must point to your PKB installation, not the pkb-starter source.
+
+**Fix**:
+```bash
+# Point to your PKB directory, not pkb-starter
+python scripts/skill_manager.py --target "D:\MyKB" --list
+# NOT: python scripts/skill_manager.py --target "D:\pkb-starter" --list
+```
+
+### Dry-run shows skills but nothing was installed
+
+**Cause**: `--dry-run` is a preview mode. It shows what WOULD happen without making changes.
+
+**Fix**: Remove `--dry-run` to actually install:
+```bash
+python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
+```
 
 ---
 

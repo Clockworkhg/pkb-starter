@@ -127,12 +127,17 @@ The `wiki/` directory structure and `[[wikilink]]` syntax are fully Obsidian-com
 
 ### 6. Optional Skill Architecture
 
-PKB's skill system follows a **registry + adapter** pattern, cataloging the full PKB ecosystem:
+PKB's skill system follows a **registry + adapter** pattern, cataloging the full PKB ecosystem. Skills can be installed during initial setup OR anytime later via the runtime skill manager.
 
 ```
 skills_registry/           pkb-starter (catalog, not bundled)
   skill_catalog.json       42 catalog entries with full metadata
   profiles.json            9 preset profiles (core/student/.../custom)
+
+scripts/
+  install.py               One-shot installer (setup time)
+  install_skills.py         Skill installer (setup time, legacy)
+  skill_manager.py          Runtime skill manager (anytime) [NEW v0.4.0]
 
 skills/_vendor/            target PKB (installed on demand)
   obsidian-skills/         cloned via git, never auto-executed
@@ -142,15 +147,34 @@ skills/_vendor/            target PKB (installed on demand)
 
 template/skill_adapters/   pkb-starter (routing rules)
   <adapter>.md             maps skill output -> raw/wiki paths
+
+template/.claude/commands/
+  skills.md                /project:skills command (anytime management)
 ```
 
 Key principles:
-- **Catalog-driven**: 42 entries across 18 external repos. Extracted from live PKB installation.
+- **Catalog-driven**: 42 entries across 9 distinct external repos. Extracted from live PKB installation.
 - **No bundling**: Skills are cloned from their own repos, not copied from pkb-starter.
 - **Adapter pattern**: Each skill gets a markdown adapter telling the LLM where to route output.
-- **Risk classification**: low (auto-install, 18 skills), medium (warn, 15 skills), high (require --enable-risky, 7 skills), reference_only (never install, 5 skills).
+- **Risk classification**: low (auto-install, 28 skills), medium (warn, 10 skills), high (require --enable-risky, 3 skills), reference_only (never install, 1 skill).
 - **No auto-execution**: Installation = `git clone --depth 1`. Nothing runs until you invoke the skill in Claude Code.
-- **Source diversity**: external_repo (9), local_template (12), plugin_marketplace (2), mcp_server (2), reference_only (5), built_in (5).
+- **Incremental adoption**: Start with Core (0 external). Add skills via `/project:skills --install-profile <name>` or `skill_manager.py` anytime.
+- **Explicit activation**: Install → audit → enable is a three-step process. Installation alone does not activate a skill.
+- **Source diversity**: external_repo (23 entries from 9 repos), local_template (10), plugin_marketplace (2), mcp_server (1), reference_only (1), built_in (5).
+
+### 6.1 Runtime Skill Management
+
+The skill manager (`scripts/skill_manager.py` and `/project:skills`) works on a live PKB installation:
+
+- **Status**: Shows installed, enabled, disabled, pending audit skills
+- **List**: Full catalog with descriptions and risk levels
+- **Describe**: Detailed view of any skill (what, why, risk, how to install)
+- **Install**: Single skill or entire profile, with dry-run support
+- **Audit**: LICENSE check, .git verification, adapter presence
+- **Enable/Disable**: Toggle without deleting source code
+- **Update catalog**: Refresh local catalog version
+
+Every skill shows its description, risk explanation, best-for/not-for guidance, and requirements (API keys, MCP, external runtime) before installation. High-risk skills require explicit user confirmation.
 
 ## Tools
 

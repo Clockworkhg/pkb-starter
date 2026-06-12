@@ -73,15 +73,32 @@ tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 PKB Starter ships with zero external dependencies. Extend it with **optional skill packs** from a catalog of 42 entries across 18 tracked external repositories:
 
 ```bash
+# During installation
 python scripts/install.py "D:\MyKB" --profile student    # 8 skills — academic essentials
 python scripts/install.py "D:\MyKB" --profile developer  # 7 skills — docs + projects
 python scripts/install.py "D:\MyKB" --profile research   # 12 skills — full pipeline
-python scripts/install.py "D:\MyKB" --profile full       # 24 skills — everything
+python scripts/install.py "D:\MyKB" --interactive-skills # pick from 42 entries
+
+# Anytime after installation
+python scripts/skill_manager.py --target "D:\MyKB" --list
+python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
+python scripts/skill_manager.py --target "D:\MyKB" --install deep-research-skills
 ```
 
-Profiles: **Core** | **Student** | **Research** | **Developer** | **Creator** | **Output** | **Security** | **Full** | **Custom**
+Or from Claude Code:
+```
+/project:skills                       # See status
+/project:skills --list                # Browse catalog
+/project:skills --describe <id>       # Learn about a skill
+/project:skills --install-profile student
+/project:skills --audit
+```
 
-See the full catalog: `python scripts/install_skills.py --list`
+Profiles: **Core** (0 external) | **Student** (8) | **Research** (12) | **Developer** (7) | **Creator** (7) | **Output** (7) | **Security** (3) | **Full** (24) | **Custom** (interactive)
+
+Every skill shows its description, risk level, and requirements before installation. Third-party skills are cloned to `skills/_vendor/` — never auto-executed, never auto-configured. Start with Core, add skills as needed.
+
+See the full catalog: `python scripts/skill_manager.py --target "D:\MyKB" --list`
 
 [Optional Skills Guide →](docs/OPTIONAL_SKILLS.md)
 

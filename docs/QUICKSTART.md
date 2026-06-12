@@ -57,24 +57,37 @@ In Claude Code (project mode):
 
 ## Optional: Install Skill Packs
 
-Extend PKB with domain-specific skills from a catalog of 42 entries:
+Extend PKB with domain-specific skills from a catalog of 42 entries. You can install skills during setup or anytime later:
 
 ```bash
-# List all available skills
-python scripts/install_skills.py --list
+# During installation: choose a profile
+python scripts/install.py "D:\MyKB" --profile student
+python scripts/install.py "D:\MyKB" --interactive-skills   # pick individually
+python scripts/install.py "D:\MyKB" --skip-skills           # core only, add later
 
-# Install a skill profile (from pkb-starter directory)
-python scripts/install_skills.py --target "D:\MyKnowledgeBase" --profile student
-
-# Preview what would be installed
-python scripts/install_skills.py --target "D:\MyKnowledgeBase" --profile research --dry-run
+# Anytime after installation: manage skills
+python scripts/skill_manager.py --target "D:\MyKB" --list
+python scripts/skill_manager.py --target "D:\MyKB" --describe deep-research-skills
+python scripts/skill_manager.py --target "D:\MyKB" --install deep-research-skills
+python scripts/skill_manager.py --target "D:\MyKB" --install-profile student --dry-run
+python scripts/skill_manager.py --target "D:\MyKB" --audit
 
 # Or from Claude Code
-/project:skills --install student
-/project:skills --list
+/project:skills                       # See status and available profiles
+/project:skills --list                # Browse all 42 entries
+/project:skills --describe <id>       # Full details for one skill
+/project:skills --install <id>        # Install a single skill
+/project:skills --install-profile student
+/project:skills --audit               # Check installed skills
+/project:skills --enable <id>         # Activate after audit
+/project:skills --disable <id>        # Deactivate without deleting
 ```
 
 Profiles: `core` (built-in only) | `student` (8 skills) | `research` (12) | `developer` (7) | `creator` (7) | `output` (7) | `security` (3) | `full` (24) | `custom`
+
+Each skill shows its description, risk level, and requirements before installation.
+Third-party skills are cloned to `skills/_vendor/` and never auto-executed.
+Start with Core and add skills as you need them — no need to decide everything upfront.
 
 [Full skill catalog and ecosystem →](OPTIONAL_SKILLS.md)
 
