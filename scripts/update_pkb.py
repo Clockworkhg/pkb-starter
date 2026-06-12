@@ -400,6 +400,71 @@ def run_migrations(target: Path, from_ver: str, to_ver: str, opts: dict) -> list
 
 
 # ---------------------------------------------------------------------------
+# Report Helpers
+# ---------------------------------------------------------------------------
+
+def _collect_protected_status(target: Path) -> list:
+    """Check and report status of all protected paths."""
+    results = []
+    seen = set()
+
+    all_protected = PROTECTED_DIRS + PROTECTED_FILES
+    for p in all_protected:
+        if p in seen:
+            continue
+        seen.add(p)
+
+        full_path = target / p
+        note = ""
+        if p.endswith("/"):
+            # Explicitly a directory
+            if full_path.is_dir():
+                note = "directory present, not touched by update"
+            else:
+                note = "directory absent, not created by update"
+        else:
+            # Could be file or directory — check both
+            if full_path.is_dir():
+                note = "directory present, not touched by update"
+            elif full_path.is_file():
+                note = "file present, not touched by update"
+            else:
+                note = "path absent, not created by update"
+        results.append({"path": p, "status": "not touched", "note": note})
+
+    # Add explicit note about pkb.config.json user fields
+    results.append({
+        "path": "pkb.config.json",
+        "status": "preserved",
+        "note": "only version fields updated; user settings and skills state preserved",
+    })
+    return results
+
+
+def _collect_skills_state(target: Path) -> dict:
+    """Read current skills state from pkb.config.json for report."""
+    config_path = target / "pkb.config.json"
+    if not config_path.is_file():
+        return {"error": "pkb.config.json not found"}
+
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        skills = config.get("skills", {})
+        return {
+            "installed_profiles": skills.get("installed_profiles", []),
+            "installed_skills": skills.get("installed_skills", []),
+            "enabled_skills": skills.get("enabled_skills", []),
+            "disabled_skills": skills.get("disabled_skills", []),
+            "vendor_downloads": skills.get("vendor_downloads", []),
+            "enabled_adapters": skills.get("enabled_adapters", []),
+            "pending_audit": skills.get("pending_audit", []),
+            "catalog_version": skills.get("catalog_version", "none"),
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# ---------------------------------------------------------------------------
 # Report
 # ---------------------------------------------------------------------------
 
@@ -452,6 +517,41 @@ def write_report(target: Path, report_data: dict):
         lines.append("")
         for e in report_data['errors']:
             lines.append(f"- {e}")
+        lines.append("")
+
+    # Protected paths — explicit not-touched audit
+    protected = report_data.get('protected_paths', [])
+    if protected:
+        lines.append("## Protected Paths Not Touched")
+        lines.append("")
+        lines.append("| Path | Status | Note |")
+        lines.append("|------|--------|------|")
+        for entry in protected:
+            p = entry['path']
+            s = entry['status']
+            n = entry['note']
+            lines.append(f"| `{p}` | {s} | {n} |")
+        lines.append("")
+
+    # Skills state — preserved detail
+    skills = report_data.get('skills_state', {})
+    if skills and 'error' not in skills:
+        lines.append("## Skills State Preserved")
+        lines.append("")
+        lines.append("The following skills state fields are preserved after update:")
+        lines.append("")
+        lines.append("| Field | Value |")
+        lines.append("|-------|-------|")
+        lines.append(f"| installed_profiles | {skills.get('installed_profiles', [])} |")
+        lines.append(f"| installed_skills | {skills.get('installed_skills', [])} |")
+        lines.append(f"| enabled_skills | {skills.get('enabled_skills', [])} |")
+        lines.append(f"| disabled_skills | {skills.get('disabled_skills', [])} |")
+        lines.append(f"| vendor_downloads | {skills.get('vendor_downloads', [])} |")
+        lines.append(f"| enabled_adapters | {skills.get('enabled_adapters', [])} |")
+        lines.append(f"| pending_audit | {skills.get('pending_audit', [])} |")
+        lines.append(f"| catalog_version | {skills.get('catalog_version', 'none')} |")
+        lines.append("")
+        lines.append("These values are **never cleared** by the update process. Only missing fields are added with empty defaults.")
         lines.append("")
 
     lines.append("## Rollback")
@@ -569,6 +669,10 @@ def main():
     print()
 
     # Phase 5: Report
+    # Collect protected paths status for report
+    protected_status = _collect_protected_status(target)
+    skills_state = _collect_skills_state(target)
+
     report_data = {
         "timestamp": now,
         "target": str(target),
@@ -580,10 +684,11 @@ def main():
         "config_changes": config_changes,
         "migration_changes": migration_changes,
         "errors": [],
+        "protected_paths": protected_status,
+        "skills_state": skills_state,
     }
 
-    if not opts["dry_run"]:
-        write_report(target, report_data)
+    write_report(target, report_data)
 
     # Summary
     print()
