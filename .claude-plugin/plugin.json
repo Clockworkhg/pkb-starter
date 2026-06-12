@@ -1,0 +1,53 @@
+{
+  "name": "pkb-starter",
+  "version": "0.1.0",
+  "description": "Local LLM Wiki / Personal Knowledge Base starter for Claude Code — turn anything into structured, queryable knowledge with one command.",
+  "author": "PKB Community",
+  "license": "MIT",
+  "keywords": ["knowledge-base", "wiki", "llm", "claude-code", "obsidian"],
+  "homepage": "https://github.com/pkb-starter/pkb-starter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pkb-starter/pkb-starter.git"
+  },
+  "claude": {
+    "minVersion": "1.0.0",
+    "skills": [
+      "skills/pkb-init",
+      "skills/pkb-auto",
+      "skills/pkb-web-pack",
+      "skills/pkb-inbox",
+      "skills/pkb-ask",
+      "skills/pkb-sanitize",
+      "skills/pkb-lint"
+    ],
+    "commands": [
+      "template/.claude/commands/pkb.md",
+      "template/.claude/commands/inbox.md",
+      "template/.claude/commands/web.md",
+      "template/.claude/commands/ask.md",
+      "template/.claude/commands/lint.md",
+      "template/.claude/commands/save.md",
+      "template/.claude/commands/clip.md",
+      "template/.claude/commands/rollback.md",
+      "template/.claude/commands/help.md",
+      "template/.claude/commands/add.md",
+      "template/.claude/commands/output.md"
+    ],
+    "tools": [
+      "template/tools/web_pack.py",
+      "template/tools/import_to_inbox.py",
+      "template/tools/pkb_auto.py",
+      "template/tools/docs_update.py",
+      "template/tools/sanitize.py"
+    ],
+    "templates": [
+      "template/"
+    ],
+    "scripts": {
+      "install": "scripts/install.py",
+      "check": "scripts/check_env.py",
+      "migrate": "scripts/migrate_existing_pkb.py"
+    }
+  }
+}

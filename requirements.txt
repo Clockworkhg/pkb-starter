@@ -1,0 +1,26 @@
+# PKB Starter — Python dependencies
+# Install: pip install -r requirements.txt
+
+# Web content extraction (multi-level fallback pipeline)
+readability-lxml>=0.2.0
+trafilatura>=1.12.0
+beautifulsoup4>=4.12.0
+markdownify>=0.13.0
+lxml>=5.0.0
+
+# HTTP / networking
+requests>=2.31.0
+httpx>=0.27.0
+
+# Video/media download (optional, for --videos all --download-media)
+# yt-dlp>=2024.0.0
+
+# Markdown / YAML
+pyyaml>=6.0
+python-frontmatter>=1.1.0
+
+# CLI
+click>=8.1.0
+
+# Windows-only (optional)
+# pywin32>=306

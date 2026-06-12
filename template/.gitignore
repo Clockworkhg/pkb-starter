@@ -1,0 +1,100 @@
+# PKB .gitignore — Personal Knowledge Base Git Ignore Rules
+# Copy this file to your PKB root directory.
+
+# === Sensitive Files ===
+.env
+.env.*
+*credentials*
+*serviceAccount*
+*.pem
+*.p12
+*.pfx
+*.key
+*.keystore
+*.jks
+id_rsa*
+*_rsa
+*.ppk
+
+# === Claude Code Local Config ===
+.claude/settings.local.json
+
+# === Inbox (pending processing, not version controlled) ===
+_INBOX/
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env/
+
+# === Node ===
+node_modules/
+
+# === IDE ===
+.idea/
+.vscode/
+.vs/
+*.swp
+*.swo
+*~
+
+# === OS ===
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# === Temp Files ===
+*.tmp
+*.temp
+*.bak
+*.log
+
+# === PKB Auto Ingest Runtime Artifacts ===
+auto_ingest_plan.json
+auto_ingest_report.md
+
+# === Obsidian ===
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.trash/
+
+# === Vendor Skills (third-party, tracked separately) ===
+skills/_vendor/*/**
+!skills/_vendor/*/AUDIT.md
+
+# === Temp Downloads and Cache ===
+*.download
+*.crdownload
+tmp/
+temp/
+downloads/
+.cache/
+
+# === Privacy: raw/personal — NEVER track anything in this directory ===
+raw/personal/*
+!raw/personal/.gitkeep
+
+# === Generated/transient raw directories ===
+raw/imported_processed/*
+!raw/imported_processed/.gitkeep
+raw/media/*
+!raw/media/.gitkeep
+raw/assets/*
+!raw/assets/.gitkeep
+
+# === Large Files (>50MB — uncomment to ignore) ===
+# raw/media/video/*
+# raw/media/audio/*
+
+# === Zotero Database ===
+zotero.sqlite
+zotero.sqlite-journal
+zotero.sqlite.bak
+
+# === MCP Local Config ===
+.claude/mcp.local.json
