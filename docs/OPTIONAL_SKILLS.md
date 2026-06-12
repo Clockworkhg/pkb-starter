@@ -1,6 +1,8 @@
 # PKB Starter — Optional Skills
 
-> Comprehensive skill ecosystem: 43 catalog entries, 9 profiles, 9 external repos tracked, + z-skills as user-approved local install. None are bundled — you choose what to install.
+> Comprehensive skill ecosystem
+
+Languages: [English](OPTIONAL_SKILLS.md) | [简体中文](zh-CN/OPTIONAL_SKILLS.md): 43 catalog entries, 9 profiles, 9 external repos tracked, + z-skills as user-approved local install. None are bundled — you choose what to install.
 
 ## Philosophy
 

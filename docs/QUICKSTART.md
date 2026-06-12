@@ -2,6 +2,8 @@
 
 > 5 minutes to your own LLM-powered personal knowledge base.
 
+Languages: [English](QUICKSTART.md) | [简体中文](zh-CN/QUICKSTART.md)
+
 ## Prerequisites
 
 - **Claude Code** installed (`claude` command available)

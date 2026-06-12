@@ -1,5 +1,7 @@
 # PKB Starter — Updating
 
+Languages: [English](UPDATING.md) | [简体中文](zh-CN/UPDATING.md)
+
 How pkb-starter itself updates, and how installed PKB users update their system files.
 
 ## Table of Contents

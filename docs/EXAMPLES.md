@@ -1,5 +1,7 @@
 # PKB Starter — Examples
 
+Languages: [English](EXAMPLES.md) | [简体中文](zh-CN/EXAMPLES.md)
+
 ## Example 1: Collect and Ingest a Blog Post
 
 ```

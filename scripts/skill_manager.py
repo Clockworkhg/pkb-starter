@@ -68,6 +68,122 @@ RISK_SYMBOLS = {
     "reference_only": "[REF]",
 }
 
+# Profile descriptions for display (English)
+PROFILE_DESCRIPTIONS = {
+    "core": {
+        "title": "Core",
+        "tagline": "Pure PKB. Zero external skills.",
+        "desc": "Basic personal knowledge base with PKB's built-in tools only: web collection, auto ingest, file import, health checks, privacy scanning, document conversion, git versioning. Start here and add skills later.",
+        "skills": 0,
+    },
+    "student": {
+        "title": "Student",
+        "tagline": "Coursework, papers, literature review.",
+        "desc": "Academic essentials for students: literature search and review, paper section writing, citation management (APA/GB/T 7714/IEEE), article extraction for research sources, YouTube transcript capture. Ideal for undergraduates and coursework-focused grad students.",
+        "skills": 8,
+    },
+    "research": {
+        "title": "Research",
+        "tagline": "Full academic pipeline. Graduate-level.",
+        "desc": "Comprehensive academic workflow: deep multi-turn research, agent-based research pipeline (31 sub-skills), literature tools, experiment design, data analysis, figure/table generation, Zotero integration, CNKI Chinese database access. For systematic academic research.",
+        "skills": 12,
+    },
+    "developer": {
+        "title": "Developer",
+        "tagline": "Code projects, docs, GitHub research.",
+        "desc": "Software engineering focused: document processing for technical docs, semantic code search (QMD), project kanban boards, GitHub repository analysis, code debugging, article extraction. For developers documenting projects and researching code.",
+        "skills": 7,
+    },
+    "creator": {
+        "title": "Creator",
+        "tagline": "Writers, musicians, filmmakers.",
+        "desc": "Content creation toolkit: AI prompt library management, song/lyrics archive with version tracking, script breakdown and storyboard generation, article extraction, YouTube transcripts, kanban project management. For creative professionals building a reference library.",
+        "skills": 7,
+    },
+    "output": {
+        "title": "Output & Publishing",
+        "tagline": "Reports, papers, presentations.",
+        "desc": "Output-focused: document conversion (DOCX/PDF/PPTX/MD), academic paper writing with evidence support, citation management, prompt library, slide generation. For users who primarily produce documents and reports.",
+        "skills": 7,
+    },
+    "security": {
+        "title": "Security & Privacy",
+        "tagline": "Audit, sanitize, harden.",
+        "desc": "Security-hardened minimal setup: enhanced secret scanning, privacy sanitization, git versioning with pre-commit checks. For auditing your knowledge base before sharing or publishing.",
+        "skills": 3,
+    },
+    "full": {
+        "title": "Full Stack",
+        "tagline": "All 24 recommended skills. Power user.",
+        "desc": "Complete PKB ecosystem: academic research, document processing, creation tools, semantic search, project management, security hardening. High-risk skills (CNKI, Zotero) are NOT auto-enabled -- use --enable-risky to add them. Review risk levels before installing.",
+        "skills": 24,
+    },
+    "custom": {
+        "title": "Custom",
+        "tagline": "Hand-pick from 43 entries.",
+        "desc": "Interactive selection: browse the full 43-entry catalog and choose exactly which skills to install. See descriptions and risk levels before selecting. Best for advanced users who know what they need.",
+        "skills": "interactive",
+    },
+}
+
+# Profile descriptions in Chinese
+PROFILE_DESCRIPTIONS_ZH = {
+    "core": {
+        "title": "Core",
+        "tagline": "纯 PKB，零外部技能。",
+        "desc": "基础个人知识库，仅使用 PKB 内置工具：网页采集、自动入库、文件导入、健康检查、隐私扫描、文档转换、Git 版本管理。从这里开始，之后按需添加技能。",
+        "skills": 0,
+    },
+    "student": {
+        "title": "Student",
+        "tagline": "课程作业、论文、文献综述。",
+        "desc": "学生学术必备：文献搜索与综述、论文章节写作、引用管理（APA/GB/T 7714/IEEE）、研究来源文章提取、YouTube 转录采集。适合本科生和以课程为中心的研究生。",
+        "skills": 8,
+    },
+    "research": {
+        "title": "Research",
+        "tagline": "完整学术流程，研究生级别。",
+        "desc": "全面学术工作流：深度多轮研究、Agent 驱动研究流程（31 个子技能）、文献工具、实验设计、数据分析、图表生成、Zotero 集成、中国知网数据库访问。适用于系统性学术研究。",
+        "skills": 12,
+    },
+    "developer": {
+        "title": "Developer",
+        "tagline": "代码项目、文档、GitHub 研究。",
+        "desc": "软件工程方向：技术文档处理、语义代码搜索（QMD）、项目看板、GitHub 仓库分析、代码调试、文章提取。适合记录项目和研究代码的开发者。",
+        "skills": 7,
+    },
+    "creator": {
+        "title": "Creator",
+        "tagline": "写作者、音乐人、影视制作人。",
+        "desc": "内容创作工具包：AI prompt 库管理、带版本追踪的歌词/歌曲归档、剧本分解与分镜生成、文章提取、YouTube 转录、看板项目管理。适合构建参考资料库的创意专业人士。",
+        "skills": 7,
+    },
+    "output": {
+        "title": "Output & Publishing",
+        "tagline": "报告、论文、演示文稿。",
+        "desc": "产出导向：文档转换（DOCX/PDF/PPTX/MD）、带证据支持的学术论文写作、引用管理、prompt 库、幻灯片生成。适合主要生产文档和报告的用户。",
+        "skills": 7,
+    },
+    "security": {
+        "title": "Security & Privacy",
+        "tagline": "审计、脱敏、加固。",
+        "desc": "安全加固最小化设置：增强密钥扫描、隐私脱敏、带提交前检查的 Git 版本管理。用于分享或发布前审计你的知识库。",
+        "skills": 3,
+    },
+    "full": {
+        "title": "Full Stack",
+        "tagline": "全部 24 个推荐技能。高级用户。",
+        "desc": "完整 PKB 生态：学术研究、文档处理、创作工具、语义搜索、项目管理、安全加固。高风险技能（CNKI、Zotero）不自动启用 -- 使用 --enable-risky 添加。安装前请查看风险等级。",
+        "skills": 24,
+    },
+    "custom": {
+        "title": "Custom",
+        "tagline": "从 43 个条目中手选。",
+        "desc": "交互式选择：浏览全部 43 个目录条目，精确选择要安装的技能。选择前可查看说明和风险等级。最适合知道自己需要什么的高级用户。",
+        "skills": "interactive",
+    },
+}
+
 # Chinese translations for zh-CN mode
 CATEGORY_LABELS_ZH = {
     "knowledge_capture": "知识采集",
@@ -142,6 +258,13 @@ def get_field_zh(entry: dict, field_en: str, field_zh: str) -> str:
         return zh_val
     return entry.get(field_en, "")
 
+def get_profile_desc(profile_id: str, target: Path = None) -> dict:
+    """Get profile description in the appropriate language."""
+    is_zh = target is not None and detect_language(target) in ("zh-CN", "bilingual")
+    if is_zh and profile_id in PROFILE_DESCRIPTIONS_ZH:
+        return PROFILE_DESCRIPTIONS_ZH[profile_id]
+    return PROFILE_DESCRIPTIONS.get(profile_id, {})
+
 
 # -- JSON Helpers ------------------------------------------------------------
 
@@ -212,12 +335,20 @@ def cmd_status(target: Path, catalog: dict, profiles: dict, pkb_config: dict):
     """Show installed skills, available profiles, and enabled status."""
     skills_state = pkb_config.get("skills", {})
     catalog_map = {s["id"]: s for s in catalog["skills"]}
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
 
-    print_header("PKB Skill Manager -- Status")
+    title = "PKB Skill Manager -- Status"
+    if is_zh:
+        title = "PKB 技能管理器 -- 状态"
+    print_header(title)
 
     # Installed profiles
     installed_profiles = skills_state.get("installed_profiles", [])
-    print(f"  Installed profiles: {', '.join(installed_profiles) if installed_profiles else 'None (core only)'}")
+    if is_zh:
+        profiles_str = ', '.join(installed_profiles) if installed_profiles else '无 (仅 core)'
+        print(f"  已安装配置预设: {profiles_str}")
+    else:
+        print(f"  Installed profiles: {', '.join(installed_profiles) if installed_profiles else 'None (core only)'}")
 
     # Installed skills (from skills/_vendor/)
     vendor_dir = target / VENDOR_DIR_REL
@@ -230,11 +361,17 @@ def cmd_status(target: Path, catalog: dict, profiles: dict, pkb_config: dict):
     pending_ids = skills_state.get("pending_audit", [])
 
     print()
-    print(f"  Skills in skills/_vendor/: {len(installed_ids)}")
+    if is_zh:
+        print(f"  skills/_vendor/ 中的技能: {len(installed_ids)}")
+    else:
+        print(f"  Skills in skills/_vendor/: {len(installed_ids)}")
     print()
 
     if installed_ids:
-        print(f"  {'Skill ID':<35s} {'Risk':<10s} {'Status':<15s} {'Source'}")
+        if is_zh:
+            print(f"  {'技能 ID':<35s} {'风险':<10s} {'状态':<15s} {'来源'}")
+        else:
+            print(f"  {'Skill ID':<35s} {'Risk':<10s} {'Status':<15s} {'Source'}")
         print(f"  {'-'*35} {'-'*10} {'-'*15} {'-'*20}")
         for sid in sorted(installed_ids):
             entry = catalog_map.get(sid, {})
@@ -242,13 +379,13 @@ def cmd_status(target: Path, catalog: dict, profiles: dict, pkb_config: dict):
             src = entry.get("source_type", "unknown").replace("_", " ")
 
             if sid in enabled_ids:
-                status = "[ENABLED]"
+                status = "[ENABLED]" if not is_zh else "[已启用]"
             elif sid in disabled_ids:
-                status = "[DISABLED]"
+                status = "[DISABLED]" if not is_zh else "[已停用]"
             elif sid in pending_ids:
-                status = "[PENDING AUDIT]"
+                status = "[PENDING AUDIT]" if not is_zh else "[待审计]"
             else:
-                status = "[INSTALLED]"
+                status = "[INSTALLED]" if not is_zh else "[已安装]"
 
             print(f"  {sid:<35s} {risk:<10s} {status:<15s} {src}")
         print()
@@ -258,28 +395,46 @@ def cmd_status(target: Path, catalog: dict, profiles: dict, pkb_config: dict):
     if adapter_dir.is_dir():
         adapters = [f.name for f in adapter_dir.iterdir() if f.is_file() and f.suffix == ".md"]
         enabled_adapters = skills_state.get("enabled_adapters", [])
-        print(f"  Adapters: {len(adapters)} available, {len(enabled_adapters)} enabled")
+        if is_zh:
+            print(f"  适配器: {len(adapters)} 可用, {len(enabled_adapters)} 已启用")
+        else:
+            print(f"  Adapters: {len(adapters)} available, {len(enabled_adapters)} enabled")
         if adapters:
             for a in sorted(adapters):
                 tag = " [ENABLED]" if a in enabled_adapters else ""
+                if is_zh:
+                    tag = " [已启用]" if a in enabled_adapters else ""
                 print(f"    {a}{tag}")
         print()
 
     # Available profiles summary
-    print(f"  Available profiles (use --install-profile <name>):")
+    if is_zh:
+        print(f"  可用配置预设 (使用 --install-profile <名称>):")
+    else:
+        print(f"  Available profiles (use --install-profile <name>):")
     print()
     for pid in ALLOWED_PROFILES:
         pdef = profiles.get("profiles", {}).get(pid, {})
         count = len(pdef.get("skills", []))
         desc = pdef.get("description", "")
-        installed = " [INSTALLED]" if pid in installed_profiles else ""
-        print(f"    {pid:<12s} {count:>2d} skills  {desc[:80]}{installed}")
+        if is_zh:
+            pd_zh = PROFILE_DESCRIPTIONS_ZH.get(pid, {})
+            desc = pd_zh.get("tagline", desc)
+        installed_tag = ""
+        if pid in installed_profiles:
+            installed_tag = " [INSTALLED]" if not is_zh else " [已安装]"
+        print(f"    {pid:<12s} {count:>2d} skills  {desc[:80]}{installed_tag}")
     print()
 
     print_separator()
-    print(f"  Catalog version: {catalog.get('version', '?')}  |  PKB skills config version: {skills_state.get('catalog_version', '?')}")
-    print(f"  Run --list to see all 42 catalog entries with descriptions.")
-    print(f"  Run --describe <id> to see full details for a skill.")
+    if is_zh:
+        print(f"  目录版本: {catalog.get('version', '?')}  |  PKB 技能配置版本: {skills_state.get('catalog_version', '?')}")
+        print(f"  运行 --list 查看全部 43 个目录条目及说明。")
+        print(f"  运行 --describe <id> 查看技能完整详情。")
+    else:
+        print(f"  Catalog version: {catalog.get('version', '?')}  |  PKB skills config version: {skills_state.get('catalog_version', '?')}")
+        print(f"  Run --list to see all 43 catalog entries with descriptions.")
+        print(f"  Run --describe <id> to see full details for a skill.")
     print()
 
 
@@ -338,15 +493,18 @@ def cmd_list(catalog: dict, target: Path):
         print("    [中风险] = 安装时有警告（依赖、token 或 API）")
         print("    [高风险] = 需要确认（MCP、外部运行时、登录）")
         print("    [参考]   = 仅供参考，不可安装")
+        print()
+        print("  使用 --describe <skill-id> 查看技能详情。")
+        print("  使用 --install-profile <profile> 安装预设技能组。")
     else:
         print("  Risk legend:")
         print("    [LOW]     = auto-install safe, no external dependencies")
         print("    [MEDIUM]  = install with warnings (deps, tokens, or API)")
         print("    [HIGH]    = requires confirmation (MCP, external runtime, login)")
         print("    [REF]     = reference only, never installable")
-    print()
-    print("  Use --describe <skill-id> to see full details for any skill." if not is_zh else "  使用 --describe <skill-id> 查看技能详情。")
-    print("  Use --install-profile <profile> to install a preset group." if not is_zh else "  使用 --install-profile <profile> 安装预设技能组。")
+        print()
+        print("  Use --describe <skill-id> to see full details for any skill.")
+        print("  Use --install-profile <profile> to install a preset group.")
     print()
 
 
@@ -358,8 +516,12 @@ def cmd_describe(catalog: dict, skill_id: str, target: Path = None):
     s = catalog_map.get(skill_id)
 
     if not s:
-        print(f"[FAIL] Skill not found: {skill_id}")
-        print(f"       Run --list to see all available skills.")
+        if target is not None and detect_language(target) in ("zh-CN", "bilingual"):
+            print(f"[FAIL] 未找到技能: {skill_id}")
+            print(f"       运行 --list 查看所有可用技能。")
+        else:
+            print(f"[FAIL] Skill not found: {skill_id}")
+            print(f"       Run --list to see all available skills.")
         sys.exit(1)
 
     is_zh = target is not None and detect_language(target) in ("zh-CN", "bilingual")
@@ -457,35 +619,43 @@ def cmd_describe(catalog: dict, skill_id: str, target: Path = None):
     # Adapter
     adapter = s.get("adapter")
     if adapter:
-        print(f"  [Adapter]")
+        section_adapter = "[Adapter]" if not is_zh else "[适配器]"
+        print(f"  {section_adapter}")
         print(f"  Adapter file:    {adapter}")
         print(f"  Installed to:    templates/skill_adapters/{adapter}")
         print()
 
     # Profiles
-    profiles = s.get("recommended_profiles", [])
-    if profiles:
-        print(f"  [Recommended profiles]")
-        print(f"  {', '.join(profiles)}")
+    profiles_list = s.get("recommended_profiles", [])
+    if profiles_list:
+        section_prof = "[Recommended profiles]" if not is_zh else "[推荐配置预设]"
+        print(f"  {section_prof}")
+        print(f"  {', '.join(profiles_list)}")
         print()
 
     # Sub-skills
     sub = s.get("sub_skills", [])
     if sub:
-        print(f"  [Sub-skills] ({len(sub)})")
+        section_sub = "[Sub-skills]" if not is_zh else "[子技能]"
+        print(f"  {section_sub} ({len(sub)})")
         for sk in sub:
             print(f"    - {sk}")
         print()
 
     # Default enabled
-    print(f"  [Default]")
-    print(f"  Enabled by default: {'Yes' if s.get('default_enabled') else 'No'}")
+    section_def = "[Default]" if not is_zh else "[默认状态]"
+    print(f"  {section_def}")
+    label_en = "Enabled by default:" if not is_zh else "默认启用:"
+    yn_yes2 = "Yes" if not is_zh else "是"
+    yn_no2 = "No" if not is_zh else "否"
+    print(f"  {label_en} {yn_yes2 if s.get('default_enabled') else yn_no2}")
     print()
 
     # Notes
     notes = s.get("notes", "")
     if notes:
-        print(f"  [Additional notes]")
+        section_notes = "[Additional notes]" if not is_zh else "[补充说明]"
+        print(f"  {section_notes}")
         for line in textwrap.wrap(notes, width=68):
             print(f"  {line}")
         print()
@@ -496,9 +666,15 @@ def cmd_describe(catalog: dict, skill_id: str, target: Path = None):
     # Install hint
     installable = s.get("install_method") not in ("reference_only",)
     if installable:
-        print(f"  To install: python scripts/skill_manager.py --target . --install {skill_id}")
+        if is_zh:
+            print(f"  安装命令: python scripts/skill_manager.py --target . --install {skill_id}")
+        else:
+            print(f"  To install: python scripts/skill_manager.py --target . --install {skill_id}")
     else:
-        print(f"  [REFERENCE ONLY] This skill cannot be installed.")
+        if is_zh:
+            print(f"  [仅供参考] 此技能不可安装。")
+        else:
+            print(f"  [REFERENCE ONLY] This skill cannot be installed.")
     print()
 
 
@@ -509,35 +685,58 @@ def cmd_install(target: Path, catalog: dict, skill_id: str, dry_run: bool = Fals
     """Install a single skill."""
     catalog_map = {s["id"]: s for s in catalog["skills"]}
     entry = catalog_map.get(skill_id)
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
 
     if not entry:
-        print(f"[FAIL] Skill not found: {skill_id}")
+        if is_zh:
+            print(f"[FAIL] 未找到技能: {skill_id}")
+        else:
+            print(f"[FAIL] Skill not found: {skill_id}")
         sys.exit(1)
 
     method = entry.get("install_method", "git_clone")
 
     # Check installability
     if method == "reference_only":
-        print(f"[BLOCKED] {skill_id} is reference-only. Never installed.")
-        print(f"         {entry.get('risk_explanation', '')}")
+        if is_zh:
+            print(f"[阻止] {skill_id} 仅供参考，不可安装。")
+            print(f"       {entry.get('risk_explanation', '')}")
+        else:
+            print(f"[BLOCKED] {skill_id} is reference-only. Never installed.")
+            print(f"         {entry.get('risk_explanation', '')}")
         sys.exit(1)
 
     if method == "plugin_marketplace":
-        print(f"[MANUAL] {skill_id} is a Claude Code plugin marketplace skill.")
-        print(f"         Install via: /plugin marketplace add {entry.get('repo_url', '?')}")
-        print(f"         Then: /plugin install {skill_id}")
+        if is_zh:
+            print(f"[需手动] {skill_id} 是 Claude Code 插件市场技能。")
+            print(f"         安装方式: /plugin marketplace add {entry.get('repo_url', '?')}")
+            print(f"         然后: /plugin install {skill_id}")
+        else:
+            print(f"[MANUAL] {skill_id} is a Claude Code plugin marketplace skill.")
+            print(f"         Install via: /plugin marketplace add {entry.get('repo_url', '?')}")
+            print(f"         Then: /plugin install {skill_id}")
         return
 
     if method == "mcp_config":
-        print(f"[MANUAL] {skill_id} requires MCP server configuration.")
-        print(f"         Configure in .claude/mcp.json manually.")
-        print(f"         PKB never auto-configures MCP servers.")
+        if is_zh:
+            print(f"[需手动] {skill_id} 需要 MCP 服务器配置。")
+            print(f"         请在 .claude/mcp.json 中手动配置。")
+            print(f"         PKB 绝不自动配置 MCP 服务器。")
+        else:
+            print(f"[MANUAL] {skill_id} requires MCP server configuration.")
+            print(f"         Configure in .claude/mcp.json manually.")
+            print(f"         PKB never auto-configures MCP servers.")
         return
 
     if method == "requires_z_skills_vendor_clone":
-        print(f"[BLOCKED] {skill_id} requires z-skills to be installed first.")
-        print(f"         Run: python scripts/skill_manager.py --target . --install z-skills")
-        print(f"         Then audit z-skills, then enable {skill_id}.")
+        if is_zh:
+            print(f"[阻止] {skill_id} 需要先安装 z-skills。")
+            print(f"       运行: python scripts/skill_manager.py --target . --install z-skills")
+            print(f"       然后审计 z-skills，再启用 {skill_id}。")
+        else:
+            print(f"[BLOCKED] {skill_id} requires z-skills to be installed first.")
+            print(f"         Run: python scripts/skill_manager.py --target . --install z-skills")
+            print(f"         Then audit z-skills, then enable {skill_id}.")
         sys.exit(1)
 
     # Special handling for z-skills
@@ -547,30 +746,49 @@ def cmd_install(target: Path, catalog: dict, skill_id: str, dry_run: bool = Fals
     # Risk check
     risk = entry.get("risk_level", "medium")
     if risk == "high" and not enable_risky:
-        print(f"[BLOCKED] {skill_id} is HIGH RISK. Use --enable-risky to install.")
-        print(f"         {entry.get('risk_explanation', '')}")
+        if is_zh:
+            print(f"[阻止] {skill_id} 为高风险。使用 --enable-risky 安装。")
+            print(f"       {entry.get('risk_explanation', '')}")
+        else:
+            print(f"[BLOCKED] {skill_id} is HIGH RISK. Use --enable-risky to install.")
+            print(f"         {entry.get('risk_explanation', '')}")
         sys.exit(1)
 
     # Show what will be installed
     print()
-    print(f"  Skill: {entry['name']} ({entry['id']})")
-    print(f"  Category: {CATEGORY_LABELS.get(entry.get('category', ''), entry.get('category', ''))}")
-    print(f"  Risk: {risk.upper()}")
-    print(f"  {entry.get('short_description', '')}")
+    name_disp = get_field_zh(entry, "name", "name_zh") if is_zh else entry['name']
+    cat_disp = get_category_label(entry.get('category', ''), target)
+    skill_label = "Skill" if not is_zh else "技能"
+    cat_label = "Category" if not is_zh else "分类"
+    risk_label = "Risk" if not is_zh else "风险"
+    print(f"  {skill_label}: {name_disp} ({entry['id']})")
+    print(f"  {cat_label}: {cat_disp}")
+    print(f"  {risk_label}: {risk.upper()}")
+    short_d = get_field_zh(entry, "short_description", "short_description_zh") if is_zh else entry.get('short_description', '')
+    if not short_d:
+        short_d = entry.get('short_description', '')
+    print(f"  {short_d}")
     print()
 
     if risk == "high":
-        print(f"  [!] HIGH RISK: {entry.get('risk_explanation', '')}")
+        risk_exp_d = get_field_zh(entry, "risk_explanation", "risk_explanation_zh") if is_zh else entry.get('risk_explanation', '')
+        if not risk_exp_d:
+            risk_exp_d = entry.get('risk_explanation', '')
+        if is_zh:
+            print(f"  [!] 高风险: {risk_exp_d}")
+        else:
+            print(f"  [!] HIGH RISK: {entry.get('risk_explanation', '')}")
         print()
 
+    warn_label = "WARN" if not is_zh else "警告"
     if entry.get("requires_mcp"):
-        print(f"  [WARN] Requires MCP server -- must be configured manually")
+        print(f"  [{warn_label}] {zh_label('需要 MCP 服务器 -- 必须手动配置', 'Requires MCP server -- must be configured manually', target)}")
     if entry.get("requires_external_runtime"):
-        print(f"  [WARN] Requires external runtime -- must be installed separately")
+        print(f"  [{warn_label}] {zh_label('需要外部运行时 -- 必须单独安装', 'Requires external runtime -- must be installed separately', target)}")
     if entry.get("requires_api_key"):
-        print(f"  [WARN] Requires API key -- configure yourself, never store in PKB")
+        print(f"  [{warn_label}] {zh_label('需要 API key -- 请自行配置，切勿存入 PKB', 'Requires API key -- configure yourself, never store in PKB', target)}")
     if entry.get("license_status", "").startswith("NO LICENSE"):
-        print(f"  [WARN] {entry['license_status']}")
+        print(f"  [{warn_label}] {entry['license_status']}")
 
     if any([entry.get("requires_mcp"), entry.get("requires_external_runtime"),
             entry.get("requires_api_key")]):
@@ -578,45 +796,59 @@ def cmd_install(target: Path, catalog: dict, skill_id: str, dry_run: bool = Fals
 
     # Confirm unless --yes
     if not yes and not dry_run:
-        print(f"  Install to: {target / VENDOR_DIR_REL / skill_id}/")
+        install_to = f"{target / VENDOR_DIR_REL / skill_id}/"
+        print(f"  {zh_label('安装到:', 'Install to:', target)} {install_to}")
         print()
-        response = input(f"  Proceed with installation? [y/N]: ").strip().lower()
+        prompt = "  确认安装? [y/N]: " if is_zh else "  Proceed with installation? [y/N]: "
+        response = input(prompt).strip().lower()
         if response not in ("y", "yes"):
-            print("  Cancelled.")
+            print(f"  {zh_label('已取消。', 'Cancelled.', target)}")
             return
 
     # Execute installation
     if dry_run:
-        print(f"  [DRY RUN] Would install: {skill_id}")
+        dr_label = "DRY RUN" if not is_zh else "预览模式"
+        print(f"  [{dr_label}] {zh_label(f'将安装: {skill_id}', f'Would install: {skill_id}', target)}")
         _simulate_install(entry, target, dry_run=True)
         return
 
-    print(f"  Installing {skill_id}...")
+    installing_label = f"Installing {skill_id}..." if not is_zh else f"正在安装 {skill_id}..."
+    print(f"  {installing_label}")
     result = _do_install_skill(entry, target)
 
     if result["status"] == "installed":
-        print(f"  [OK] Installed to {result['vendor_path']}")
+        if is_zh:
+            print(f"  [OK] 已安装到 {result['vendor_path']}")
+        else:
+            print(f"  [OK] Installed to {result['vendor_path']}")
 
         # Copy adapter
         if entry.get("adapter"):
             copied = _copy_adapter(entry, target)
             if copied:
-                print(f"  [OK] Adapter: {entry['adapter']} -> {ADAPTER_DIR_REL}/")
+                print(f"  [OK] {zh_label('适配器:', 'Adapter:', target)} {entry['adapter']} -> {ADAPTER_DIR_REL}/")
 
         # Update config
         _update_pkb_config_for_install(target, entry)
         _update_skill_links_for_install(target, entry)
-        print(f"  [OK] Config updated: pkb.config.json, SKILL_LINKS.md")
+        print(f"  [OK] {zh_label('配置已更新: pkb.config.json, SKILL_LINKS.md', 'Config updated: pkb.config.json, SKILL_LINKS.md', target)}")
 
         # Add to pending audit
         _mark_pending_audit(target, entry["id"])
 
         print()
-        print(f"  Next steps:")
-        print(f"    1. Review the skill's LICENSE in {VENDOR_DIR_REL}/{skill_id}/")
-        print(f"    2. Run --audit to verify installation")
-        print(f"    3. Run --enable {skill_id} to activate the adapter")
-        print(f"    4. Restart Claude Code to load new skills")
+        if is_zh:
+            print(f"  后续步骤:")
+            print(f"    1. 在 {VENDOR_DIR_REL}/{skill_id}/ 中查看技能的 LICENSE")
+            print(f"    2. 运行 --audit 验证安装")
+            print(f"    3. 运行 --enable {skill_id} 激活适配器")
+            print(f"    4. 重启 Claude Code 加载新技能")
+        else:
+            print(f"  Next steps:")
+            print(f"    1. Review the skill's LICENSE in {VENDOR_DIR_REL}/{skill_id}/")
+            print(f"    2. Run --audit to verify installation")
+            print(f"    3. Run --enable {skill_id} to activate the adapter")
+            print(f"    4. Restart Claude Code to load new skills")
     else:
         print(f"  [FAIL] {result.get('error', 'unknown error')}")
 
@@ -624,78 +856,124 @@ def cmd_install(target: Path, catalog: dict, skill_id: str, dry_run: bool = Fals
 def _cmd_install_z_skills(target: Path, entry: dict, dry_run: bool,
                           enable_risky: bool, yes: bool):
     """Special installation flow for z-skills with explicit warnings."""
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
     print()
     print("=" * 72)
-    print("  [!] Z-Skills — Third-Party Local Installation")
-    print("=" * 72)
-    print()
-    print("  IMPORTANT — Please read carefully:")
-    print()
-    print("  1. PKB Starter does NOT redistribute z-skills code.")
-    print("     This installation clones directly from:")
-    print(f"     {entry.get('repo_url', 'https://github.com/tjxj/z-skills')}")
-    print()
-    print("  2. z-skills is a third-party repository. Each sub-directory")
-    print("     may have its own license terms. You must audit before use.")
-    print()
-    print("  3. After installation, z-skills will be in:")
-    print(f"     skills/_vendor/z-skills/")
-    print("     Status: pending_audit (NOT auto-enabled)")
-    print()
-    print("  4. You must explicitly run --audit and --enable before any")
-    print("     z-skills code can be invoked through the PKB adapter.")
-    print()
-    print("  5. PKB never auto-executes z-skills scripts.")
-    print("     The adapter only routes z-web-pack output to raw/webpacks/.")
-    print()
-    print("  6. You are responsible for complying with the repository's")
-    print("     license terms. If no license is found, treat as")
-    print("     'all rights reserved' — personal reference only.")
-    print()
+    if is_zh:
+        print("  [!] Z-Skills -- 第三方本地安装")
+        print("=" * 72)
+        print()
+        print("  重要 -- 请仔细阅读:")
+        print()
+        print("  1. PKB Starter 不二次分发 z-skills 代码。")
+        print("     本次安装直接从以下地址克隆:")
+        print(f"     {entry.get('repo_url', 'https://github.com/tjxj/z-skills')}")
+        print()
+        print("  2. z-skills 是第三方仓库。每个子目录可能有各自的")
+        print("     许可条款。使用前必须审计。")
+        print()
+        print("  3. 安装后，z-skills 将位于:")
+        print(f"     skills/_vendor/z-skills/")
+        print("     状态: pending_audit (不自动启用)")
+        print()
+        print("  4. 你必须明确运行 --audit 和 --enable 之后，任何")
+        print("     z-skills 代码才能通过 PKB 适配器被调用。")
+        print()
+        print("  5. PKB 绝不自动执行 z-skills 脚本。")
+        print("     适配器仅将 z-web-pack 输出路由到 raw/webpacks/。")
+        print()
+        print("  6. 你有责任遵守仓库的许可条款。如果未找到许可证，")
+        print("     视为'保留所有权利' -- 仅供个人参考。")
+        print()
+    else:
+        print("  [!] Z-Skills -- Third-Party Local Installation")
+        print("=" * 72)
+        print()
+        print("  IMPORTANT -- Please read carefully:")
+        print()
+        print("  1. PKB Starter does NOT redistribute z-skills code.")
+        print("     This installation clones directly from:")
+        print(f"     {entry.get('repo_url', 'https://github.com/tjxj/z-skills')}")
+        print()
+        print("  2. z-skills is a third-party repository. Each sub-directory")
+        print("     may have its own license terms. You must audit before use.")
+        print()
+        print("  3. After installation, z-skills will be in:")
+        print(f"     skills/_vendor/z-skills/")
+        print("     Status: pending_audit (NOT auto-enabled)")
+        print()
+        print("  4. You must explicitly run --audit and --enable before any")
+        print("     z-skills code can be invoked through the PKB adapter.")
+        print()
+        print("  5. PKB never auto-executes z-skills scripts.")
+        print("     The adapter only routes z-web-pack output to raw/webpacks/.")
+        print()
+        print("  6. You are responsible for complying with the repository's")
+        print("     license terms. If no license is found, treat as")
+        print("     'all rights reserved' -- personal reference only.")
+        print()
 
     if dry_run:
-        print("  [DRY RUN] Would git clone into: skills/_vendor/z-skills/")
-        print("  [DRY RUN] Status would be: pending_audit")
-        print("  [DRY RUN] Adapter: z_skills_adapter.md")
+        if is_zh:
+            print("  [预览模式] 将 git clone 到: skills/_vendor/z-skills/")
+            print("  [预览模式] 状态将为: pending_audit")
+            print("  [预览模式] 适配器: z_skills_adapter.md")
+        else:
+            print("  [DRY RUN] Would git clone into: skills/_vendor/z-skills/")
+            print("  [DRY RUN] Status would be: pending_audit")
+            print("  [DRY RUN] Adapter: z_skills_adapter.md")
         print()
         _simulate_install(entry, target, dry_run=True)
         return
 
     # Confirmation
     if not yes:
-        response = input(
-            "  Type 'INSTALL' to confirm you understand and consent: "
-        ).strip()
+        prompt = "  输入 'INSTALL' 确认你理解并同意: " if is_zh else "  Type 'INSTALL' to confirm you understand and consent: "
+        response = input(prompt).strip()
         if response != "INSTALL":
-            print("  Cancelled. z-skills was not installed.")
+            print(f"  {zh_label('已取消。z-skills 未安装。', 'Cancelled. z-skills was not installed.', target)}")
             return
 
     print()
-    print(f"  Cloning z-skills into skills/_vendor/z-skills/...")
+    print(f"  {zh_label('正在克隆 z-skills 到 skills/_vendor/z-skills/...', 'Cloning z-skills into skills/_vendor/z-skills/...', target)}")
     result = _do_install_skill(entry, target)
 
     if result["status"] == "installed":
-        print(f"  [OK] z-skills installed to {result['vendor_path']}")
+        if is_zh:
+            print(f"  [OK] z-skills 已安装到 {result['vendor_path']}")
+        else:
+            print(f"  [OK] z-skills installed to {result['vendor_path']}")
 
         # Copy adapter
         if entry.get("adapter"):
             copied = _copy_adapter(entry, target)
             if copied:
-                print(f"  [OK] Adapter: {entry['adapter']} -> {ADAPTER_DIR_REL}/")
+                print(f"  [OK] {zh_label('适配器:', 'Adapter:', target)} {entry['adapter']} -> {ADAPTER_DIR_REL}/")
 
         # Update config (pending_audit, NOT enabled)
         _update_pkb_config_for_install(target, entry)
         _update_skill_links_for_install(target, entry)
         _mark_pending_audit(target, entry["id"])
-        print(f"  [OK] Config updated. Status: pending_audit")
+        if is_zh:
+            print(f"  [OK] 配置已更新。状态: pending_audit")
+        else:
+            print(f"  [OK] Config updated. Status: pending_audit")
 
         print()
-        print(f"  Next steps:")
-        print(f"    1. Run --audit to check LICENSE and structure")
-        print(f"       python scripts/skill_manager.py --target . --audit")
-        print(f"    2. Review the audit report: zskill_audit_report.md")
-        print(f"    3. Run --enable z-web-pack-local to activate the adapter")
-        print(f"    4. The adapter then connects z-web-pack output to raw/webpacks/")
+        if is_zh:
+            print(f"  后续步骤:")
+            print(f"    1. 运行 --audit 检查 LICENSE 和结构")
+            print(f"       python scripts/skill_manager.py --target . --audit")
+            print(f"    2. 查看审计报告: zskill_audit_report.md")
+            print(f"    3. 运行 --enable z-web-pack-local 激活适配器")
+            print(f"    4. 适配器随后将 z-web-pack 输出连接到 raw/webpacks/")
+        else:
+            print(f"  Next steps:")
+            print(f"    1. Run --audit to check LICENSE and structure")
+            print(f"       python scripts/skill_manager.py --target . --audit")
+            print(f"    2. Review the audit report: zskill_audit_report.md")
+            print(f"    3. Run --enable z-web-pack-local to activate the adapter")
+            print(f"    4. The adapter then connects z-web-pack output to raw/webpacks/")
     else:
         print(f"  [FAIL] {result.get('error', 'unknown error')}")
 
@@ -731,19 +1009,20 @@ def _do_install_skill(entry: dict, target: Path) -> dict:
 
 def _simulate_install(entry: dict, target: Path, dry_run: bool = True):
     """Simulate installation -- print what would happen."""
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
     vendor_path = target / VENDOR_DIR_REL / entry["id"]
-    print(f"    Vendor path:    {vendor_path}")
-    print(f"    Repo:           {entry.get('repo_url', 'N/A')}")
-    print(f"    Method:         {entry.get('install_method', 'git_clone')}")
+    print(f"    {zh_label('Vendor 路径:', 'Vendor path:', target)}    {vendor_path}")
+    print(f"    {zh_label('仓库:', 'Repo:', target)}           {entry.get('repo_url', 'N/A')}")
+    print(f"    {zh_label('方式:', 'Method:', target)}         {entry.get('install_method', 'git_clone')}")
     if entry.get("adapter"):
-        print(f"    Adapter:        {entry['adapter']} -> {ADAPTER_DIR_REL}/")
+        print(f"    {zh_label('适配器:', 'Adapter:', target)}        {entry['adapter']} -> {ADAPTER_DIR_REL}/")
     if entry.get("requires_mcp"):
-        print(f"    [WARN] MCP configuration needed (manual)")
+        print(f"    [{zh_label('警告', 'WARN', target)}] {zh_label('需要 MCP 配置 (手动)', 'MCP configuration needed (manual)', target)}")
     if entry.get("requires_external_runtime"):
-        print(f"    [WARN] External runtime needed (manual install)")
+        print(f"    [{zh_label('警告', 'WARN', target)}] {zh_label('需要外部运行时 (手动安装)', 'External runtime needed (manual install)', target)}")
     if entry.get("requires_api_key"):
-        print(f"    [WARN] API key needed (manual configuration)")
-    print(f"    License:        {entry.get('license_status', 'unknown')}")
+        print(f"    [{zh_label('警告', 'WARN', target)}] {zh_label('需要 API key (手动配置)', 'API key needed (manual configuration)', target)}")
+    print(f"    {zh_label('许可证:', 'License:', target)}        {entry.get('license_status', 'unknown')}")
     print()
 
 
@@ -752,34 +1031,53 @@ def _simulate_install(entry: dict, target: Path, dry_run: bool = True):
 def cmd_install_profile(target: Path, catalog: dict, profiles: dict, profile: str,
                         dry_run: bool = False, enable_risky: bool = False, yes: bool = False):
     """Install all skills from a profile."""
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
+
     if profile not in profiles.get("profiles", {}):
-        print(f"[FAIL] Unknown profile: {profile}")
-        print(f"       Available: {', '.join(profiles['profiles'].keys())}")
+        if is_zh:
+            print(f"[FAIL] 未知配置预设: {profile}")
+            print(f"       可用: {', '.join(profiles['profiles'].keys())}")
+        else:
+            print(f"[FAIL] Unknown profile: {profile}")
+            print(f"       Available: {', '.join(profiles['profiles'].keys())}")
         sys.exit(1)
 
     profile_def = profiles["profiles"][profile]
     skill_ids = profile_def.get("skills", [])
     profile_desc = profile_def.get("description", "")
+    pd_local = get_profile_desc(profile, target)
+    if pd_local.get("desc"):
+        profile_desc = pd_local["desc"]
 
     if profile == "custom":
-        skill_ids = _interactive_select(catalog)
+        skill_ids = _interactive_select(catalog, target)
         if not skill_ids:
-            print("[INFO] No skills selected. PKB core only.")
+            if is_zh:
+                print("[INFO] 未选择技能。仅使用 PKB core。")
+            else:
+                print("[INFO] No skills selected. PKB core only.")
             return
 
     if not skill_ids:
-        print(f"[INFO] Profile '{profile}' has no additional skills.")
-        print(f"       {profile_desc}")
-        print(f"       PKB core tools are always available.")
+        if is_zh:
+            print(f"[INFO] 配置预设 '{profile}' 没有额外技能。")
+            print(f"       {profile_desc}")
+            print(f"       PKB 核心工具始终可用。")
+        else:
+            print(f"[INFO] Profile '{profile}' has no additional skills.")
+            print(f"       {profile_desc}")
+            print(f"       PKB core tools are always available.")
         return
 
     catalog_map = {s["id"]: s for s in catalog["skills"]}
 
     # Show profile overview
-    print_header(f"Install Profile: {profile}")
+    title = f"Install Profile: {profile}" if not is_zh else f"安装配置预设: {profile}"
+    print_header(title)
     print(f"  {profile_desc}")
     print()
-    print(f"  {len(skill_ids)} skill(s) in this profile:")
+    skills_label = f"{len(skill_ids)} skill(s) in this profile:" if not is_zh else f"此配置预设包含 {len(skill_ids)} 个技能:"
+    print(f"  {skills_label}")
     print()
 
     to_install = []
@@ -787,55 +1085,73 @@ def cmd_install_profile(target: Path, catalog: dict, profiles: dict, profile: st
     for sid in skill_ids:
         entry = catalog_map.get(sid)
         if not entry:
-            print(f"  [SKIP] {sid} -- not found in catalog")
+            skip_msg = f"  [SKIP] {sid} -- not found in catalog" if not is_zh else f"  [跳过] {sid} -- 目录中未找到"
+            print(skip_msg)
             skipped.append(sid)
             continue
         method = entry.get("install_method", "")
         risk = entry.get("risk_level", "")
 
         if method == "reference_only":
-            print(f"  [SKIP] {sid} -- reference only (not installable)")
+            skip_msg = f"  [SKIP] {sid} -- reference only (not installable)" if not is_zh else f"  [跳过] {sid} -- 仅供参考 (不可安装)"
+            print(skip_msg)
             skipped.append(sid)
             continue
         if method == "user_approved_clone":
-            print(f"  [MANUAL] {sid} -- requires explicit user consent (use --install {sid})")
+            man_msg = f"  [MANUAL] {sid} -- requires explicit user consent (use --install {sid})" if not is_zh else f"  [需手动] {sid} -- 需要明确用户同意 (使用 --install {sid})"
+            print(man_msg)
             skipped.append(sid)
             continue
         if method == "requires_z_skills_vendor_clone":
-            print(f"  [MANUAL] {sid} -- requires z-skills first (use --install z-skills)")
+            man_msg = f"  [MANUAL] {sid} -- requires z-skills first (use --install z-skills)" if not is_zh else f"  [需手动] {sid} -- 需要先安装 z-skills (使用 --install z-skills)"
+            print(man_msg)
             skipped.append(sid)
             continue
         if risk == "high" and not enable_risky:
-            print(f"  [SKIP] {sid} -- HIGH RISK (use --enable-risky)")
+            skip_msg = f"  [SKIP] {sid} -- HIGH RISK (use --enable-risky)" if not is_zh else f"  [跳过] {sid} -- 高风险 (使用 --enable-risky)"
+            print(skip_msg)
             skipped.append(sid)
             continue
         if method == "plugin_marketplace":
-            print(f"  [MANUAL] {sid} -- plugin marketplace (install via Claude Code)")
+            man_msg = f"  [MANUAL] {sid} -- plugin marketplace (install via Claude Code)" if not is_zh else f"  [需手动] {sid} -- 插件市场 (通过 Claude Code 安装)"
+            print(man_msg)
             skipped.append(sid)
             continue
         if method == "mcp_config":
-            print(f"  [MANUAL] {sid} -- MCP server (configure manually)")
+            man_msg = f"  [MANUAL] {sid} -- MCP server (configure manually)" if not is_zh else f"  [需手动] {sid} -- MCP 服务器 (手动配置)"
+            print(man_msg)
             skipped.append(sid)
             continue
 
         mcp = " [MCP]" if entry.get("requires_mcp") else ""
         api = " [API]" if entry.get("requires_api_key") else ""
-        print(f"  [{risk.upper():<7s}] {sid:<35s} {entry.get('short_description', '')[:60]}{mcp}{api}")
+        short_d = get_field_zh(entry, "short_description", "short_description_zh") if is_zh else entry.get('short_description', '')
+        if not short_d:
+            short_d = entry.get('short_description', '')
+        print(f"  [{risk.upper():<7s}] {sid:<35s} {short_d[:60]}{mcp}{api}")
         to_install.append(entry)
 
     print()
-    print(f"  To install: {len(to_install)}  |  Skipped: {len(skipped)}")
+    install_label = f"To install: {len(to_install)}  |  Skipped: {len(skipped)}" if not is_zh else f"将安装: {len(to_install)}  |  已跳过: {len(skipped)}"
+    print(f"  {install_label}")
     print()
 
     if not to_install:
-        print("[INFO] No auto-installable skills in this profile.")
-        if skipped:
-            print("       Skipped skills may require --enable-risky, manual MCP config,")
-            print("       or Claude Code plugin marketplace installation.")
+        if is_zh:
+            print("[INFO] 此配置预设中没有可自动安装的技能。")
+            if skipped:
+                print("       跳过的技能可能需要 --enable-risky、手动 MCP 配置、")
+                print("       或通过 Claude Code 插件市场安装。")
+        else:
+            print("[INFO] No auto-installable skills in this profile.")
+            if skipped:
+                print("       Skipped skills may require --enable-risky, manual MCP config,")
+                print("       or Claude Code plugin marketplace installation.")
         return
 
     if dry_run:
-        print(f"  [DRY RUN] Would install {len(to_install)} skills:")
+        dr_label = f"[DRY RUN] Would install {len(to_install)} skills:" if not is_zh else f"[预览模式] 将安装 {len(to_install)} 个技能:"
+        print(f"  {dr_label}")
         for entry in to_install:
             _simulate_install(entry, target, dry_run=True)
         _print_dry_run_config_summary(target, to_install, profile)
@@ -843,27 +1159,31 @@ def cmd_install_profile(target: Path, catalog: dict, profiles: dict, profile: st
 
     # Confirm
     if not yes:
-        response = input(f"  Proceed with installation of {len(to_install)} skill(s)? [y/N]: ").strip().lower()
+        prompt = f"  确认安装 {len(to_install)} 个技能? [y/N]: " if is_zh else f"  Proceed with installation of {len(to_install)} skill(s)? [y/N]: "
+        response = input(prompt).strip().lower()
         if response not in ("y", "yes"):
-            print("  Cancelled.")
+            print(f"  {zh_label('已取消。', 'Cancelled.', target)}")
             return
 
     # Install each
     print()
     results = []
     for entry in to_install:
-        print(f"  Installing: {entry['id']}...")
+        install_msg = f"  Installing: {entry['id']}..." if not is_zh else f"  正在安装: {entry['id']}..."
+        print(install_msg)
         result = _do_install_skill(entry, target)
         results.append(result)
 
         if result["status"] == "installed":
-            print(f"    [OK] -> {result['vendor_path']}")
+            ok_msg = f"    [OK] -> {result['vendor_path']}" if not is_zh else f"    [OK] -> {result['vendor_path']}"
+            print(ok_msg)
             if entry.get("adapter"):
                 _copy_adapter(entry, target)
-                print(f"    [OK] Adapter: {entry['adapter']}")
+                print(f"    [OK] {zh_label('适配器:', 'Adapter:', target)} {entry['adapter']}")
             _update_pkb_config_for_install(target, entry)
         else:
-            print(f"    [FAIL] {result.get('error', 'unknown')[:120]}")
+            fail_msg = f"    [FAIL] {result.get('error', 'unknown')[:120]}" if not is_zh else f"    [失败] {result.get('error', 'unknown')[:120]}"
+            print(fail_msg)
 
     # Final config update
     _update_pkb_config_for_profile(target, profile, results)
@@ -874,25 +1194,41 @@ def cmd_install_profile(target: Path, catalog: dict, profiles: dict, profile: st
     failed = [r for r in results if r["status"] == "failed"]
 
     print()
-    print_header("Installation Report")
-    print(f"  Profile:    {profile}")
-    print(f"  Installed:  {len(succeeded)}")
-    print(f"  Failed:     {len(failed)}")
-    print(f"  Skipped:    {len(skipped)}")
+    report_title = "Installation Report" if not is_zh else "安装报告"
+    print_header(report_title)
+    profile_label = "Profile" if not is_zh else "配置预设"
+    installed_label = "Installed" if not is_zh else "已安装"
+    failed_label = "Failed" if not is_zh else "失败"
+    skipped_label = "Skipped" if not is_zh else "已跳过"
+    print(f"  {profile_label}:    {profile}")
+    print(f"  {installed_label}:  {len(succeeded)}")
+    print(f"  {failed_label}:     {len(failed)}")
+    print(f"  {skipped_label}:    {len(skipped)}")
     if succeeded:
-        print(f"  Path:       {VENDOR_DIR_REL}/")
+        path_label = "Path" if not is_zh else "路径"
+        next_label = "Next steps" if not is_zh else "后续步骤"
+        print(f"  {path_label}:       {VENDOR_DIR_REL}/")
         print()
-        print(f"  Next steps:")
-        print(f"    1. Run --audit to verify installations")
-        print(f"    2. Run --enable <id> for skills you want to activate")
-        print(f"    3. Restart Claude Code to load new skills")
+        print(f"  {next_label}:")
+        if is_zh:
+            print(f"    1. 运行 --audit 验证安装")
+            print(f"    2. 运行 --enable <id> 激活你想使用的技能")
+            print(f"    3. 重启 Claude Code 加载新技能")
+        else:
+            print(f"    1. Run --audit to verify installations")
+            print(f"    2. Run --enable <id> for skills you want to activate")
+            print(f"    3. Restart Claude Code to load new skills")
     print("=" * 72)
 
 
 def _print_dry_run_config_summary(target: Path, to_install: list, profile: str):
     """Print what config changes would be made."""
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
     print()
-    print(f"  [DRY RUN] Would update:")
+    if is_zh:
+        print(f"  [预览模式] 将更新:")
+    else:
+        print(f"  [DRY RUN] Would update:")
     print(f"    pkb.config.json  -- installed_profiles += [{profile}]")
     print(f"    pkb.config.json  -- installed_skills += [{', '.join(e['id'] for e in to_install)}]")
     print(f"    SKILL_LINKS.md   -- add entries for {len(to_install)} skills")
@@ -910,23 +1246,34 @@ def cmd_audit(target: Path, catalog: dict, dry_run: bool = False):
     catalog_map = {s["id"]: s for s in catalog["skills"]}
     pkb_config = load_pkb_config(target)
     skills_state = pkb_config.get("skills", {})
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
 
-    print_header("PKB Skill Audit")
+    title = "PKB Skill Audit" if not is_zh else "PKB 技能审计"
+    print_header(title)
 
     if not vendor_dir.is_dir():
-        print("  No skills/_vendor/ directory found.")
-        print("  No skills installed. Use --install-profile <name> to get started.")
+        if is_zh:
+            print("  未找到 skills/_vendor/ 目录。")
+            print("  没有已安装的技能。使用 --install-profile <name> 开始。")
+        else:
+            print("  No skills/_vendor/ directory found.")
+            print("  No skills installed. Use --install-profile <name> to get started.")
         print()
         return
 
     installed_dirs = [d for d in vendor_dir.iterdir() if d.is_dir()]
     if not installed_dirs:
-        print("  skills/_vendor/ is empty.")
-        print("  No skills installed. Use --install-profile <name> to get started.")
+        if is_zh:
+            print("  skills/_vendor/ 为空。")
+            print("  没有已安装的技能。使用 --install-profile <name> 开始。")
+        else:
+            print("  skills/_vendor/ is empty.")
+            print("  No skills installed. Use --install-profile <name> to get started.")
         print()
         return
 
-    print(f"  Found {len(installed_dirs)} installed skill(s):")
+    found_label = f"Found {len(installed_dirs)} installed skill(s):" if not is_zh else f"找到 {len(installed_dirs)} 个已安装技能:"
+    print(f"  {found_label}")
     print()
 
     known = 0
@@ -947,24 +1294,27 @@ def cmd_audit(target: Path, catalog: dict, dry_run: bool = False):
             name = entry.get("name", "?")
 
             print(f"  [{risk.upper():<7s}] {skill_id}  -- {name}")
-            print(f"              Repo: {entry.get('repo_url', 'N/A')}")
-            print(f"              License: {lic}")
+            repo_label = "Repo" if not is_zh else "仓库"
+            lic_label = "License" if not is_zh else "许可证"
+            print(f"              {repo_label}: {entry.get('repo_url', 'N/A')}")
+            print(f"              {lic_label}: {lic}")
         else:
             unknown += 1
             print(f"  [UNKNOWN ] {skill_id}")
-            print(f"              NOT in catalog -- may be manually installed")
+            unknown_msg = f"              NOT in catalog -- may be manually installed" if not is_zh else "              不在目录中 -- 可能是手动安装的"
+            print(unknown_msg)
             issues.append(f"{skill_id}: not in catalog")
 
         # Check .git
         if not (d / ".git").is_dir():
-            issues.append(f"{skill_id}: missing .git (not a git clone)")
-            print(f"              [!] .git MISSING (may be copy, not clone)")
+            git_msg = f"{skill_id}: missing .git (not a git clone)" if not is_zh else f"{skill_id}: 缺少 .git (非 git clone)"
+            issues.append(git_msg)
+            print(f"              [!] .git MISSING (may be copy, not clone)" if not is_zh else f"              [!] .git 缺失 (可能为复制而非克隆)")
 
         # Check INSTALL_NOTE.md
-        if (d / "INSTALL_NOTE.md").is_file():
-            print(f"              INSTALL_NOTE.md: present")
-        else:
-            print(f"              INSTALL_NOTE.md: MISSING")
+        install_note_msg_en = "INSTALL_NOTE.md: present" if (d / "INSTALL_NOTE.md").is_file() else "INSTALL_NOTE.md: MISSING"
+        install_note_msg_zh = "INSTALL_NOTE.md: 存在" if (d / "INSTALL_NOTE.md").is_file() else "INSTALL_NOTE.md: 缺失"
+        print(f"              {install_note_msg_zh if is_zh else install_note_msg_en}")
 
         # Check license in repo
         if entry and lic.startswith("NO LICENSE"):
@@ -975,63 +1325,86 @@ def cmd_audit(target: Path, catalog: dict, dry_run: bool = False):
         if adapter:
             adapter_path = target / ADAPTER_DIR_REL / adapter
             if adapter_path.is_file():
-                print(f"              Adapter: {adapter} -- present")
+                print(f"              Adapter: {adapter} -- present" if not is_zh else f"              适配器: {adapter} -- 存在")
             else:
                 no_adapter.append(skill_id)
-                print(f"              Adapter: {adapter} -- MISSING")
+                print(f"              Adapter: {adapter} -- MISSING" if not is_zh else f"              适配器: {adapter} -- 缺失")
 
         # Enabled?
         enabled_ids = skills_state.get("enabled_skills", [])
         disabled_ids = skills_state.get("disabled_skills", [])
         pending_ids = skills_state.get("pending_audit", [])
         if skill_id in enabled_ids:
-            print(f"              Status: ENABLED")
+            print(f"              Status: ENABLED" if not is_zh else f"              状态: 已启用")
         elif skill_id in disabled_ids:
-            print(f"              Status: DISABLED")
+            print(f"              Status: DISABLED" if not is_zh else f"              状态: 已停用")
         elif skill_id in pending_ids:
-            print(f"              Status: PENDING AUDIT")
+            print(f"              Status: PENDING AUDIT" if not is_zh else f"              状态: 待审计")
             pending.append(skill_id)
         else:
-            print(f"              Status: installed (not yet classified)")
+            print(f"              Status: installed (not yet classified)" if not is_zh else f"              状态: 已安装 (尚未分类)")
 
         print()
 
     # Summary
     print_separator()
-    print(f"  Summary: {known} known, {unknown} unknown -- {known + unknown} total")
-    print(f"  Catalog version: {catalog.get('version', '?')}")
-    print(f"  PKB skills config: {skills_state.get('catalog_version', '?')}")
+    summary_label = f"Summary: {known} known, {unknown} unknown -- {known + unknown} total" if not is_zh else f"摘要: {known} 已知, {unknown} 未知 -- 共 {known + unknown}"
+    print(f"  {summary_label}")
+    print(f"  {zh_label('目录版本:', 'Catalog version:', target)} {catalog.get('version', '?')}")
+    print(f"  {zh_label('PKB 技能配置:', 'PKB skills config:', target)} {skills_state.get('catalog_version', '?')}")
     print()
 
     if no_license:
-        print(f"  [!] Skills with NO LICENSE ({len(no_license)}):")
-        for sid in no_license:
-            print(f"      {sid}")
-        print(f"      Treat as all rights reserved. Use for personal reference only.")
+        if is_zh:
+            print(f"  [!] 无 LICENSE 的技能 ({len(no_license)}):")
+            for sid in no_license:
+                print(f"      {sid}")
+            print(f"      视为保留所有权利。仅供个人参考使用。")
+        else:
+            print(f"  [!] Skills with NO LICENSE ({len(no_license)}):")
+            for sid in no_license:
+                print(f"      {sid}")
+            print(f"      Treat as all rights reserved. Use for personal reference only.")
         print()
 
     if no_adapter:
-        print(f"  [!] Skills with missing adapters ({len(no_adapter)}):")
-        for sid in no_adapter:
-            print(f"      {sid}")
-        print(f"      Run --install {sid} again to copy the adapter.")
+        if is_zh:
+            print(f"  [!] 缺少适配器的技能 ({len(no_adapter)}):")
+            for sid in no_adapter:
+                print(f"      {sid}")
+            print(f"      重新运行 --install {sid} 以复制适配器。")
+        else:
+            print(f"  [!] Skills with missing adapters ({len(no_adapter)}):")
+            for sid in no_adapter:
+                print(f"      {sid}")
+            print(f"      Run --install {sid} again to copy the adapter.")
         print()
 
     if pending:
-        print(f"  [!] Skills pending audit ({len(pending)}):")
-        for sid in pending:
-            print(f"      {sid}")
-        print(f"      Review LICENSE, code, and adapter before --enable.")
+        if is_zh:
+            print(f"  [!] 待审计的技能 ({len(pending)}):")
+            for sid in pending:
+                print(f"      {sid}")
+            print(f"      在 --enable 之前，请审查 LICENSE、代码和适配器。")
+        else:
+            print(f"  [!] Skills pending audit ({len(pending)}):")
+            for sid in pending:
+                print(f"      {sid}")
+            print(f"      Review LICENSE, code, and adapter before --enable.")
         print()
 
     if issues:
-        print(f"  Issues found: {len(issues)}")
+        issues_label = f"Issues found: {len(issues)}" if not is_zh else f"发现的问题: {len(issues)}"
+        print(f"  {issues_label}")
         for i in issues:
             print(f"    - {i}")
         print()
 
     if not issues and not no_license and not no_adapter and not pending:
-        print(f"  [OK] All installed skills pass audit.")
+        if is_zh:
+            print(f"  [OK] 所有已安装技能通过审计。")
+        else:
+            print(f"  [OK] All installed skills pass audit.")
         print()
 
     print_separator()
@@ -1041,7 +1414,7 @@ def cmd_audit(target: Path, catalog: dict, dry_run: bool = False):
         report_path = target / "skill_manager_report.md"
         _write_audit_report(report_path, installed_dirs, catalog_map, skills_state,
                            known, unknown, issues, no_license, no_adapter, pending, catalog)
-        print(f"  Report: {report_path}")
+        print(f"  {zh_label('报告:', 'Report:', target)} {report_path}")
 
     # Z-Skills specific audit (delegates to zskill_bridge.py if z-skills is installed)
     _audit_z_skills_if_present(target, dry_run)
@@ -1049,6 +1422,7 @@ def cmd_audit(target: Path, catalog: dict, dry_run: bool = False):
 
 def _audit_z_skills_if_present(target: Path, dry_run: bool):
     """Run zskill_bridge.py audit if z-skills is installed."""
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
     z_skills_path = target / VENDOR_DIR_REL / "z-skills"
     if not z_skills_path.is_dir():
         return
@@ -1060,16 +1434,22 @@ def _audit_z_skills_if_present(target: Path, dry_run: bool):
 
     if not bridge_script.is_file():
         print()
-        print("  [INFO] z-skills installed but zskill_bridge.py not found.")
-        print("         Copy it from pkb-starter/template/tools/zskill_bridge.py")
+        if is_zh:
+            print("  [INFO] z-skills 已安装但未找到 zskill_bridge.py。")
+            print("         请从 pkb-starter/template/tools/zskill_bridge.py 复制。")
+        else:
+            print("  [INFO] z-skills installed but zskill_bridge.py not found.")
+            print("         Copy it from pkb-starter/template/tools/zskill_bridge.py")
         return
 
     print()
-    print(f"  --- Z-Skills Audit (via zskill_bridge.py) ---")
+    z_audit_label = "--- Z-Skills Audit (via zskill_bridge.py) ---" if not is_zh else "--- Z-Skills 审计 (通过 zskill_bridge.py) ---"
+    print(f"  {z_audit_label}")
     print()
 
     if dry_run:
-        print(f"  [DRY RUN] Would run: python {bridge_script} audit")
+        dr_label = f"[DRY RUN] Would run: python {bridge_script} audit" if not is_zh else f"[预览模式] 将运行: python {bridge_script} audit"
+        print(f"  {dr_label}")
         return
 
     try:
@@ -1083,9 +1463,9 @@ def _audit_z_skills_if_present(target: Path, dry_run: bool):
         if proc.stderr.strip():
             print(proc.stderr)
     except subprocess.TimeoutExpired:
-        print("  [WARN] z-skills audit timed out")
+        print(f"  {zh_label('[WARN] z-skills 审计超时', '[WARN] z-skills audit timed out', target)}")
     except Exception as e:
-        print(f"  [WARN] z-skills audit failed: {e}")
+        print(f"  {zh_label(f'[WARN] z-skills 审计失败: {e}', f'[WARN] z-skills audit failed: {e}', target)}")
 
 
 
@@ -1134,25 +1514,35 @@ def cmd_enable(target: Path, catalog: dict, skill_id: str):
     """Enable a skill's adapter."""
     catalog_map = {s["id"]: s for s in catalog["skills"]}
     entry = catalog_map.get(skill_id)
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
 
     # Special check for z-web-pack-local: requires z-skills installed + audited
     if skill_id == "z-web-pack-local":
         z_skills_path = target / VENDOR_DIR_REL / "z-skills"
         if not z_skills_path.is_dir():
-            print(f"[FAIL] z-web-pack-local requires z-skills to be installed first.")
-            print(f"       Run: --install z-skills")
+            if is_zh:
+                print(f"[FAIL] z-web-pack-local 需要先安装 z-skills。")
+                print(f"       运行: --install z-skills")
+            else:
+                print(f"[FAIL] z-web-pack-local requires z-skills to be installed first.")
+                print(f"       Run: --install z-skills")
             sys.exit(1)
 
         audit_report = target / "zskill_audit_report.md"
         if not audit_report.is_file():
-            print(f"[FAIL] z-skills has not been audited yet.")
-            print(f"       Run: --audit (which includes z-skills audit)")
-            print(f"       Or: python tools/zskill_bridge.py audit")
+            if is_zh:
+                print(f"[FAIL] z-skills 尚未审计。")
+                print(f"       运行: --audit (包含 z-skills 审计)")
+                print(f"       或: python tools/zskill_bridge.py audit")
+            else:
+                print(f"[FAIL] z-skills has not been audited yet.")
+                print(f"       Run: --audit (which includes z-skills audit)")
+                print(f"       Or: python tools/zskill_bridge.py audit")
             sys.exit(1)
 
         print()
         print(f"  z-skills: INSTALLED at {z_skills_path}")
-        print(f"  Audit report: {audit_report}")
+        print(f"  {zh_label('审计报告:', 'Audit report:', target)} {audit_report}")
         print()
 
     # Verify installed
@@ -1161,8 +1551,12 @@ def cmd_enable(target: Path, catalog: dict, skill_id: str):
         # z-web-pack-local is adapter_only, doesn't have its own vendor dir
         pass
     elif not vendor_path.is_dir():
-        print(f"[FAIL] {skill_id} is not installed in {VENDOR_DIR_REL}/")
-        print(f"       Run --install {skill_id} first.")
+        if is_zh:
+            print(f"[FAIL] {skill_id} 未安装在 {VENDOR_DIR_REL}/")
+            print(f"       请先运行 --install {skill_id}。")
+        else:
+            print(f"[FAIL] {skill_id} is not installed in {VENDOR_DIR_REL}/")
+            print(f"       Run --install {skill_id} first.")
         sys.exit(1)
 
     config = load_pkb_config(target)
@@ -1188,10 +1582,14 @@ def cmd_enable(target: Path, catalog: dict, skill_id: str):
             enabled_adapters = set(skills_state.get("enabled_adapters", []))
             enabled_adapters.add(adapter)
             skills_state["enabled_adapters"] = list(enabled_adapters)
-            print(f"  [OK] Adapter enabled: {adapter}")
+            print(f"  [OK] {zh_label('适配器已启用:', 'Adapter enabled:', target)} {adapter}")
         else:
-            print(f"  [WARN] Adapter not found in pkb-starter: {adapter}")
-            print(f"         Expected: {adapter_src}")
+            if is_zh:
+                print(f"  [WARN] pkb-starter 中未找到适配器: {adapter}")
+                print(f"         预期位置: {adapter_src}")
+            else:
+                print(f"  [WARN] Adapter not found in pkb-starter: {adapter}")
+                print(f"         Expected: {adapter_src}")
 
     skills_state["enabled_skills"] = list(enabled)
     skills_state["disabled_skills"] = list(disabled)
@@ -1199,14 +1597,23 @@ def cmd_enable(target: Path, catalog: dict, skill_id: str):
 
     save_pkb_config(target, config)
 
-    print(f"  [OK] {skill_id} is now ENABLED")
+    if is_zh:
+        print(f"  [OK] {skill_id} 现在已启用")
+    else:
+        print(f"  [OK] {skill_id} is now ENABLED")
     if entry:
-        print(f"       {entry.get('short_description', '')}")
-    print(f"       Restart Claude Code to load the skill.")
+        short_d = get_field_zh(entry, "short_description", "short_description_zh") if is_zh else entry.get('short_description', '')
+        if not short_d:
+            short_d = entry.get('short_description', '')
+        print(f"       {short_d}")
+    restart_msg = "Restart Claude Code to load the skill." if not is_zh else "重启 Claude Code 以加载此技能。"
+    print(f"       {restart_msg}")
 
 
 def cmd_disable(target: Path, skill_id: str):
     """Disable a skill without deleting its code."""
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
+
     # Special handling for z-web-pack-local (adapter-only, no vendor dir)
     if skill_id == "z-web-pack-local":
         config = load_pkb_config(target)
@@ -1226,15 +1633,24 @@ def cmd_disable(target: Path, skill_id: str):
 
         save_pkb_config(target, config)
 
-        print(f"  [OK] z-web-pack-local is now DISABLED")
-        print(f"       Adapter deactivated. z-skills code remains in {VENDOR_DIR_REL}/z-skills/")
-        print(f"       Run --enable z-web-pack-local to re-enable.")
-        print(f"       To fully remove z-skills: delete {VENDOR_DIR_REL}/z-skills/")
+        if is_zh:
+            print(f"  [OK] z-web-pack-local 现在已停用")
+            print(f"       适配器已停用。z-skills 代码保留在 {VENDOR_DIR_REL}/z-skills/")
+            print(f"       运行 --enable z-web-pack-local 重新启用。")
+            print(f"       要完全删除 z-skills: 删除 {VENDOR_DIR_REL}/z-skills/")
+        else:
+            print(f"  [OK] z-web-pack-local is now DISABLED")
+            print(f"       Adapter deactivated. z-skills code remains in {VENDOR_DIR_REL}/z-skills/")
+            print(f"       Run --enable z-web-pack-local to re-enable.")
+            print(f"       To fully remove z-skills: delete {VENDOR_DIR_REL}/z-skills/")
         return
 
     vendor_path = target / VENDOR_DIR_REL / skill_id
     if not vendor_path.is_dir():
-        print(f"[FAIL] {skill_id} is not installed.")
+        if is_zh:
+            print(f"[FAIL] {skill_id} 未安装。")
+        else:
+            print(f"[FAIL] {skill_id} is not installed.")
         sys.exit(1)
 
     config = load_pkb_config(target)
@@ -1251,10 +1667,16 @@ def cmd_disable(target: Path, skill_id: str):
 
     save_pkb_config(target, config)
 
-    print(f"  [OK] {skill_id} is now DISABLED")
-    print(f"       Source code remains in {VENDOR_DIR_REL}/{skill_id}/")
-    print(f"       Run --enable {skill_id} to re-enable.")
-    print(f"       To fully remove: delete {VENDOR_DIR_REL}/{skill_id}/")
+    if is_zh:
+        print(f"  [OK] {skill_id} 现在已停用")
+        print(f"       源代码保留在 {VENDOR_DIR_REL}/{skill_id}/")
+        print(f"       运行 --enable {skill_id} 重新启用。")
+        print(f"       要完全删除: 删除 {VENDOR_DIR_REL}/{skill_id}/")
+    else:
+        print(f"  [OK] {skill_id} is now DISABLED")
+        print(f"       Source code remains in {VENDOR_DIR_REL}/{skill_id}/")
+        print(f"       Run --enable {skill_id} to re-enable.")
+        print(f"       To fully remove: delete {VENDOR_DIR_REL}/{skill_id}/")
 
 
 # -- Show enabled ------------------------------------------------------------
@@ -1266,35 +1688,52 @@ def cmd_enabled(target: Path, catalog: dict):
     enabled_ids = skills_state.get("enabled_skills", [])
     enabled_adapters = skills_state.get("enabled_adapters", [])
     catalog_map = {s["id"]: s for s in catalog["skills"]}
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
 
-    print_header("Enabled Skills & Adapters")
+    title = "Enabled Skills & Adapters" if not is_zh else "已启用的技能与适配器"
+    print_header(title)
 
     if not enabled_ids and not enabled_adapters:
-        print("  No skills or adapters are currently enabled.")
-        print()
-        print("  Use --install-profile <name> to install skills,")
-        print("  then --enable <id> to activate them.")
+        if is_zh:
+            print("  当前没有启用任何技能或适配器。")
+            print()
+            print("  使用 --install-profile <name> 安装技能，")
+            print("  然后 --enable <id> 激活它们。")
+        else:
+            print("  No skills or adapters are currently enabled.")
+            print()
+            print("  Use --install-profile <name> to install skills,")
+            print("  then --enable <id> to activate them.")
         print()
         return
 
     if enabled_ids:
-        print(f"  Enabled skills ({len(enabled_ids)}):")
+        if is_zh:
+            print(f"  已启用的技能 ({len(enabled_ids)}):")
+        else:
+            print(f"  Enabled skills ({len(enabled_ids)}):")
         print()
         for sid in sorted(enabled_ids):
             entry = catalog_map.get(sid, {})
-            name = entry.get("name", sid)
+            name = get_field_zh(entry, "name", "name_zh") if is_zh else entry.get("name", sid)
+            if not name:
+                name = sid
             cat = entry.get("category", "?")
-            print(f"    {sid:<35s} [{CATEGORY_LABELS.get(cat, cat)}] {name}")
+            print(f"    {sid:<35s} [{get_category_label(cat, target)}] {name}")
         print()
 
     if enabled_adapters:
-        print(f"  Enabled adapters ({len(enabled_adapters)}):")
+        if is_zh:
+            print(f"  已启用的适配器 ({len(enabled_adapters)}):")
+        else:
+            print(f"  Enabled adapters ({len(enabled_adapters)}):")
         print()
         for a in sorted(enabled_adapters):
             adapter_path = target / ADAPTER_DIR_REL / a
             exists = adapter_path.is_file()
             tag = "present" if exists else "MISSING"
-            print(f"    {a:<40s} [{tag}]")
+            tag_zh = "存在" if exists else "缺失"
+            print(f"    {a:<40s} [{tag_zh if is_zh else tag}]")
         print()
 
     print_separator()
@@ -1304,20 +1743,25 @@ def cmd_enabled(target: Path, catalog: dict):
 
 def cmd_update_catalog(target: Path, catalog: dict, dry_run: bool = False):
     """Update the local skill catalog from pkb-starter source."""
+    is_zh = detect_language(target) in ("zh-CN", "bilingual")
+
     if dry_run:
-        print(f"  [DRY RUN] Would update catalog from: {CATALOG_PATH}")
+        dr_label = f"[DRY RUN] Would update catalog from: {CATALOG_PATH}" if not is_zh else f"[预览模式] 将从以下路径更新目录: {CATALOG_PATH}"
+        print(f"  {dr_label}")
         return
 
-    # This copies the latest catalog and profiles to the target's reference
-    # (The catalog is read from pkb-starter, so "update" means refresh the local config)
     config = load_pkb_config(target)
     skills_state = config.setdefault("skills", {})
     old_version = skills_state.get("catalog_version", "?")
     skills_state["catalog_version"] = catalog.get("version", "0.4.0")
     save_pkb_config(target, config)
 
-    print(f"  [OK] Local catalog version updated: {old_version} -> {catalog.get('version', '?')}")
-    print(f"       Source: {CATALOG_PATH}")
+    if is_zh:
+        print(f"  [OK] 本地目录版本已更新: {old_version} -> {catalog.get('version', '?')}")
+        print(f"       来源: {CATALOG_PATH}")
+    else:
+        print(f"  [OK] Local catalog version updated: {old_version} -> {catalog.get('version', '?')}")
+        print(f"       Source: {CATALOG_PATH}")
 
 
 # -- Config Helpers ----------------------------------------------------------
@@ -1474,15 +1918,23 @@ def _update_skill_links_for_profile(target: Path, entries: list, profile: str):
 
 # -- Interactive Selection ---------------------------------------------------
 
-def _interactive_select(catalog: dict) -> list[str]:
+def _interactive_select(catalog: dict, target: Path = None) -> list[str]:
     """Interactive skill selection for custom profile."""
+    is_zh = target is not None and detect_language(target) in ("zh-CN", "bilingual")
     print()
     print("=" * 60)
-    print("  Custom Profile -- Select Skills")
+    if is_zh:
+        print("  自定义配置预设 -- 选择技能")
+    else:
+        print("  Custom Profile -- Select Skills")
     print("=" * 60)
     print()
-    print("  Enter skill IDs separated by spaces, or 'all' for all safe skills.")
-    print("  Reference-only and plugin_marketplace skills cannot be auto-installed.")
+    if is_zh:
+        print("  输入技能 ID，以空格分隔，或输入 'all' 安装所有安全技能。")
+        print("  仅供参考和 plugin_marketplace 技能无法自动安装。")
+    else:
+        print("  Enter skill IDs separated by spaces, or 'all' for all safe skills.")
+        print("  Reference-only and plugin_marketplace skills cannot be auto-installed.")
     print()
 
     installable = [
@@ -1490,13 +1942,17 @@ def _interactive_select(catalog: dict) -> list[str]:
         if s["install_method"] not in ("reference_only", "plugin_marketplace", "mcp_config")
     ]
     for i, skill in enumerate(installable, 1):
-        risk_tag = RISK_SYMBOLS.get(skill.get("risk_level"), "[?]")
+        risk_tag = get_risk_symbol(skill.get("risk_level"), target) if target else RISK_SYMBOLS.get(skill.get("risk_level"), "[?]")
         mcp_tag = " [MCP]" if skill.get("requires_mcp") else ""
         api_tag = " [API]" if skill.get("requires_api_key") else ""
-        print(f"  {i:2d}. {skill['id']:<32s} {risk_tag:<7s} {skill.get('short_description', '')[:60]}{mcp_tag}{api_tag}")
+        short_d = get_field_zh(skill, "short_description", "short_description_zh") if is_zh else skill.get("short_description", "")
+        if not short_d:
+            short_d = skill.get("short_description", "")
+        print(f"  {i:2d}. {skill['id']:<32s} {risk_tag:<7s} {short_d[:60]}{mcp_tag}{api_tag}")
 
     print()
-    choice = input("  Enter skill IDs (space-separated, or 'all'): ").strip()
+    prompt = "  输入技能 ID (空格分隔，或 'all'): " if is_zh else "  Enter skill IDs (space-separated, or 'all'): "
+    choice = input(prompt).strip()
 
     if choice.lower() == "all":
         return [s["id"] for s in installable if s.get("risk_level") != "high"]
@@ -1560,6 +2016,7 @@ def main():
     target = Path(args.target).resolve()
 
     if not target.is_dir():
+        # Try to detect language even when target doesn't exist
         print(f"[FAIL] Target directory does not exist: {target}")
         sys.exit(1)
 
@@ -1576,7 +2033,7 @@ def main():
     if args.list:
         cmd_list(catalog, target)
     elif args.describe:
-        cmd_describe(catalog, args.describe)
+        cmd_describe(catalog, args.describe, target)
     elif args.install:
         cmd_install(target, catalog, args.install, args.dry_run, args.enable_risky, args.yes)
     elif args.install_profile:

@@ -1,5 +1,7 @@
 # PKB Starter — Security
 
+Languages: [English](SECURITY.md) | [简体中文](zh-CN/SECURITY.md)
+
 ## What PKB Does NOT Upload
 
 PKB is a **local-first** system. By default:

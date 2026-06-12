@@ -4,6 +4,14 @@
 Safely updates system files (tools, commands, registry, adapters) while
 preserving all user data (raw/, wiki/, _INBOX/).
 
+Language protection:
+  - Language fields (language, wiki_language, output_language) in pkb.config.json
+    are NEVER overwritten during update.
+  - User-customized Chinese documents (README.zh-CN.md, AGENTS.zh-CN.md, etc.)
+    are preserved. Only missing locale files are added — existing ones are skipped.
+  - System docs (docs/zh-CN/) are only added if missing. Modified files are never
+    force-overwritten.
+
 Usage:
     python scripts/update_pkb.py "D:\\MyKB"
     python scripts/update_pkb.py "D:\\MyKB" --dry-run
@@ -32,8 +40,8 @@ SKILLS_DIR = REPO_ROOT / "skills"
 REGISTRY_DIR = REPO_ROOT / "skills_registry"
 
 # Current pkb-starter version
-CURRENT_VERSION = "0.5.0-alpha"
-CURRENT_SCHEMA_VERSION = "0.5.0"
+CURRENT_VERSION = "0.6.1-alpha"
+CURRENT_SCHEMA_VERSION = "0.6.0"
 
 # User data paths — NEVER overwrite or delete
 PROTECTED_DIRS = [
@@ -110,6 +118,7 @@ def is_user_config_key(key: str) -> bool:
     """Keys in pkb.config.json that are user-specific and should be preserved."""
     user_keys = {
         "name", "version", "created", "directories", "settings",
+        "language", "wiki_language", "output_language",
         "skills.installed_profiles", "skills.installed_skills",
         "skills.enabled_skills", "skills.disabled_skills",
         "skills.vendor_downloads", "skills.enabled_adapters",
@@ -322,6 +331,12 @@ def update_config(target: Path, opts: dict) -> list:
     if "catalog_version" not in existing_skills:
         existing_skills["catalog_version"] = CURRENT_VERSION
         changes.append(f"pkb.config.json: skills.catalog_version = {CURRENT_VERSION}")
+
+    # Language fields (language, wiki_language, output_language) are preserved
+    # implicitly — we never overwrite existing keys. Only version fields are touched.
+    for lang_key in ("language", "wiki_language", "output_language"):
+        if lang_key in config:
+            changes.append(f"pkb.config.json: {lang_key}={config[lang_key]} (preserved)")
 
     if not opts.get("dry_run"):
         config_path.write_text(

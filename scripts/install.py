@@ -170,8 +170,8 @@ def generate_config(target: Path, lang: str = "en") -> Path:
     config = {
         "name": target.name,
         "version": "0.1.0",
-        "starter_version": "0.5.0-alpha",
-        "schema_version": "0.5.0",
+        "starter_version": "0.6.1-alpha",
+        "schema_version": "0.6.0",
         "created": today,
         "last_updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "template": "pkb-starter",
@@ -400,7 +400,7 @@ def main():
     if interactive_skills:
         profile = "custom"
 
-    print(f"=== PKB Starter Installer v0.5.0-alpha ===")
+    print(f"=== PKB Starter Installer v0.6.1-alpha ===")
     print(f"Target: {target}")
     print(f"Language: {lang}")
     if dry_run:

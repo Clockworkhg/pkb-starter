@@ -2,6 +2,14 @@
 
 Update the current knowledge base's system files (tools, commands, skill registry, adapters) to the latest pkb-starter version. User data is NEVER touched.
 
+## Language Detection
+
+Before executing, read `pkb.config.json`. If `language` / `output_language` is set to `zh-CN`:
+1. Update reports, migration summaries, and status messages default to Simplified Chinese.
+2. `pkb.config.json` language fields (`language`, `wiki_language`, `output_language`) are NEVER modified by the update process.
+3. User-customized Chinese documents (README, AGENTS, COMMANDS) are preserved and not overwritten.
+4. Technical version numbers, file paths, and command names remain in English.
+
 ## Behavior
 
 1. Detect installed version from `pkb.config.json` (`starter_version`).

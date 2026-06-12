@@ -1,6 +1,8 @@
 # PKB web_pack -- Z-Web-Pack Parity
 
-> Capability comparison between PKB's built-in web_pack collector and z-web-pack (tjxj/z-skills), plus z-skills compatibility module documentation.
+> Capability comparison between
+
+Languages: [English](Z_WEB_PACK_PARITY.md) | [简体中文](zh-CN/Z_WEB_PACK_PARITY.md) PKB's built-in web_pack collector and z-web-pack (tjxj/z-skills), plus z-skills compatibility module documentation.
 
 ## Two Collectors
 

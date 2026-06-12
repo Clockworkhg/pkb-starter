@@ -1,5 +1,7 @@
 # PKB Starter — Design
 
+Languages: [English](DESIGN.md) | [简体中文](zh-CN/DESIGN.md)
+
 ## Philosophy
 
 PKB is based on Andrej Karpathy's **LLM Wiki** concept: a compiled knowledge base where LLMs do the heavy lifting of organizing, linking, and maintaining knowledge. You throw things in; the system structures them.

@@ -1,5 +1,7 @@
 # PKB Starter — Troubleshooting
 
+Languages: [English](TROUBLESHOOTING.md) | [简体中文](zh-CN/TROUBLESHOOTING.md)
+
 ## Common Issues and Solutions
 
 ### `/pkb` says "unknown command"
