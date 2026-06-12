@@ -67,6 +67,7 @@ tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 | `/project:rollback` | View/rollback git history |
 | `/project:sanitize` | Privacy scan |
 | `/project:skills` | Manage optional skill packs |
+| `/project:update` | Update system files from pkb-starter |
 
 ## Optional Skills
 
@@ -134,6 +135,28 @@ PKB Starter v0.1.0 ships with a **basic web collector** (`tools/web_pack.py`) th
 
 See [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) for capability comparison and the z-skills compatibility module.
 
+## Updating
+
+PKB Starter tracks its version in `pkb.config.json`. To update your installed PKB's system files:
+
+```
+/project:update                  # Full check and update
+/project:update --dry-run        # Preview changes
+/project:update --backup-only    # Create backup only
+```
+
+Or manually:
+```bash
+cd D:\pkb-starter
+git pull
+python scripts/update_pkb.py "D:\MyKB" --dry-run
+python scripts/update_pkb.py "D:\MyKB"
+```
+
+Every update creates a timestamped backup in `.pkb_backup/`. User data (`raw/`, `wiki/`, `_INBOX/`) is **never** touched.
+
+[Update Guide →](docs/UPDATING.md)
+
 ## Safety
 
 - Nothing uploaded by default
@@ -159,6 +182,7 @@ See [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) for capability comparison 
 | [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) | web_pack capabilities |
 | [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues |
 | [OPTIONAL_SKILLS.md](docs/OPTIONAL_SKILLS.md) | Optional skill packs |
+| [UPDATING.md](docs/UPDATING.md) | Update and migration guide |
 | [EXAMPLES.md](docs/EXAMPLES.md) | Usage examples |
 
 ## Contributing

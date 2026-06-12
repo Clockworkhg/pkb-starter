@@ -260,6 +260,62 @@ python scripts/skill_manager.py --target "D:\MyKB" --list
 python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 ```
 
+### Update fails with "No pkb.config.json found"
+
+**Cause**: The target directory is not a PKB installation, or the config file was deleted.
+
+**Fix**:
+1. Verify you are pointing to your PKB install, not pkb-starter source
+2. Run `ls pkb.config.json` in your PKB directory
+3. If missing, reinstall: `python scripts/install.py "D:\MyKB" --force`
+
+### Update says "Already up-to-date" but I expected changes
+
+**Cause**: Your installed `starter_version` matches or exceeds the current version.
+
+**Fix**:
+1. Check your version: `cat pkb.config.json | grep starter_version`
+2. Check pkb-starter version in `scripts/update_pkb.py` (CURRENT_VERSION)
+3. If pkb-starter is ahead, pull: `cd D:\pkb-starter && git pull`
+4. Then re-run the update
+
+### Update overwrote my AGENTS.md
+
+**Cause**: `AGENTS.md` was explicitly in the system update path and `--force` was used.
+
+**Fix**:
+1. Restore from backup: `cp .pkb_backup/<LATEST>/AGENTS.md .`
+2. By default, user-modified AGENTS.md is skipped. Only use `--force` if intentional.
+3. Consider adding your custom rules to a separate file and referencing it from AGENTS.md.
+
+### Migration script failed
+
+**Cause**: A migration script encountered unexpected state in the target PKB.
+
+**Fix**:
+1. Check the error output — migration scripts report what precondition failed.
+2. Restore from backup: `cp -r .pkb_backup/<LATEST>/* .`
+3. Report the issue with your pkb-starter version and target PKB state.
+
+### Backup directory is growing large
+
+**Cause**: Multiple updates create multiple timestamped backup directories.
+
+**Fix**:
+1. Review backups: `ls .pkb_backup/`
+2. Keep the most recent 2-3 backups
+3. Delete older ones: `rm -rf .pkb_backup/20250101_120000`
+4. `.pkb_backup/` is in `.gitignore` and never committed
+
+### /project:update says "unknown command"
+
+**Cause**: The update command was added in pkb-starter v0.5.0. Older installs don't have it.
+
+**Fix**:
+1. Update manually first: `python scripts/update_pkb.py "D:\MyKB"`
+2. After migration, `/project:update` will be available
+3. Future updates can use the command directly
+
 ---
 
 ## Still Stuck?

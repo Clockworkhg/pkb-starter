@@ -140,7 +140,7 @@ catalog entry  --install-->  skills/_vendor/<id>/  (downloaded, not active)
 
 ```json
 "skills": {
-  "catalog_version": "0.4.0",
+  "catalog_version": "0.5.0",
   "installed_profiles": ["student"],
   "installed_skills": ["deep-research-skills", "kanban-skill"],
   "enabled_skills": ["kanban-skill"],

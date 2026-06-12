@@ -199,3 +199,71 @@ See [Z_WEB_PACK_PARITY.md](Z_WEB_PACK_PARITY.md) for the full capability compari
 | `pkb_auto.py` | Health check and auto-pipeline orchestration |
 | `docs_update.py` | Project documentation freshness checker |
 | `sanitize.py` | Privacy scan with pattern detection |
+| `update_pkb.py` | Version migration and system file update |
+
+## Versioning and Migration
+
+### Version Tracking
+
+Every PKB installation tracks its pkb-starter origin via `pkb.config.json`:
+
+```json
+{
+  "starter_version": "0.5.0",
+  "schema_version": "0.5.0",
+  "created_at": "2026-06-12T00:00:00Z",
+  "last_updated_at": "2026-06-12T12:00:00Z",
+  "skills": { ... }
+}
+```
+
+### Migration Architecture
+
+```
+Installed PKB (v0.3.0)          pkb-starter (current)
+========================        ====================
+pkb.config.json                  scripts/update_pkb.py
+  starter_version: 0.3.0 -------> detects gap
+                                  migrations/
+                                    0.3.0_to_0.4.0.py
+                                    0.4.0_to_0.5.0.py
+                                    (runs both incrementally)
+
+                                  Result:
+                                    pkb.config.json
+                                      starter_version: 0.5.0
+```
+
+### Safe Update Flow
+
+1. **Detect** installed version from `pkb.config.json > starter_version`
+2. **Backup** system files to `.pkb_backup/YYYYMMDD_HHMMSS/`
+3. **Migrate** run incremental migration scripts
+4. **Update** copy new system files from template
+5. **Merge** update version fields in config (preserve user settings)
+6. **Report** write `update_report.md`
+
+### Protected Data
+
+The update process has strict boundaries:
+
+| Protected (never touched) | Updated (system only) |
+|--------------------------|----------------------|
+| `raw/` | `tools/` |
+| `wiki/` | `.claude/commands/` |
+| `_INBOX/` | `skill_adapters/` |
+| `skills/_vendor/` | `skills_registry/` |
+| `pkb.config.json` settings | `pkb.config.json` version fields |
+| `.pkb_local/` | `COMMANDS.md` |
+
+### Sync Pipeline (Maintainer)
+
+The private PKB syncs sanitized system files to pkb-starter via a controlled pipeline:
+
+```
+Private PKB --[sanitize + license check]--> pkb-starter/template/
+```
+
+Only files listed in `starter_sync_manifest.json` are eligible. Personal paths, emails, and sensitive patterns are replaced with placeholders before files reach the public repository.
+
+[Full update documentation ->](UPDATING.md)

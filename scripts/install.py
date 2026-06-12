@@ -153,7 +153,10 @@ def generate_config(target: Path) -> Path:
     config = {
         "name": target.name,
         "version": "0.1.0",
+        "starter_version": "0.5.0",
+        "schema_version": "0.5.0",
         "created": today,
+        "last_updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "template": "pkb-starter",
         "directories": {
             "raw": "raw",
@@ -169,7 +172,7 @@ def generate_config(target: Path) -> Path:
             "privacy_level": "local",
         },
         "skills": {
-            "catalog_version": "0.4.1",
+            "catalog_version": "0.5.0",
             "installed_profiles": [],
             "installed_skills": [],
             "enabled_skills": [],
