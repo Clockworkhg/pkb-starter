@@ -82,6 +82,91 @@ tools/        Python 辅助脚本（web_pack、import、sanitize 等）
 | `/project:skills` | 管理可选技能包 |
 | `/project:update` | 从 pkb-starter 更新系统文件 |
 
+## 配合 Obsidian 使用
+
+PKB 的 `wiki/` 目录是一个标准的 [Obsidian](https://obsidian.md/zh) 仓库——直接将其作为你的 vault 文件夹打开即可。所有 wiki 页面使用 `[[wikilinks]]` 交叉引用，开箱即用，提供丰富的知识图谱。
+
+### 快速开始
+
+1. [下载 Obsidian](https://obsidian.md/zh)（免费，支持 Windows/Mac/Linux）
+2. 打开 Obsidian → "打开文件夹作为仓库" → 选择你的 PKB 的 `wiki/` 目录
+3. 图谱视图将自动展示你的知识连接
+
+### 示例场景
+
+**研究者 — 文献综述**
+
+```bash
+# 采集论文和网页资源
+/project:pkb https://arxiv.org/abs/1706.03762   # "Attention Is All You Need"
+/project:pkb ~/Downloads/transformer-survey.pdf
+/project:pkb https://karpathy.bearblog.dev/llm-wiki/
+```
+
+然后在 Obsidian 中：
+- 打开图谱视图（`Ctrl+G`）—— 看到论文、概念、来源自动关联
+- 点击任意节点跳转到对应 wiki 页面
+- 输入 `[[` 使用自动补全，边写边链接新想法
+- 使用 `Ctrl+Shift+F` 搜索全部知识
+
+**学生 — 课程笔记**
+
+```bash
+/project:pkb ~/Notes/CS229-lecture01.pdf        # 课件
+/project:pkb https://ocw.mit.edu/course/notes    # 课程页面
+/project:pkb ~/Downloads/assignment-solution.pdf  # 你的作业
+```
+
+然后在 Obsidian 中：
+- 每节课成为一个 wiki 页面，与核心概念链接
+- 局部图谱（`Ctrl+G` → "局部图谱"）只显示该课程相关的连接
+- 在 wiki frontmatter 中使用标签（`#cs229`、`#考试`）按主题组织
+- 画布（`Ctrl+P` → "新建画布"）将概念按空间排列
+
+**开发者 — 项目文档**
+
+```bash
+/project:pkb https://github.com/oven-sh/bun       # 仓库调研
+/project:pkb ~/Projects/设计文档.md               # 你的工作
+/project:pkb https://docs.python.org/zh-cn/3/      # 参考资料
+```
+
+然后在 Obsidian 中：
+- 项目笔记与引用的文档并排展示
+- `[[wikilinks]]` 将你的设计决策与来源关联
+- 日记插件 → 记录开发进度，链接到 wiki 页面
+- Dataview 插件 → 查询所有标记为 `#project-x` 或 `#决策` 的页面
+
+**写作者 — 主题研究**
+
+```bash
+/project:pkb https://zh.wikipedia.org/wiki/知识图谱
+/project:pkb https://blog.research.google/2023/05/
+/project:pkb ~/Downloads/采访笔记.md
+```
+
+然后在 Obsidian 中：
+- 使用大纲面板查看长文 wiki 页面的结构
+- 分屏（`Ctrl+点击`）—— 一边看资料，一边起草
+- 书签插件 → 固定常用的概念参考页
+- 图谱展示空白区域：连接稀少的聚类 = 需要深入研究的方向
+
+### 推荐插件
+
+以下 Obsidian 社区插件与 PKB 自动生成的 wiki 搭配良好：
+
+| 插件 | 用途 |
+|------|------|
+| **Dataview** | 按标签、日期或元数据查询 wiki 页面 |
+| **Calendar** | 查看与 wiki 概念关联的日记 |
+| **Excalidraw** | 在概念页面旁手绘草图 |
+| **Omnisearch** | 更快的全文本搜索 |
+| **Tag Wrangler** | 批量重命名/合并所有 wiki 页面的标签 |
+
+> **提示**: PKB 自动提交每一次变更。如果你在 Claude Code 运行时通过 Obsidian 编辑 wiki 页面，保存文件——PKB 的 `/save` 或自动提交 hook 会在下一个周期检测到你的更改。
+
+[Obsidian →](https://obsidian.md/zh)
+
 ## 可选技能
 
 PKB Starter 出厂零外部依赖。通过 **可选技能包** 扩展功能，目录包含 43 个条目，覆盖 9 个外部仓库（另含 z-skills 作为用户授权本地安装）：

@@ -75,6 +75,91 @@ tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 | `/project:skills` | Manage optional skill packs |
 | `/project:update` | Update system files from pkb-starter |
 
+## Usage with Obsidian
+
+PKB's `wiki/` directory is a standard [Obsidian](https://obsidian.md/) vault — open it directly as your vault folder. All wiki pages use `[[wikilinks]]` for cross-referencing, giving you a rich knowledge graph out of the box.
+
+### Getting Started
+
+1. [Download Obsidian](https://obsidian.md/) (free, Windows/Mac/Linux)
+2. Open Obsidian → "Open folder as vault" → select your PKB's `wiki/` directory
+3. The graph view will show your knowledge connections automatically
+
+### Example Scenarios
+
+**Researcher — Literature Review**
+
+```bash
+# Collect papers and web resources
+/project:pkb https://arxiv.org/abs/1706.03762   # "Attention Is All You Need"
+/project:pkb ~/Downloads/transformer-survey.pdf
+/project:pkb https://karpathy.bearblog.dev/llm-wiki/
+```
+
+Then in Obsidian:
+- Open graph view (`Ctrl+G`) — see papers, concepts, and sources linked automatically
+- Click any node to navigate to that wiki page
+- Use `[[` autocomplete to link new ideas as you write
+- Search across all your knowledge with `Ctrl+Shift+F`
+
+**Student — Course Notes**
+
+```bash
+/project:pkb ~/Notes/CS229-lecture01.pdf        # Lecture slides
+/project:pkb https://ocw.mit.edu/course/notes    # Course page
+/project:pkb ~/Downloads/assignment-solution.pdf  # Your work
+```
+
+Then in Obsidian:
+- Each lecture becomes a wiki page linked to core concepts
+- The local graph (`Ctrl+G` → "Local graph") shows only this course's connections
+- Use tags (`#cs229`, `#exam`) in wiki frontmatter to organize by topic
+- Canvas (`Ctrl+P` → "New canvas") to arrange concepts spatially
+
+**Developer — Project Documentation**
+
+```bash
+/project:pkb https://github.com/oven-sh/bun       # Repo research
+/project:pkb ~/Projects/design-doc.md             # Your work
+/project:pkb https://docs.python.org/3/whatsnew/   # Reference
+```
+
+Then in Obsidian:
+- Project notes appear alongside referenced documentation
+- `[[wikilinks]]` connect your design decisions to their sources
+- Daily Notes plugin → log development progress linked to wiki pages
+- Dataview plugin → query all pages tagged `#project-x` or `#decision`
+
+**Writer — Topic Research**
+
+```bash
+/project:pkb https://en.wikipedia.org/wiki/Knowledge_graph
+/project:pkb https://blog.research.google/2023/05/
+/project:pkb ~/Downloads/interview-notes.md
+```
+
+Then in Obsidian:
+- Use Outline pane to see the structure of long wiki pages
+- Split panes (`Ctrl+Click`) — read source on one side, draft on the other
+- Bookmarks plugin → pin frequently referenced concept pages
+- The graph shows gaps: clusters with few connections = topics to research deeper
+
+### Recommended Plugins
+
+These Obsidian community plugins pair well with PKB's auto-generated wiki:
+
+| Plugin | Why |
+|--------|-----|
+| **Dataview** | Query wiki pages by tag, date, or metadata |
+| **Calendar** | Navigate daily notes linked to wiki concepts |
+| **Excalidraw** | Sketch diagrams alongside concept pages |
+| **Omnisearch** | Faster full-text search across your wiki |
+| **Tag Wrangler** | Rename/merge tags across all wiki pages at once |
+
+> **Tip**: PKB auto-commits every change. If you edit wiki pages in Obsidian while Claude Code is running, save the file — PKB's `/save` or auto-commit hooks will pick up your changes in the next cycle.
+
+[Obsidian →](https://obsidian.md/)
+
 ## Optional Skills
 
 PKB Starter ships with zero external dependencies. Extend it with **optional skill packs** from a catalog of 43 entries across 9 tracked external repositories (plus z-skills as user-approved local install):
