@@ -169,7 +169,7 @@ def generate_config(target: Path) -> Path:
             "privacy_level": "local",
         },
         "skills": {
-            "catalog_version": "0.4.0",
+            "catalog_version": "0.4.1",
             "installed_profiles": [],
             "installed_skills": [],
             "enabled_skills": [],

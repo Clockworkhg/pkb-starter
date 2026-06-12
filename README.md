@@ -70,7 +70,7 @@ tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 
 ## Optional Skills
 
-PKB Starter ships with zero external dependencies. Extend it with **optional skill packs** from a catalog of 42 entries across 18 tracked external repositories:
+PKB Starter ships with zero external dependencies. Extend it with **optional skill packs** from a catalog of 43 entries across 9 tracked external repositories (plus z-skills as user-approved local install):
 
 ```bash
 # During installation
@@ -126,9 +126,13 @@ PKB Starter v0.1.0 ships with a **basic web collector** (`tools/web_pack.py`) th
 - GitHub blob/raw URL handling
 - Standard output structure (README, manifest, inventories)
 
-**What's NOT included**: Advanced image pipeline (srcset, magic bytes, tracking filter), video/yt-dlp integration, browser cookie support, Jina Reader fallback. These capabilities are planned for v0.2 clean-room implementation.
+**Z-Web-Pack (optional local install)**: Users may optionally install [z-web-pack](https://github.com/tjxj/z-skills/tree/main/z-web-pack) as an alternative collector backend. PKB Starter does NOT distribute z-skills or z-web-pack code. The user must:
+1. Explicitly opt in: `/project:skills --install z-skills`
+2. Audit license: `/project:skills --audit z-skills`
+3. Enable adapter: `/project:skills --enable z-web-pack-local`
+4. Use: `/project:web --collector z-web-pack <url>`
 
-The collector's functional design is inspired by [z-web-pack](https://github.com/tjxj/z-skills/tree/main/z-web-pack). No code from z-web-pack is included — see [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) for details. To use z-web-pack directly, refer to its repository and license terms.
+See [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) for capability comparison and the z-skills compatibility module.
 
 ## Safety
 

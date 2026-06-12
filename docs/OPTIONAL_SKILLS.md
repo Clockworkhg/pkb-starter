@@ -1,6 +1,6 @@
 # PKB Starter — Optional Skills
 
-> Comprehensive skill ecosystem: 42 catalog entries, 9 profiles, 18 external repos tracked. None are bundled — you choose what to install.
+> Comprehensive skill ecosystem: 43 catalog entries, 9 profiles, 9 external repos tracked, + z-skills as user-approved local install. None are bundled — you choose what to install.
 
 ## Philosophy
 
@@ -18,12 +18,14 @@ We do NOT bundle third-party code because:
 
 | Metric | Count |
 |--------|-------|
-| Total catalog entries | 42 |
+| Total catalog entries | 43 |
 | External GitHub repos tracked | 9 |
 | PKB self-built skills (bundled) | 12 |
 | Claude Code plugin marketplace | 2 |
 | MCP servers | 2 |
-| Reference only (never installed) | 5 |
+| Reference only | 0 |
+| Adapter only (requires prior install) | 1 |
+| User-approved local install (z-skills) | 1 |
 | Core built-in tools | 5 |
 
 ## Profiles
@@ -164,10 +166,10 @@ Skills are classified by risk to help you make informed decisions:
 
 | Level | Policy | Count | Examples |
 |-------|--------|-------|----------|
-| `low` | Auto-install. No external dependencies. | 18 | obsidian-skills, kanban-skill, prompt-library, article-extractor |
-| `medium` | Install with warning. Review deps/token usage. | 15 | academic-research-skills, deep-research-skills, qmd, data-analysis |
-| `high` | Requires `--enable-risky`. MCP or external runtime. | 7 | cnki-skills, zotero-mcp, zotero-mcp-skill, ocr-helper |
-| `reference_only` | Never installed. Design reference only. | 5 | z-skills (Anthropic copyrighted) |
+| `low` | Auto-install. No external dependencies. | 28 | obsidian-skills, kanban-skill, prompt-library, article-extractor |
+| `medium` | Install with warning. Review deps/token usage. | 10 | academic-research-skills, deep-research-skills, qmd, data-analysis |
+| `high` | Requires explicit confirmation. MCP or external runtime. | 5 | cnki-skills, zotero-mcp, z-skills, z-web-pack-local |
+| `reference_only` | Never installed. Design reference only. | 0 | (none — z-skills is now user-approved local install) |
 
 ## Source Types
 
@@ -179,6 +181,8 @@ Skills are classified by risk to help you make informed decisions:
 | `plugin_marketplace` | Claude Code plugin marketplace | `/plugin marketplace add` + `/plugin install` |
 | `mcp_server` | MCP server | Manual `.claude/mcp.json` config |
 | `reference_only` | Design reference | NEVER installed |
+| `adapter_only` | Adapter requiring prior installation | Requires parent skill installed + audited |
+| `user_approved_clone` | Third-party repo with explicit consent | git clone after user types 'INSTALL' |
 
 ## Skill Catalog (v0.3.0)
 
@@ -262,15 +266,41 @@ Skills are classified by risk to help you make informed decisions:
 | youtube-transcript | tapestry-skills (MIT) | low | — | yt-dlp based, no API key |
 | youtube-skills | ZeroPointRepo (MIT) | medium | 12 | Some need TranscriptAPI key |
 
-### Reference Only (5 entries)
+### Reference Only (0 entries)
+
+All 43 catalog entries can be installed. There are no reference_only entries. Two entries require special user opt-in:
 
 | ID | Source | Risk | Notes |
 |----|--------|------|-------|
-| z-skills | tjxj (NO LICENSE) | reference_only | (c) Anthropic — ALL RIGHTS RESERVED |
-| awesome-agent-skills | VoltAgent | reference | Skill discovery index |
-| awesome-claude-skills | ComposioHQ | reference | Skill discovery index |
-| obsidian-claude-pkm | ballred | reference | PKM workflow reference |
-| daily-patterns-pack | aplaceforallmystuff | reference | Daily note templates reference |
+| z-skills | tjxj (audit required) | high | User-approved local install. PKB does NOT distribute. |
+| z-web-pack-local | adapter_only | high | Requires z-skills installed + audited first. |
+
+### Z-Skills Compatibility Module
+
+PKB Starter v0.4.1 includes a compatibility module for [z-skills](https://github.com/tjxj/z-skills) as an optional, user-approved local install:
+
+- **Not bundled**: PKB Starter does NOT include, copy, or redistribute z-skills code.
+- **User opt-in**: The user must explicitly run `/project:skills --install z-skills` and type 'INSTALL' to confirm.
+- **Audit required**: z-skills goes to `pending_audit` after install. Must pass audit before enabling.
+- **Adapter only**: The PKB adapter (`z_skills_adapter.md`) only routes output — no code modification.
+- **No default patching**: z-skills source is never modified. Compatibility through wrappers/configuration.
+- **Local patches (last resort)**: Only with explicit `--allow-local-patch`. Stored in `.pkb_local/patches/` (gitignored).
+- **Default collector unchanged**: PKB's built-in basic web_pack remains the default. z-web-pack is an alternative.
+
+```bash
+# Install z-skills (explicit consent required)
+python scripts/skill_manager.py --target . --install z-skills
+
+# Audit z-skills
+python tools/zskill_bridge.py audit
+
+# Enable z-web-pack as collector backend
+python scripts/skill_manager.py --target . --enable z-web-pack-local
+
+# Use as collector
+python tools/zskill_bridge.py run --skill z-web-pack --url <url> --topic <topic>
+python tools/zskill_bridge.py import-output --path <output-dir>
+```
 
 ## How Adapters Work
 
@@ -314,7 +344,7 @@ when integrating skill output into your knowledge base. Adapters live in
 | cookjohn/cnki-skills | 10 | Check repo | high |
 | 54yyyu/zotero-mcp | 1 (MCP) | Check repo | high |
 | kerim/zotero-mcp-skill | 1 | Check repo | high |
-| tjxj/z-skills | 5 (REF ONLY) | NO LICENSE | reference_only |
+| tjxj/z-skills | 5 (user opt-in) | audit required | high (user-approved local install) |
 | VoltAgent/awesome-agent-skills | index | Check repo | reference |
 | ComposioHQ/awesome-claude-skills | index | Check repo | reference |
 
@@ -348,8 +378,11 @@ rm -rf skills/_vendor/<skill-id>/
 - PKB never reads or stores API keys for third-party skills.
 - Review each skill's LICENSE before use (check the cloned repo for LICENSE file).
 - High-risk skills (CNKI, Zotero) require explicit `--enable-risky` opt-in.
-- Reference-only skills (z-skills) are NEVER downloaded — catalog entry only.
+- Reference-only skills are NEVER downloaded — catalog entry only.
+- Z-skills (z-skills, z-web-pack-local) requires explicit user opt-in ("INSTALL"), audit, and enable before use.
+- Z-skills code is NOT distributed by pkb-starter. Users clone directly from tjxj/z-skills.
+- Z-skills patches go to `.pkb_local/patches/` (gitignored), never committed or distributed.
 - Remove a skill by deleting its `skills/_vendor/<id>/` directory.
 
 ---
-*PKB Starter v0.3.0. Updated: 2026-06-12.*
+*PKB Starter v0.4.1. Updated: 2026-06-12.*

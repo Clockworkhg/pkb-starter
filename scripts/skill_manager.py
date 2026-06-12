@@ -408,6 +408,16 @@ def cmd_install(target: Path, catalog: dict, skill_id: str, dry_run: bool = Fals
         print(f"         PKB never auto-configures MCP servers.")
         return
 
+    if method == "requires_z_skills_vendor_clone":
+        print(f"[BLOCKED] {skill_id} requires z-skills to be installed first.")
+        print(f"         Run: python scripts/skill_manager.py --target . --install z-skills")
+        print(f"         Then audit z-skills, then enable {skill_id}.")
+        sys.exit(1)
+
+    # Special handling for z-skills
+    if skill_id == "z-skills":
+        return _cmd_install_z_skills(target, entry, dry_run, enable_risky, yes)
+
     # Risk check
     risk = entry.get("risk_level", "medium")
     if risk == "high" and not enable_risky:
@@ -481,6 +491,85 @@ def cmd_install(target: Path, catalog: dict, skill_id: str, dry_run: bool = Fals
         print(f"    2. Run --audit to verify installation")
         print(f"    3. Run --enable {skill_id} to activate the adapter")
         print(f"    4. Restart Claude Code to load new skills")
+    else:
+        print(f"  [FAIL] {result.get('error', 'unknown error')}")
+
+
+def _cmd_install_z_skills(target: Path, entry: dict, dry_run: bool,
+                          enable_risky: bool, yes: bool):
+    """Special installation flow for z-skills with explicit warnings."""
+    print()
+    print("=" * 72)
+    print("  [!] Z-Skills — Third-Party Local Installation")
+    print("=" * 72)
+    print()
+    print("  IMPORTANT — Please read carefully:")
+    print()
+    print("  1. PKB Starter does NOT redistribute z-skills code.")
+    print("     This installation clones directly from:")
+    print(f"     {entry.get('repo_url', 'https://github.com/tjxj/z-skills')}")
+    print()
+    print("  2. z-skills is a third-party repository. Each sub-directory")
+    print("     may have its own license terms. You must audit before use.")
+    print()
+    print("  3. After installation, z-skills will be in:")
+    print(f"     skills/_vendor/z-skills/")
+    print("     Status: pending_audit (NOT auto-enabled)")
+    print()
+    print("  4. You must explicitly run --audit and --enable before any")
+    print("     z-skills code can be invoked through the PKB adapter.")
+    print()
+    print("  5. PKB never auto-executes z-skills scripts.")
+    print("     The adapter only routes z-web-pack output to raw/webpacks/.")
+    print()
+    print("  6. You are responsible for complying with the repository's")
+    print("     license terms. If no license is found, treat as")
+    print("     'all rights reserved' — personal reference only.")
+    print()
+
+    if dry_run:
+        print("  [DRY RUN] Would git clone into: skills/_vendor/z-skills/")
+        print("  [DRY RUN] Status would be: pending_audit")
+        print("  [DRY RUN] Adapter: z_skills_adapter.md")
+        print()
+        _simulate_install(entry, target, dry_run=True)
+        return
+
+    # Confirmation
+    if not yes:
+        response = input(
+            "  Type 'INSTALL' to confirm you understand and consent: "
+        ).strip()
+        if response != "INSTALL":
+            print("  Cancelled. z-skills was not installed.")
+            return
+
+    print()
+    print(f"  Cloning z-skills into skills/_vendor/z-skills/...")
+    result = _do_install_skill(entry, target)
+
+    if result["status"] == "installed":
+        print(f"  [OK] z-skills installed to {result['vendor_path']}")
+
+        # Copy adapter
+        if entry.get("adapter"):
+            copied = _copy_adapter(entry, target)
+            if copied:
+                print(f"  [OK] Adapter: {entry['adapter']} -> {ADAPTER_DIR_REL}/")
+
+        # Update config (pending_audit, NOT enabled)
+        _update_pkb_config_for_install(target, entry)
+        _update_skill_links_for_install(target, entry)
+        _mark_pending_audit(target, entry["id"])
+        print(f"  [OK] Config updated. Status: pending_audit")
+
+        print()
+        print(f"  Next steps:")
+        print(f"    1. Run --audit to check LICENSE and structure")
+        print(f"       python scripts/skill_manager.py --target . --audit")
+        print(f"    2. Review the audit report: zskill_audit_report.md")
+        print(f"    3. Run --enable z-web-pack-local to activate the adapter")
+        print(f"    4. The adapter then connects z-web-pack output to raw/webpacks/")
     else:
         print(f"  [FAIL] {result.get('error', 'unknown error')}")
 
@@ -580,6 +669,14 @@ def cmd_install_profile(target: Path, catalog: dict, profiles: dict, profile: st
 
         if method == "reference_only":
             print(f"  [SKIP] {sid} -- reference only (not installable)")
+            skipped.append(sid)
+            continue
+        if method == "user_approved_clone":
+            print(f"  [MANUAL] {sid} -- requires explicit user consent (use --install {sid})")
+            skipped.append(sid)
+            continue
+        if method == "requires_z_skills_vendor_clone":
+            print(f"  [MANUAL] {sid} -- requires z-skills first (use --install z-skills)")
             skipped.append(sid)
             continue
         if risk == "high" and not enable_risky:
@@ -820,6 +917,51 @@ def cmd_audit(target: Path, catalog: dict, dry_run: bool = False):
                            known, unknown, issues, no_license, no_adapter, pending, catalog)
         print(f"  Report: {report_path}")
 
+    # Z-Skills specific audit (delegates to zskill_bridge.py if z-skills is installed)
+    _audit_z_skills_if_present(target, dry_run)
+
+
+def _audit_z_skills_if_present(target: Path, dry_run: bool):
+    """Run zskill_bridge.py audit if z-skills is installed."""
+    z_skills_path = target / VENDOR_DIR_REL / "z-skills"
+    if not z_skills_path.is_dir():
+        return
+
+    bridge_script = target / "tools" / "zskill_bridge.py"
+    if not bridge_script.is_file():
+        # Bridge script might not be in target PKB yet; check pkb-starter
+        bridge_script = STARTER_DIR / "template" / "tools" / "zskill_bridge.py"
+
+    if not bridge_script.is_file():
+        print()
+        print("  [INFO] z-skills installed but zskill_bridge.py not found.")
+        print("         Copy it from pkb-starter/template/tools/zskill_bridge.py")
+        return
+
+    print()
+    print(f"  --- Z-Skills Audit (via zskill_bridge.py) ---")
+    print()
+
+    if dry_run:
+        print(f"  [DRY RUN] Would run: python {bridge_script} audit")
+        return
+
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(bridge_script), "audit"],
+            capture_output=True, text=True, timeout=30,
+            encoding="utf-8", errors="replace",
+            cwd=str(target),
+        )
+        print(proc.stdout)
+        if proc.stderr.strip():
+            print(proc.stderr)
+    except subprocess.TimeoutExpired:
+        print("  [WARN] z-skills audit timed out")
+    except Exception as e:
+        print(f"  [WARN] z-skills audit failed: {e}")
+
+
 
 def _write_audit_report(report_path: Path, installed_dirs, catalog_map, skills_state,
                         known, unknown, issues, no_license, no_adapter, pending, catalog):
@@ -867,9 +1009,32 @@ def cmd_enable(target: Path, catalog: dict, skill_id: str):
     catalog_map = {s["id"]: s for s in catalog["skills"]}
     entry = catalog_map.get(skill_id)
 
+    # Special check for z-web-pack-local: requires z-skills installed + audited
+    if skill_id == "z-web-pack-local":
+        z_skills_path = target / VENDOR_DIR_REL / "z-skills"
+        if not z_skills_path.is_dir():
+            print(f"[FAIL] z-web-pack-local requires z-skills to be installed first.")
+            print(f"       Run: --install z-skills")
+            sys.exit(1)
+
+        audit_report = target / "zskill_audit_report.md"
+        if not audit_report.is_file():
+            print(f"[FAIL] z-skills has not been audited yet.")
+            print(f"       Run: --audit (which includes z-skills audit)")
+            print(f"       Or: python tools/zskill_bridge.py audit")
+            sys.exit(1)
+
+        print()
+        print(f"  z-skills: INSTALLED at {z_skills_path}")
+        print(f"  Audit report: {audit_report}")
+        print()
+
     # Verify installed
     vendor_path = target / VENDOR_DIR_REL / skill_id
-    if not vendor_path.is_dir():
+    if skill_id == "z-web-pack-local":
+        # z-web-pack-local is adapter_only, doesn't have its own vendor dir
+        pass
+    elif not vendor_path.is_dir():
         print(f"[FAIL] {skill_id} is not installed in {VENDOR_DIR_REL}/")
         print(f"       Run --install {skill_id} first.")
         sys.exit(1)
@@ -916,6 +1081,31 @@ def cmd_enable(target: Path, catalog: dict, skill_id: str):
 
 def cmd_disable(target: Path, skill_id: str):
     """Disable a skill without deleting its code."""
+    # Special handling for z-web-pack-local (adapter-only, no vendor dir)
+    if skill_id == "z-web-pack-local":
+        config = load_pkb_config(target)
+        skills_state = config.setdefault("skills", {})
+
+        enabled = set(skills_state.get("enabled_skills", []))
+        disabled = set(skills_state.get("disabled_skills", []))
+        enabled_adapters = set(skills_state.get("enabled_adapters", []))
+
+        enabled.discard(skill_id)
+        disabled.add(skill_id)
+        enabled_adapters.discard("z_skills_adapter.md")
+
+        skills_state["enabled_skills"] = list(enabled)
+        skills_state["disabled_skills"] = list(disabled)
+        skills_state["enabled_adapters"] = list(enabled_adapters)
+
+        save_pkb_config(target, config)
+
+        print(f"  [OK] z-web-pack-local is now DISABLED")
+        print(f"       Adapter deactivated. z-skills code remains in {VENDOR_DIR_REL}/z-skills/")
+        print(f"       Run --enable z-web-pack-local to re-enable.")
+        print(f"       To fully remove z-skills: delete {VENDOR_DIR_REL}/z-skills/")
+        return
+
     vendor_path = target / VENDOR_DIR_REL / skill_id
     if not vendor_path.is_dir():
         print(f"[FAIL] {skill_id} is not installed.")

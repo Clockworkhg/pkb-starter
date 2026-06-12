@@ -59,7 +59,7 @@ Throw anything at `/pkb`, the Agent auto-decides what to do:
 | Command | Purpose |
 |---------|---------|
 | `/project:skills` | Show installed skills, enabled status, and available profiles |
-| `/project:skills --list` | List all 42 catalog entries with descriptions and risk levels |
+| `/project:skills --list` | List all 43 catalog entries with descriptions and risk levels |
 | `/project:skills --describe <id>` | Show full details for a skill (what, risk, how to install) |
 | `/project:skills --install <id>` | Install a single skill with description + risk shown first |
 | `/project:skills --install-profile <profile>` | Install all skills from a profile (core/student/research/...) |
@@ -68,6 +68,8 @@ Throw anything at `/pkb`, the Agent auto-decides what to do:
 | `/project:skills --enable <id>` | Enable an audited skill (activates its adapter) |
 | `/project:skills --disable <id>` | Disable a skill without deleting source code |
 | `/project:skills --update-catalog` | Refresh local catalog version |
+| `/project:skills --install z-skills` | Install z-skills locally (explicit consent required) |
+| `/project:skills --enable z-web-pack-local` | Enable z-web-pack as alt collector backend |
 
 ### Research Commands (requires academic-research-skills plugin)
 | Command | Purpose |

@@ -20,7 +20,7 @@ Do NOT pause or ask "next step?" unless one of these 6 conditions occurs:
 
 ## Collector
 
-`/pkb` uses **PKB web_pack** as collection engine.
+`/pkb` uses **PKB web_pack** as the default collection engine.
 
 | Usage | Mode | Behavior |
 |------|------|----------|
@@ -29,6 +29,31 @@ Do NOT pause or ask "next step?" unless one of these 6 conditions occurs:
 | `/pkb --manual <anything>` | full | 🤚 Manual — ask after collection |
 | `/pkb --collect-only <anything>` | full | 📦 Collect only — stop at raw/webpacks |
 | `/pkb --plan <anything>` | - | 📋 Plan only — generate plan, don't execute |
+| `/pkb --collector z-web-pack <url>` | full | 🔧 Use z-web-pack as collector backend |
+
+### Collector Backends
+
+| Flag | Collector | Requirements |
+|------|-----------|-------------|
+| *(default)* | PKB basic web_pack | Always available (built-in) |
+| `--collector z-web-pack` | z-web-pack (local) | z-skills installed + audited + z-web-pack-local enabled |
+
+**If `--collector z-web-pack` is used but adapter is not enabled:**
+
+```
+z-web-pack local adapter is not enabled.
+Use /project:skills --install z-skills,
+/project:skills --audit z-skills,
+then /project:skills --enable z-web-pack-local.
+```
+
+**When z-web-pack collector is enabled:**
+1. Collection: `python tools/zskill_bridge.py run --skill z-web-pack --url "<url>" --topic "<topic>"`
+2. Import: `python tools/zskill_bridge.py import-output --path "<output-dir>"`
+3. Output still goes to `raw/webpacks/` (same as basic collector)
+4. Subsequent `/project:inbox` pipeline is identical
+
+**Note**: PKB Starter does NOT distribute z-skills/z-web-pack code. The user must install it directly from https://github.com/tjxj/z-skills.
 
 ---
 

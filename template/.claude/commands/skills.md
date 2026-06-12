@@ -7,7 +7,8 @@ You are the PKB skill management agent, available at any time after PKB installa
 - Skills are NOT bundled. They are installed on demand from the PKB ecosystem catalog (42 entries).
 - No third-party code is auto-executed. Installation = git clone only.
 - High-risk skills (MCP, external runtime) require explicit user confirmation.
-- Reference-only skills (like z-skills) are NEVER installed — catalog entry only.
+- Reference-only skills are NEVER installed — catalog entry only.
+- **z-skills**: Third-party collection available as user-approved local install. PKB Starter does NOT distribute its code. User must explicitly opt in, audit, and enable.
 - All output from third-party skills routes through PKB adapters to `raw/` or `wiki/`.
 - MCP is never auto-configured. API keys are never read, stored, or configured.
 - Users can install skills at any time — during setup or months later.
@@ -26,6 +27,10 @@ You are the PKB skill management agent, available at any time after PKB installa
 | `/project:skills --enable <skill-id>` | Enable an audited skill (activates its adapter) |
 | `/project:skills --disable <skill-id>` | Disable a skill without deleting source |
 | `/project:skills --update-catalog` | Refresh local catalog version |
+| `/project:skills --describe z-skills` | Learn about z-skills local install option |
+| `/project:skills --install z-skills` | Install z-skills to skills/_vendor/ (explicit consent) |
+| `/project:skills --audit z-skills` | Audit z-skills license and structure |
+| `/project:skills --enable z-web-pack-local` | Enable z-web-pack as collector backend |
 
 ## Execution Steps
 
@@ -220,13 +225,56 @@ Report the version change.
 | `full` | 24 | All recommended. Review risks first. |
 | `custom` | interactive | Hand-pick from 42 entries |
 
+## Z-Skills (Third-Party Local Install)
+
+z-skills is a third-party skill collection (https://github.com/tjxj/z-skills). PKB Starter does NOT bundle or redistribute it. The user may choose to install it locally.
+
+### Install Flow
+
+```
+/project:skills --install z-skills
+  |
+  +---> Shows risk explanation + "PKB does not distribute this code"
+  +---> User must type 'INSTALL' to confirm
+  +---> git clone -> skills/_vendor/z-skills/
+  +---> Status: pending_audit (NOT auto-enabled)
+
+/project:skills --audit
+  |
+  +---> Automatically audits z-skills if installed
+  +---> Delegates to zskill_bridge.py for LICENSE check
+  +---> Generates zskill_audit_report.md
+
+/project:skills --enable z-web-pack-local
+  |
+  +---> Only if z-skills installed AND audited
+  +---> Activates z_skills_adapter.md
+  +---> z-web-pack now available as collector backend
+
+/project:web --collector z-web-pack <url>
+  |
+  +---> Uses z-web-pack for collection
+  +---> Output routed to raw/webpacks/ via adapter
+```
+
+### Important Notes
+
+- z-skills is NOT a built-in PKB component.
+- PKB Starter does not redistribute z-skills source code.
+- The user must audit license terms before use.
+- Adapter only connects output — does not modify z-skills source.
+- Default collector is PKB's built-in basic web_pack.
+- To remove: delete `skills/_vendor/z-skills/` and disable the adapter.
+
 ## Safety Rules
 
 1. **Never auto-execute** third-party skill scripts. Installation = git clone only.
 2. **Never auto-configure** MCP servers. User must edit `.claude/mcp.json` manually.
 3. **Never read or store** API keys for third-party skills.
-4. **Reference-only skills** (z-skills) are catalog entries only — do NOT suggest installing.
-5. **High-risk skills** (cnki-skills, zotero-mcp) require explicit user confirmation and `--enable-risky`.
+4. **z-skills is a local install option**, not a bundled component. PKB Starter does NOT distribute its code. The user must explicitly opt in via `--install z-skills`.
+5. **High-risk skills** (cnki-skills, zotero-mcp, z-skills) require explicit user confirmation.
 6. **NO LICENSE repos** must be flagged. Warn user: "Treat as all rights reserved — personal reference only."
 7. **Before enabling** a skill, remind user to review its LICENSE and code.
 8. **Always show** the skill's description, risk explanation, and requirements before installing.
+9. **z-web-pack-local** can only be enabled after z-skills is installed AND audited.
+10. **Never patch** z-skills source by default. If path issues arise, prefer wrapper/configuration solutions.

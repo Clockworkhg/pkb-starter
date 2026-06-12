@@ -118,12 +118,13 @@ PKB's optional skill system (42 catalog entries, 9 distinct external repos) uses
 6. **Risk classification**: 
    - 28 low-risk (auto-install)
    - 10 medium-risk (warn before install)
-   - 3 high-risk (require `--enable-risky`)
-   - 1 reference-only (never installed)
-7. **LICENSE review**: Each skill entry records its license status. Skills with NO LICENSE are flagged. Reference-only entries (z-skills) are blocked from installation because of Anthropic copyright.
+   - 5 high-risk (require explicit confirmation)
+   - 0 reference-only (z-skills is now user-approved local install)
+7. **LICENSE review**: Each skill entry records its license status. Skills with NO LICENSE are flagged. Z-skills requires full audit before enable.
+8. **Z-skills local install**: User must explicitly opt in ("INSTALL"), audit the repository, and explicitly enable the adapter. PKB Starter does NOT distribute z-skills code. See docs/Z_WEB_PACK_PARITY.md.
 8. **Plugin marketplace**: 2 skills are only installable via Claude Code's official plugin marketplace, not via git clone.
 9. **Removal = delete directory**: To remove a skill, delete `skills/_vendor/<skill-id>/`. No lingering state.
-10. **Audit trail**: `skill_manager.py --audit` and `/project:skills --audit` report all installed skills with risk levels, license status, .git verification, adapter presence, and INSTALL_NOTE.md presence.
+10. **Audit trail**: `skill_manager.py --audit` and `/project:skills --audit` report all installed skills with risk levels, license status, .git verification, adapter presence, and INSTALL_NOTE.md presence. Z-skills audit is delegated to `zskill_bridge.py audit` and generates `zskill_audit_report.md`.
 
 ### Runtime Safety
 
@@ -135,6 +136,19 @@ Skills can be installed at any time — during setup or months later. The same s
 - **Disable doesn't delete** — `--disable <id>` deactivates the adapter but keeps source code.
 - **Start small** — Core profile (zero external skills) is the safest default. Add skills incrementally.
 - **Full profile warning** — The Full profile lists all 24 recommended skills but does NOT auto-enable high-risk ones.
+
+### Z-Skills Safety
+
+PKB Starter's z-skills compatibility module follows strict safety rules:
+
+1. **No code redistribution** — PKB Starter does NOT include, copy, or bundle z-skills source.
+2. **User explicit opt-in** — Installing z-skills requires typing 'INSTALL' after reading the risk explanation.
+3. **Audit before enable** — z-skills goes to `pending_audit` after clone. Must pass audit before `z-web-pack-local` can be enabled.
+4. **No auto-execution** — The zskill_bridge.py does NOT auto-execute z-skills scripts. It only describes how to invoke them.
+5. **No default patching** — z-skills source is never modified. Incompatibilities are resolved through wrappers, configuration, or output relocation.
+6. **Local patches only (if absolutely needed)** — Require `--allow-local-patch`. Stored in `.pkb_local/patches/` (gitignored). Never committed or distributed.
+7. **Output isolation** — z-web-pack output goes to `raw/webpacks/` (same as PKB's built-in collector). Never writes to wiki/ directly.
+8. **Default collector unchanged** — The basic web_pack remains default. z-web-pack is opt-in.
 
 ## Reporting Security Issues
 

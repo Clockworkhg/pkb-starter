@@ -125,13 +125,53 @@
 
 ### High-risk skill won't install
 
-**Cause**: Skills with `risk_level: high` or `reference_only` are blocked by default (7 high-risk, 5 reference-only in catalog).
+**Cause**: Skills with `risk_level: high` or `reference_only` are blocked by default (5 high-risk in catalog).
 
-**Fix**: Use `--enable-risky` to install high-risk skills:
+**Fix**: Use `--enable-risky` to install most high-risk skills:
 ```
 python scripts/install_skills.py --target "D:\MyKB" --profile full --enable-risky
 ```
-Reference-only skills (like z-skills, awesome-* indexes) can NEVER be installed -- they are catalog entries for design reference only.
+Z-skills requires a different flow: use `/project:skills --install z-skills` (explicit consent).
+
+### Z-Skills not installing
+
+**Cause**: z-skills uses `install_method: user_approved_clone` and requires explicit consent.
+
+**Fix**:
+1. Run: `python scripts/skill_manager.py --target "D:\MyKB" --install z-skills`
+2. Read the risk explanation displayed
+3. Type 'INSTALL' (not 'y' or 'yes') to confirm
+4. z-skills will clone to `skills/_vendor/z-skills/` in pending_audit state
+
+### z-web-pack-local won't enable
+
+**Cause**: z-web-pack-local requires z-skills to be installed AND audited first.
+
+**Fix**:
+1. Install z-skills: `/project:skills --install z-skills`
+2. Audit: `/project:skills --audit` (automatically audits z-skills if installed)
+3. Then enable: `/project:skills --enable z-web-pack-local`
+
+### Z-skills audit report is missing
+
+**Cause**: Audit hasn't been run, or zskill_bridge.py is not in the target PKB.
+
+**Fix**:
+1. Run: `python scripts/skill_manager.py --target "D:\MyKB" --audit`
+2. Or directly: `python tools/zskill_bridge.py audit`
+3. If bridge script not found: copy `template/tools/zskill_bridge.py` from pkb-starter to your PKB's `tools/` directory.
+
+### Z-web-pack collector says "adapter is not enabled"
+
+**Cause**: `--collector z-web-pack` was used but z-web-pack-local is not enabled.
+
+**Fix**:
+```
+/project:skills --install z-skills      # install (explicit consent)
+/project:skills --audit                 # audit license + structure
+/project:skills --enable z-web-pack-local  # enable adapter
+```
+Then retry: `/project:web --collector z-web-pack <url>`
 
 ### Plugin marketplace skill not installing
 

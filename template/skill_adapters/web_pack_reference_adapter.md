@@ -1,30 +1,26 @@
-# Web Pack Reference Adapter
+# Web Pack Reference Adapter (LEGACY)
+
+> **NOTE**: This adapter is superseded by `z_skills_adapter.md` (v0.4.1+).
+> Z-skills is now available as a user-approved local install.
+> See [docs/Z_WEB_PACK_PARITY.md](../docs/Z_WEB_PACK_PARITY.md) for details.
 
 ## Metadata
 
 - **skill_name**: Z-Skills / z-web-pack (tjxj/z-skills)
-- **adapter_version**: 0.2.0
-- **install_status**: REFERENCE ONLY -- NOT INSTALLABLE
-- **when_to_use**: Design reference for PKB's web_pack collector. Read for inspiration. Do NOT copy code.
+- **adapter_version**: 0.2.0 (legacy reference)
+- **install_status**: SUPERSEDED — use `z_skills_adapter.md` for installable z-skills
+- **when_to_use**: Design reference for PKB's web_pack collector. For actual z-web-pack integration, use `/project:skills --install z-skills`.
 
-## Why Reference Only
+## Historical Reference
 
-z-skills (including z-web-pack) is copyright Anthropic, PBC. ALL RIGHTS RESERVED.
-Its LICENSE explicitly forbids:
-- Copying code
-- Creating derivative works
-- Redistribution
+This adapter was created when z-skills was categorized as reference_only in the catalog. As of PKB Starter v0.4.1, z-skills is available as a user-approved local install. PKB Starter still does NOT distribute z-skills code, but users may now install it locally with explicit consent.
 
-PKB Starter respects this. We do NOT:
-- Include any z-skills code
-- Clone or vendor z-skills
-- Auto-install z-skills as a dependency
+## What to Use Instead
 
-## What to Read Instead
-
-- PKB's `tools/web_pack.py` -- Independent clean-room basic collector (v0.1.0)
-- PKB's `docs/Z_WEB_PACK_PARITY.md` -- Capability comparison and roadmap
-- z-web-pack SKILL.md (read on GitHub) -- Functional design patterns (concepts only, not code)
+- **For design reference**: Read `z_skills_adapter.md` for the current integration rules.
+- **For z-web-pack integration**: Use `/project:skills --install z-skills` flow.
+- **For PKB's built-in collector**: Continue using `tools/web_pack.py` (default).
+- **For capability comparison**: See `docs/Z_WEB_PACK_PARITY.md`.
 
 ## Conceptual Mapping (Design Inspiration Only)
 
@@ -39,15 +35,9 @@ PKB Starter respects this. We do NOT:
 | Advanced image pipeline | Planned v0.2 | Clean-room design |
 | Video/yt-dlp integration | NOT planned | PKB focuses on text-first collection |
 
-## Command Integration
-
-- N/A -- z-skills is not installed. PKB's web_pack serves the same role.
-- `/project:web <url>` -- Uses PKB web_pack, not z-web-pack
-- `/project:pkb <url>` -- Uses PKB web_pack for collection phase
-
 ## Safety Notes
 
-- If you manually install z-skills, observe Anthropic's LICENSE terms.
-- Do NOT mix z-web-pack code with PKB code in your local installation.
-- The PKB adapter system does NOT bridge to z-skills code -- it documents the design relationship.
-- If you need z-web-pack's full capabilities, install it independently per its LICENSE terms.
+- This adapter is legacy. For current z-skills safety rules, see `z_skills_adapter.md`.
+- PKB Starter does NOT distribute z-skills code.
+- User must explicitly install, audit, and enable z-skills before use.
+- Default collector is PKB's built-in web_pack (always available).

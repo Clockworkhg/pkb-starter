@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "updated": "2026-06-12",
-  "description": "PKB Starter — Skill installation profiles. Each profile selects a curated subset from the 42-entry skill catalog. Profiles are starting points; skills can be added/removed anytime via skill_manager.py or /project:skills.",
+  "description": "PKB Starter — Skill installation profiles. Each profile selects a curated subset from the 43-entry skill catalog. Profiles are starting points; skills can be added/removed anytime via skill_manager.py or /project:skills. z-skills available as user-approved local install (not in any profile).",
   "profiles": {
     "core": {
       "name": "Core",

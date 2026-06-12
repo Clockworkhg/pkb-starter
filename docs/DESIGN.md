@@ -156,11 +156,12 @@ Key principles:
 - **Catalog-driven**: 42 entries across 9 distinct external repos. Extracted from live PKB installation.
 - **No bundling**: Skills are cloned from their own repos, not copied from pkb-starter.
 - **Adapter pattern**: Each skill gets a markdown adapter telling the LLM where to route output.
-- **Risk classification**: low (auto-install, 28 skills), medium (warn, 10 skills), high (require --enable-risky, 3 skills), reference_only (never install, 1 skill).
+- **Risk classification**: low (auto-install, 28 skills), medium (warn, 10 skills), high (require explicit confirmation, 5 skills), reference_only (never install, 0 skills).
 - **No auto-execution**: Installation = `git clone --depth 1`. Nothing runs until you invoke the skill in Claude Code.
 - **Incremental adoption**: Start with Core (0 external). Add skills via `/project:skills --install-profile <name>` or `skill_manager.py` anytime.
 - **Explicit activation**: Install → audit → enable is a three-step process. Installation alone does not activate a skill.
-- **Source diversity**: external_repo (23 entries from 9 repos), local_template (10), plugin_marketplace (2), mcp_server (1), reference_only (1), built_in (5).
+- **Source diversity**: external_repo (24 entries from 9 repos), local_template (10), plugin_marketplace (2), mcp_server (1), adapter_only (1), built_in (5).
+- **Z-skills compatibility**: User-approved local install via explicit consent. PKB does NOT distribute z-skills code. Bridge (zskill_bridge.py) handles locate, audit, run, import-output, and patch.
 
 ### 6.1 Runtime Skill Management
 
@@ -175,6 +176,19 @@ The skill manager (`scripts/skill_manager.py` and `/project:skills`) works on a 
 - **Update catalog**: Refresh local catalog version
 
 Every skill shows its description, risk explanation, best-for/not-for guidance, and requirements (API keys, MCP, external runtime) before installation. High-risk skills require explicit user confirmation.
+
+### 6.2 Z-Skills Compatibility Module
+
+PKB Starter includes a bridge module for optional z-skills integration:
+
+- **No code redistribution**: PKB does NOT bundle, copy, or redistribute z-skills source.
+- **User explicit opt-in**: Installing z-skills requires typing 'INSTALL' after reading risks.
+- **Bridge architecture**: `zskill_bridge.py` handles locate, audit, status, run, import-output, and patch.
+- **Three-stage lifecycle**: install (user clone) -> audit (LICENSE check) -> enable (activate adapter).
+- **Default collector unchanged**: PKB's built-in web_pack is the default. z-web-pack is opt-in.
+- **Local patches only**: Patches require `--allow-local-patch`, stored in `.pkb_local/patches/` (gitignored).
+
+See [Z_WEB_PACK_PARITY.md](Z_WEB_PACK_PARITY.md) for the full capability comparison and architecture.
 
 ## Tools
 

@@ -64,8 +64,16 @@ auto_ingest_report.md
 .trash/
 
 # === Vendor Skills (third-party, tracked separately) ===
+skills/_vendor/
 skills/_vendor/*/**
 !skills/_vendor/*/AUDIT.md
+
+# === Z-Skills (third-party, user-installed, never committed) ===
+zskill_audit_report.md
+skill_manager_report.md
+
+# === Local Patches (per-machine, never committed or distributed) ===
+.pkb_local/
 
 # === Temp Downloads and Cache ===
 *.download
