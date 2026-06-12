@@ -658,6 +658,7 @@ def main():
 
     # Read installed config
     config_path = target / "pkb.config.json"
+    config = {}
     if config_path.is_file():
         config = json.loads(config_path.read_text(encoding="utf-8"))
         installed_ver = from_ver or get_installed_version(config)
