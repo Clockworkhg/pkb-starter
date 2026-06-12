@@ -4,6 +4,37 @@ All notable changes to PKB Starter.
 
 ---
 
+## [0.6.6-alpha] — 2026-06-13
+
+### Fixed
+
+- Fixed update client failing to detect newer remote tags (e.g. v0.6.5-alpha not found from v0.6.4-alpha).
+- Fixed stale starter cache causing `/update` to report the installed version as latest.
+- Fixed update flows that could resolve Claude hook paths under `.pkb_system/starter_cache/`.
+- Fixed `update_pkb.py` running with `cwd` in starter cache instead of KB root — now uses `cwd=KB_ROOT`.
+- `pkb_update_client.py` now always fetches remote tags (`git fetch --tags --force`) before checking versions.
+- Version discovery no longer relies solely on hardcoded `CURRENT_VERSION` — also queries `git ls-remote --tags`.
+- Cache auto-refresh: if cache is on detached HEAD, checkout master before fetching.
+
+### Added
+
+- Added `--doctor` diagnostic mode to `pkb_update_client.py` — runs 10 checks for update system health.
+- Added hook path pollution detection and repair in doctor mode.
+- Added automatic hook path repair on `--apply` (fixes `starter_cache` references in `.claude/settings.json`).
+- Added CWD safety check: aborts if running from inside `.pkb_system/starter_cache/`.
+- Update output now shows: installed version, latest remote tag, selected checkout, cache path, cache refresh status.
+
+### Safety
+
+- Dry-run still does NOT modify any KB files.
+- Git cache refresh in `.pkb_system/` is allowed during dry-run but only affects the cache, not KB content.
+- `.claude/settings.json` remains NEVER written by the update process.
+- Hook commands remain KB-relative paths (e.g. `python .claude/hooks/05_stop.py`).
+- "Bun not found" is documented as a non-blocking external hook issue — not a PKB update failure.
+- Existing v0.6.2-alpha, v0.6.3-alpha, v0.6.4-alpha, and v0.6.5-alpha tags remain unchanged.
+
+---
+
 ## [0.6.5-alpha] — 2026-06-12
 
 ### Added

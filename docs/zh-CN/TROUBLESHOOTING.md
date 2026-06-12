@@ -312,13 +312,59 @@ python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 
 ### 更新提示 "Already up-to-date" 但我预期有变更
 
-**原因**：你已安装的 `starter_version` 匹配或超过了当前版本。
+**原因**：以下一项或多项：
+1. `.pkb_system/starter_cache/` 中的 starter 缓存已过期（未拉取新 tag）。
+2. 缓存处于 detached HEAD 状态（来自之前的 `--checkout`），`git pull --ff-only` 静默失败。
+3. 缓存中 `update_pyb.py` 的 `CURRENT_VERSION` 已过时。
+4. 缓存是使用 `--depth 1` 创建的，从未刷新。
 
 **解决方法**：
-1. 检查你的版本：`cat pkb.config.json | grep starter_version`
-2. 检查 `scripts/update_pkb.py` 中的 pkb-starter 版本（CURRENT_VERSION）
-3. 如果 pkb-starter 领先，拉取：`cd D:\pkb-starter && git pull`
-4. 然后重新运行更新
+1. 运行 `python tools/pkb_update_client.py --doctor` 诊断问题。
+2. 显式指定版本：`python tools/pkb_update_client.py --checkout v0.6.6-alpha`
+3. 或手动刷新缓存：
+   ```bash
+   cd .pkb_system/starter_cache
+   git checkout master
+   git fetch origin --tags --force
+   cd ../..
+   python tools/pkb_update_client.py
+   ```
+4. 如果缓存损坏，删除后重新运行：`rm -rf .pkb_system/starter_cache`
+
+**更新客户端现在每次运行都会刷新远端 tag。** 如果你使用的是旧版本（v0.6.6-alpha 之前），请使用 `--checkout v0.6.6-alpha` 引导更新。
+
+### Hook 路径指向 .pkb_system/starter_cache
+
+**原因**：`.claude/settings.json` 中的 hook 命令可能引用了 `.pkb_system/starter_cache/` 下的路径，而非 KB 根目录。旧版本更新客户端可能使用了错误的工作目录导致此问题。
+
+**解决方法**：
+1. 运行 `python tools/pkb_update_client.py --doctor` 检查 hook 路径。
+2. 运行 `python tools/pkb_update_client.py --checkout v0.6.6-alpha --apply` — 客户端会自动修复受污染的 hook 路径。
+3. 或手动编辑 `.claude/settings.json`：
+   - 找到包含 `.pkb_system/starter_cache/` 的 hook `command`
+   - 替换为正确的 KB 相对路径（如 `python .claude/hooks/05_stop.py`）
+4. 始终从 KB 根目录启动 Claude Code。
+
+### 更新时出现 "Bun not found"
+
+**原因**：此消息来自外部 Claude Code hooks 或全局 hook 配置。PKB Starter 不使用也不依赖 Bun — 所有 PKB hooks 均为 Python 3.9+。
+
+**解决方法**：
+- 这是**非阻塞**问题。更新会正常进行。
+- 检查全局 Claude Code hook 设置（`~/.claude/settings.json` 或 `%USERPROFILE%\.claude\settings.json`），查找引用 `bun` 的 hooks。
+- 如果消息持续出现且烦人，请在全局设置中禁用或删除使用 Bun 的 hooks。
+- PKB Starter 的更新工具完全基于 Python，不依赖 Bun。
+
+### 更新客户端显示错误的 latest 版本
+
+**原因**：更新客户端依赖远程仓库的 tag。如果 tag 未推送或缓存已过期，latest 版本可能不正确。
+
+**解决方法**：
+1. 运行 `python tools/pkb_update_client.py --doctor` 查看远端报告的内容。
+2. 验证远端 tag 存在：`git ls-remote --tags https://github.com/Clockworkhg/pkb-starter.git`
+3. 如果使用 fork，确保已从上游同步 tag。
+4. 使用 `--checkout <版本>` 显式指定目标版本。
+5. 更新客户端（v0.6.6-alpha+）每次运行都会执行 `git fetch --tags --force` 以确保缓存最新。
 
 ### 更新覆写了我的 AGENTS.md
 

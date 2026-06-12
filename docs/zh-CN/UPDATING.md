@@ -48,7 +48,8 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <变更说明>"
 
 ### 版本历史
 
-- **v0.6.5-alpha**：当前。新增可选的 z-web-pack 兼容层（`tools/pkb_compat/`）、采集器健康检查（`tools/check_collectors.py`）、bridge 执行支持。内置 web_pack 仍为默认推荐。
+- **v0.6.6-alpha**：当前。修复更新客户端远程 tag 检测、缓存过期误报、hook 路径污染问题。新增 `--doctor` 诊断模式。内置 web_pack 仍为默认推荐。
+- **v0.6.5-alpha**：新增可选的 z-web-pack 兼容层（`tools/pkb_compat/`）、采集器健康检查（`tools/check_collectors.py`）、bridge 执行支持。内置 web_pack 仍为默认推荐。
 - **v0.6.4-alpha**：修复默认 starter_repo_url 占位符，新装使用官方更新源。
 - **v0.6.3-alpha**：新装自洽、docs-update 安全修复、v0.6.2-alpha 恢复。
 - **v0.6.2-alpha**：自定义安装路径、内置更新客户端、增强配置保留。

@@ -308,13 +308,59 @@ python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
 
 ### Update says "Already up-to-date" but I expected changes
 
-**Cause**: Your installed `starter_version` matches or exceeds the current version.
+**Cause**: One or more of:
+1. The starter cache at `.pkb_system/starter_cache/` is stale (hasn't fetched new tags).
+2. The cache is on a detached HEAD from a previous `--checkout` and `git pull --ff-only` silently failed.
+3. `CURRENT_VERSION` in the cached `update_pkb.py` is outdated.
+4. The cache was created with `--depth 1` and never refreshed.
 
 **Fix**:
-1. Check your version: `cat pkb.config.json | grep starter_version`
-2. Check pkb-starter version in `scripts/update_pkb.py` (CURRENT_VERSION)
-3. If pkb-starter is ahead, pull: `cd D:\pkb-starter && git pull`
-4. Then re-run the update
+1. Run `python tools/pkb_update_client.py --doctor` to diagnose the issue.
+2. Run with explicit checkout: `python tools/pkb_update_client.py --checkout v0.6.6-alpha`
+3. Or manually refresh the cache:
+   ```bash
+   cd .pkb_system/starter_cache
+   git checkout master
+   git fetch origin --tags --force
+   cd ../..
+   python tools/pkb_update_client.py
+   ```
+4. If the cache is corrupted, delete it and re-run: `rm -rf .pkb_system/starter_cache`
+
+**The update client now always fetches remote tags before checking versions.** If you're on an older version (before v0.6.6-alpha), use `--checkout v0.6.6-alpha` to bootstrap.
+
+### Hook path points to .pkb_system/starter_cache
+
+**Cause**: Hook commands in `.claude/settings.json` may reference paths under `.pkb_system/starter_cache/` instead of KB root. This can happen if the update client ran with incorrect working directory in older versions.
+
+**Fix**:
+1. Run `python tools/pkb_update_client.py --doctor` to check hook paths.
+2. Run `python tools/pkb_update_client.py --checkout v0.6.6-alpha --apply` — the client automatically repairs polluted hook paths.
+3. Or manually edit `.claude/settings.json`:
+   - Find any hook `command` containing `.pkb_system/starter_cache/`
+   - Replace with the correct KB-relative path (e.g., `python .claude/hooks/05_stop.py`)
+4. Always start Claude Code from the KB root directory.
+
+### "Bun not found" during update
+
+**Cause**: This message comes from external Claude Code hooks or global hook configuration. PKB Starter does NOT use or require Bun — all PKB hooks are Python 3.9+.
+
+**Fix**:
+- This is a **non-blocking** issue. The update proceeds normally.
+- Check your global Claude Code hook settings (`~/.claude/settings.json` or `%USERPROFILE%\.claude\settings.json`) for hooks referencing `bun`.
+- If the message persists and is annoying, disable or remove the Bun-using hooks from your global settings.
+- PKB Starter's update tools are entirely Python-based and do not depend on Bun.
+
+### Update client shows wrong latest version
+
+**Cause**: The update client relies on tags from the remote repo. If tags haven't been pushed or the cache is stale, the latest version may be incorrect.
+
+**Fix**:
+1. Run `python tools/pkb_update_client.py --doctor` to see what the remote reports.
+2. Verify tags exist on the remote: `git ls-remote --tags https://github.com/Clockworkhg/pkb-starter.git`
+3. If using a fork, ensure you've synced tags from upstream.
+4. Use `--checkout <version>` to explicitly target a version.
+5. The update client (v0.6.6-alpha+) always runs `git fetch --tags --force` to ensure cache freshness.
 
 ### Update overwrote my AGENTS.md
 
