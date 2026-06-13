@@ -48,7 +48,8 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <变更说明>"
 
 ### 版本历史
 
-- **v0.6.7-alpha**：当前。新增 MarkItDown 文档入库（Phase 1.5）、web_pack v3.1（Playwright 动态渲染 fallback — DOM 渲染、网络捕获、三方选择）、正文质量评分、`--render`/`--headed`/`--debug-network` 参数。145 个 Web Pack 单元测试 + 10 个 Chromium 集成测试 + 89 个 MarkItDown 回归测试。
+- **v0.6.8-alpha**：当前。新增学术元数据增强：文献检测、Crossref/OpenAlex 元数据、本地期刊等级目录、GB/T 7714 与 APA 引用、`/pkb` 同步集成、批量断点恢复和结构化文献筛选。
+- **v0.6.7-alpha**：新增 MarkItDown 文档入库（Phase 1.5）、web_pack v3.1（Playwright 动态渲染 fallback — DOM 渲染、网络捕获、三方选择）、正文质量评分、`--render`/`--headed`/`--debug-network` 参数。145 个 Web Pack 单元测试 + 10 个 Chromium 集成测试 + 89 个 MarkItDown 回归测试。
 - **v0.6.6-alpha**：修复更新客户端远程 tag 检测、缓存过期误报、hook 路径污染问题。新增 `--doctor` 诊断模式。内置 web_pack 仍为默认推荐。
 - **v0.6.5-alpha**：新增可选的 z-web-pack 兼容层（`tools/pkb_compat/`）、采集器健康检查（`tools/check_collectors.py`）、bridge 执行支持。内置 web_pack 仍为默认推荐。
 - **v0.6.4-alpha**：修复默认 starter_repo_url 占位符，新装使用官方更新源。

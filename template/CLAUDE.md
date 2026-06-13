@@ -6,7 +6,7 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
-项目版本：`v0.6.7-alpha` | 组件：`web_pack v3.1`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
+项目版本：`v0.6.8-alpha` | 组件：`web_pack v3.1`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
@@ -132,4 +132,4 @@ powershell tools/launch_chrome.ps1   # 启动 Chrome 调试
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-13 (web_pack v3.1 / MarkItDown Phase 1.5)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-13 (web_pack v3.1 / Scholarly Phase 1B.2)*

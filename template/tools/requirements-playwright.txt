@@ -26,7 +26,7 @@
 #   - 某些 App-only 内容仍可能无法采集
 #   - 不宣传"支持所有动态网站"
 #
-# 当前状态 (PKB v0.6.7-alpha / web_pack v3.1):
+# 当前状态 (PKB v0.6.8-alpha / web_pack v3.1):
 #   - 通用动态网页采集已完成（155 tests：27 quality + 42 capture + 22 network_content
 #     + 23 selection_engine + 31 render + 10 integration = 155 passed, 0 failed）
 #   - 真实 Chromium 集成测试全部通过（10/10）

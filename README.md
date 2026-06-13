@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.7--alpha-blue)
+# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.8--alpha-blue)
 
 > **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
 >
-> **Current version**: v0.6.7-alpha
+> **Current version**: v0.6.8-alpha
 
 Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -331,7 +331,32 @@ Every update creates a timestamped backup in `.pkb_backup/`. User data (`raw/`, 
 | [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues |
 | [OPTIONAL_SKILLS.md](docs/OPTIONAL_SKILLS.md) | Optional skill packs |
 | [UPDATING.md](docs/UPDATING.md) | Update and migration guide |
+| [SCHOLARLY_METADATA.md](docs/SCHOLARLY_METADATA.md) | Scholarly metadata enrichment |
 | [EXAMPLES.md](docs/EXAMPLES.md) | Usage examples |
+
+## Scholarly Metadata Enrichment
+
+PKB Starter now detects scholarly literature automatically and enriches wiki pages with structured metadata:
+
+- **Auto-detection**: Recognizes academic papers via explicit declarations, DOI/ISSN identifiers, journal names, and citation patterns
+- **Metadata enrichment**: Crossref + optional OpenAlex (work metrics, source rankings)
+- **Local journal registry**: User-imported CSSCI, PKU Core, AMI, CSCD, and custom datasets
+- **Citation formatting**: GB/T 7714 numeric/author-date (verified fallback), APA 7 (citeproc-py), BibTeX, RIS, CSL-JSON
+- **Batch processing**: Scan, dry-run, write, --only-missing, --resume with job recovery
+- **Literature filtering**: Structured multi-criteria selection (ranking scheme, year, citations, DOI)
+
+Enabled by default in `/pkb`. Configure via `pkb.config.json`:
+
+```json
+{"scholarly": {"enabled": true, "auto_enrich_on_pkb": true}}
+```
+
+See [SCHOLARLY_METADATA.md](docs/SCHOLARLY_METADATA.md) for full documentation.
+
+## Version History
+
+- **v0.6.8-alpha**: Current. Adds scholarly metadata enrichment: literature detection, Crossref/OpenAlex metadata, local journal-ranking registry, GB/T 7714 and APA citations, `/pkb` integration, batch resume, and structured literature filtering.
+- **v0.6.7-alpha**: Adds MarkItDown document ingestion and web_pack v3.1 Playwright dynamic-content fallback.
 
 ## Contributing
 

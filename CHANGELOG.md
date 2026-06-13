@@ -4,6 +4,43 @@ All notable changes to PKB Starter.
 
 ---
 
+## [0.6.8-alpha] — 2026-06-13
+
+### Added — Scholarly Metadata Enrichment
+
+- Added automatic scholarly-document detection with explicit declarations, structured identifiers, exclusion safeguards, and confidence-based routing.
+- Added Crossref metadata enrichment and optional OpenAlex work/source metrics.
+- Added local journal-ranking registry with user-imported CSSCI, PKU Core, AMI, CSCD, and custom datasets.
+- Added journal matching by DOI-resolved ISSN, ISSN, EISSN, ISSN-L, normalized journal name, and reviewed fuzzy matching.
+- Added GB/T 7714 journal-article formatting, APA 7 through citeproc-py, BibTeX, RIS, and CSL-JSON export.
+- Added synchronous `/pkb` scholarly enrichment before commit with fail-open behavior.
+- Added batch enrichment with dry-run, write, only-missing, JSONL, resumable jobs, locked-page protection, and byte-identical idempotency.
+- Added structured literature filtering by ranking, edition, level, year, journal, DOI, citation count, review state, and missing fields.
+- Added `.pkb_local/scholarly/` cache, ranking, style, and job storage with update protection.
+
+### Changed
+
+- `/pkb` now detects and enriches scholarly literature synchronously before the final commit.
+- GB/T journal articles use the validated fallback formatter by default.
+- APA 7 uses citeproc-py only and never silently falls back to an unverified formatter.
+- Scholarly detection now distinguishes explicit declarations, verified identifiers, hard exclusions, and soft exclusions.
+- Template test layout now supports direct execution from `template/`.
+
+### Safety
+
+- Private PKB content, imported ranking datasets, caches, job states, and API keys are never synchronized to the public template.
+- OpenAlex requires `OPENALEX_API_KEY`; missing keys degrade gracefully.
+- Crossref and OpenAlex failures do not block normal `/pkb` ingestion.
+- Complete proprietary journal-ranking lists are not bundled or downloaded automatically.
+- No PostToolUse background writes are used.
+- The private PKB repository remains local and is never pushed.
+
+### Testing
+
+- Private PKB full suite: 611 passed.
+- pkb-starter template suite: 568 passed.
+- Fresh temporary installation: module imports, three scholarly CLIs, and 568 tests passed.
+
 ## [0.6.7-alpha] — 2026-06-13
 
 ### Added — MarkItDown Document Ingestion (Phase 1.5)
