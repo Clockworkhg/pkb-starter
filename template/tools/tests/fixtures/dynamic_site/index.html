@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>动态测试页面</title></head>
+<body>
+<nav>首页 登录 注册 关于</nav>
+<main>
+  <div id="loading">加载中...</div>
+  <article id="content"></article>
+</main>
+<footer>Copyright 2024</footer>
+<script>
+  // 模拟 SPA：初始 HTML 只有空壳，正文通过 API 动态加载
+  setTimeout(async () => {
+    try {
+      const resp = await fetch('/api/article');
+      const data = await resp.json();
+      document.getElementById('loading').remove();
+      document.getElementById('content').innerHTML =
+        '<h1>' + data.title + '</h1>' +
+        data.blocks.map(b => '<p>' + b + '</p>').join('');
+    } catch(e) {
+      document.getElementById('loading').textContent = '加载失败: ' + e;
+    }
+  }, 300);
+
+  // 滚动后懒加载更多内容
+  let lazyLoaded = false;
+  window.addEventListener('scroll', async () => {
+    if (lazyLoaded) return;
+    if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 50) {
+      lazyLoaded = true;
+      try {
+        const resp = await fetch('/api/lazy');
+        const data = await resp.json();
+        const p = document.createElement('p');
+        p.textContent = data.extra;
+        document.getElementById('content').appendChild(p);
+      } catch(e) {}
+    }
+  });
+</script>
+</body>
+</html>

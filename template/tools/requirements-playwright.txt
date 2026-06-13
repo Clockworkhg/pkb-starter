@@ -1,0 +1,43 @@
+# PKB 可选依赖 — Playwright 动态渲染
+# 仅在使用 --render / --headed / --debug-network 时需要安装
+#
+# 安装:
+#   pip install -r requirements-playwright.txt
+#   playwright install chromium
+#
+# 用法:
+#   python tools/web_pack.py --topic "主题" --url "URL" --render
+#   python tools/web_pack.py --topic "主题" --url "URL" --render --headed
+#   python tools/web_pack.py --topic "主题" --url "URL" --render --debug-network
+#
+# /pkb 指令:
+#   /pkb --render <URL>
+#   /pkb --headed <URL>
+#   /pkb --render --debug-network <URL>
+#
+# 说明:
+#   - Playwright 是可选依赖，默认不启动浏览器
+#   - 只有普通采集不完整时才执行动态渲染
+#   - --headed 可用于用户自行完成正常登录
+#   - 工具不会绕过验证码
+#   - 网络调试不保存完整正文和敏感认证信息
+#   - CapturedResponse 的数据结构不定义 headers、cookies 等字段；
+#     调试输出使用字段白名单；frozen dataclass 在运行时阻止字段重新赋值
+#   - 某些 App-only 内容仍可能无法采集
+#   - 不宣传"支持所有动态网站"
+#
+# 当前状态 (PKB v0.6.7-alpha / web_pack v3.1):
+#   - 通用动态网页采集已完成（155 tests：27 quality + 42 capture + 22 network_content
+#     + 23 selection_engine + 31 render + 10 integration = 155 passed, 0 failed）
+#   - 真实 Chromium 集成测试全部通过（10/10）
+#   - 三方选择引擎（HTTP / Playwright DOM / Playwright Network）已集成
+#   - --debug-network 安全脱敏调试输出
+#   - 真实网页验证通过（静态 Wikipedia + 动态 react.dev + 小黑盒 困难样本）
+#   - 默认静态采集行为不变
+#   - App-only 页面仍可能失败
+#   - 不绕过登录或验证码
+#   - 17 个 scholarly 模块测试失败为已知历史问题，与本次修改无关
+#
+# 普通采集不需要此文件中的任何依赖。
+
+playwright>=1.40.0

@@ -25,6 +25,7 @@ _INBOX/
 # === Python ===
 __pycache__/
 *.py[cod]
+.pytest_cache/
 *.egg-info/
 dist/
 build/
@@ -93,6 +94,14 @@ temp/
 downloads/
 .cache/
 .pkb-cache/
+
+# === PKB Cache (Playwright profiles, network debug, etc.) ===
+.pkbcache/
+playwright-profile/
+network-debug/
+
+# === Test Webpack Output (auto-generated during testing) ===
+raw/webpacks/*test*/
 
 # === Privacy: raw/personal — NEVER track anything in this directory ===
 raw/personal/*
