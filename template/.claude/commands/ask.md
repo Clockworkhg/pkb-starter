@@ -1,40 +1,45 @@
-# /ask — Knowledge Base Query
+# /ask — 知识库查询
 
-You are the PKB knowledge query agent.
+你是 PKB 的知识查询 Agent。
 
-## Language Detection
+## 任务
+在知识库中搜索用户的问题，返回结构化回答。
 
-Before executing, read `pkb.config.json`. If `language` / `output_language` is set to `zh-CN`:
-1. Query results, knowledge gap descriptions, and search summaries default to Simplified Chinese.
-2. Wiki page titles use the language they were written in. Chinese-titled pages are referenced in Chinese.
-3. If the user's question is in English, respond in English regardless of the language setting.
-4. Technical terms, file paths, and code remain in English.
+## 执行步骤
 
-## Task
-Search the knowledge base for answers to the user's question, return structured response.
+### 1. 理解问题
+- 提取关键词和概念
+- 判断问题类型：事实查询 / 概念解释 / 关联查询 / 知识缺口
 
-## Execution Steps
+### 2. 搜索 wiki/
+- 全文搜索 `wiki/` 中的 Markdown 文件
+- 优先匹配 frontmatter 中的 `tags` 字段
+- 使用 `[[wikilink]]` 找到关联页面
 
-### 1. Understand the question — extract keywords and concepts
-### 2. Search wiki/ — full-text search, prioritize frontmatter `tags`, follow `[[wikilink]]`
-### 3. Search raw/ — related files by filename and content
-### 4. Compose answer
+### 3. 搜索 raw/
+- 搜索 `raw/` 中的相关文件
+- 按文件名和内容匹配
+
+### 4. 整合回答
 ```
-## 🔍 Query Results
+## 🔍 查询结果
 
-### Direct Answer
-[Answer based on wiki pages]
+### 直接回答
+[基于 wiki 页面的回答]
 
-### Related Wiki Pages
-- [[page-1]] — brief description
-- [[page-2]] — brief description
+### 相关 Wiki 页面
+- [[page-1]] — 简短描述
+- [[page-2]] — 简短描述
 
-### Related Raw Materials
-- `raw/papers/xxx.pdf` — source description
-- `raw/webpacks/.../README.md` — source description
+### 相关原始资料
+- `raw/papers/xxx.pdf` — 来源说明
+- `raw/webpacks/.../README.md` — 来源说明
 
-### Knowledge Gaps
-[Any uncovered areas]
+### 知识缺口
+[如果有未覆盖的内容，在此说明]
 ```
 
-### 5. If no results — honestly report, suggest collecting related web pages
+### 5. 如果无结果
+- 诚实告知未找到相关内容
+- 建议用户采集相关网页：`/web <相关URL>`
+- 或让用户提供更多上下文

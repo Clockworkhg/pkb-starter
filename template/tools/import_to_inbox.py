@@ -25,7 +25,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 # --- 配置 ---
-PKB_ROOT = Path(os.environ.get("PKB_ROOT", str(Path(__file__).resolve().parent.parent)))
+PKB_ROOT = Path(os.environ.get("PKB_ROOT", r"D:\PKB_个人知识库"))
 INBOX_FILES = PKB_ROOT / "_INBOX" / "imported"
 INBOX_FOLDERS = PKB_ROOT / "_INBOX" / "imported-folders"
 
@@ -228,32 +228,32 @@ def print_report(entries: list[dict], source_path: str, is_folder: bool = False)
 
     print()
     print("=" * 60)
-    print(f"[import] PKB Import Report")
+    print(f"📥 PKB 导入报告")
     print("=" * 60)
-    print(f"   Source: {source_path}")
-    print(f"   Type: {'Folder' if is_folder else 'File'}")
+    print(f"   来源: {source_path}")
+    print(f"   类型: {'文件夹' if is_folder else '文件'}")
 
     if imported:
-        print(f"   [OK] Imported: {len(imported)} files")
+        print(f"   ✅ 成功导入: {len(imported)} 个文件")
         if total_size > 1024 * 1024:
-            print(f"       Total size: {total_size / (1024*1024):.1f} MB")
+            print(f"      总大小: {total_size / (1024*1024):.1f} MB")
         elif total_size > 1024:
-            print(f"       Total size: {total_size / 1024:.1f} KB")
+            print(f"      总大小: {total_size / 1024:.1f} KB")
         else:
-            print(f"       Total size: {total_size} B")
+            print(f"      总大小: {total_size} B")
 
     if rejected:
-        print(f"   [BLOCKED] Sensitive content: {len(rejected)} files")
+        print(f"   🔴 已阻止 (敏感信息): {len(rejected)} 个文件")
         for r in rejected:
             print(f"      - {r.get('source_path')}: {r.get('reason')}")
 
     if errors:
-        print(f"   [FAIL] Errors: {len(errors)} files")
+        print(f"   ❌ 错误: {len(errors)} 个文件")
         for e in errors:
             print(f"      - {e.get('source_path')}: {e.get('reason')}")
 
     if not imported and not rejected and not errors:
-        print("   [WARN] No files were imported")
+        print("   ⚠️  没有文件被导入")
 
     print("=" * 60)
 
@@ -300,7 +300,7 @@ def main():
     src_path = Path(args.path).resolve()
 
     if not src_path.exists():
-        print(f"[FAIL] 路径不存在: {src_path}")
+        print(f"❌ 路径不存在: {src_path}")
         sys.exit(1)
 
     # 确保收件箱目录存在
@@ -309,14 +309,14 @@ def main():
 
     if args.folder or src_path.is_dir():
         if not src_path.is_dir():
-            print(f"[FAIL] 不是目录: {src_path}（去掉 --folder 以导入单文件）")
+            print(f"❌ 不是目录: {src_path}（去掉 --folder 以导入单文件）")
             sys.exit(1)
         entries = import_folder(src_path, move=args.move)
         print_report(entries, str(src_path), is_folder=True)
     else:
         entry = import_file(src_path, INBOX_FILES, move=args.move)
         if entry is None:
-            print("[WARN]  文件被跳过（未知原因）")
+            print("⚠️  文件被跳过（未知原因）")
             sys.exit(1)
         print_report([entry], str(src_path), is_folder=False)
 

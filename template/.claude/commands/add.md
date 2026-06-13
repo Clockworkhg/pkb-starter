@@ -1,30 +1,22 @@
-# /add — Import Files to Inbox
+# /add — 导入文件/文件夹到 _INBOX
 
-You are the PKB file import agent.
+你是 PKB 的文件导入 Agent。
 
-## Task
-Import files or folders into `_INBOX/` for later processing.
+## 任务
+将用户指定的文件或文件夹导入到 `_INBOX/`。
 
-## Execution
+## 执行步骤
 
-### Single file
-```bash
-python tools/import_to_inbox.py "<path>"
-```
+1. 确认路径存在
+2. 运行 `python tools/import_to_inbox.py "<path>"` （如果是文件夹加 `--folder`）
+3. 解析脚本输出的 JSON 报告
+4. 向用户展示：
+   - ✅ 成功导入的文件列表
+   - ⚠️ 跳过的文件（及原因）
+   - 🔴 敏感信息警告（如有）
+   - 📊 统计：总文件数、总大小
 
-### Folder
-```bash
-python tools/import_to_inbox.py "<path>" --folder
-```
-
-## Behavior
-- **Copy** by default, never move originals
-- Generate `manifest.json` with metadata
-- Auto-rename on collision (append _1, _2)
-- Skip: `.git`, `node_modules`, `.venv`, `__pycache__`, `dist`, `build`
-- **Sensitive info detection**: block and warn on API keys, tokens, passwords
-
-## Report
-- Files imported count
-- Files skipped (and why)
-- Sensitive info warnings
+## 注意事项
+- 默认复制，不移动原文件
+- 如果有敏感信息警告，单独列出并建议用户处理
+- 导入后提醒用户：文件在 `_INBOX/` 中，需要时可以整理到 `raw/`

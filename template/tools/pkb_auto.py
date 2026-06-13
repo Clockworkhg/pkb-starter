@@ -35,8 +35,7 @@ CONTENT_RULES = {
     "academic_paper": {
         "extensions": [".pdf", ".docx"],
         "keywords": ["学报", "大学", "哲学", "法律", "历史", "文学", "政治", "经济",
-                     "社会", "philosophy", "political theory", "humanities",
-                     "social theory", "实践", "权利",
+                     "社会", "马克思", "恩格斯", "费尔巴哈", "唯物", "实践", "权利",
                      "journal", "university", "research", "analysis"],
     },
     "coursework": {
@@ -426,7 +425,7 @@ def _get_wiki_targets(ctype: str) -> List[str]:
         "coursework": ["wiki/sources/", "wiki/outputs/"],
         "school_policy": ["wiki/sources/", "wiki/concepts/"],
         "project_ppt": ["wiki/sources/", "wiki/projects/"],
-        "methodology": ["wiki/concepts/", "wiki/projects/pkb-knowledge-base/"],
+        "methodology": ["wiki/concepts/", "wiki/projects/PKB个人知识库/"],
         "unknown": ["wiki/sources/"],
     }
     return targets.get(ctype, ["wiki/sources/"])
@@ -492,13 +491,13 @@ def generate_report(plan: Dict) -> str:
     lines.append("")
     lines.append(f"| 检查项 | 状态 |")
     lines.append(f"|--------|------|")
-    lines.append(f"| Frontmatter 完整 | {'[OK]' if not fm_issues else f'[WARN]{len(fm_issues)} issues'} |")
-    lines.append(f"| 破损双链 | {'[OK]' if not broken else f'[FAIL] {len(broken)} broken'} |")
-    lines.append(f"| 未索引页面 | {'[OK]' if not unindexed else f'[WARN]{len(unindexed)} unindexed'} |")
-    lines.append(f"| Stale _INBOX 引用 | {'[OK]' if not stale else f'[WARN]{len(stale)} stale'} |")
+    lines.append(f"| Frontmatter 完整 | {'✅' if not fm_issues else f'⚠️ {len(fm_issues)} issues'} |")
+    lines.append(f"| 破损双链 | {'✅' if not broken else f'❌ {len(broken)} broken'} |")
+    lines.append(f"| 未索引页面 | {'✅' if not unindexed else f'⚠️ {len(unindexed)} unindexed'} |")
+    lines.append(f"| Stale _INBOX 引用 | {'✅' if not stale else f'⚠️ {len(stale)} stale'} |")
     sp_stale = source_paths.get('stale_count', 0)
-    lines.append(f"| source_path 一致性 | {'[OK]' if sp_stale == 0 else '[WARN]' + str(sp_stale) + ' stale'} |")
-    lines.append(f"| Webpack 质量 | {'[OK]' if not webpack_issues else f'[WARN]{len(webpack_issues)} issues'} |")
+    lines.append(f"| source_path 一致性 | {'✅' if sp_stale == 0 else '⚠️ ' + str(sp_stale) + ' stale'} |")
+    lines.append(f"| Webpack 质量 | {'✅' if not webpack_issues else f'⚠️ {len(webpack_issues)} issues'} |")
 
     if fm_issues:
         lines.append("")
@@ -586,28 +585,28 @@ def main():
         stale = find_stale_inbox_refs()
         sp = check_source_paths()
 
-        print(f"Frontmatter: {'[OK] OK' if not fm else f'[WARN]{len(fm)} issues'}", flush=True)
+        print(f"Frontmatter: {'✅ OK' if not fm else f'⚠️ {len(fm)} issues'}", flush=True)
         for f in fm[:10]:
             print(f"  - {f['file']}: {f['issue']}", flush=True)
 
-        print(f"Broken links: {'[OK] 0' if not broken else f'[FAIL] {len(broken)}'}", flush=True)
+        print(f"Broken links: {'✅ 0' if not broken else f'❌ {len(broken)}'}", flush=True)
         for b in broken[:10]:
             print(f"  - {b['file']} → [[{b['link']}]]", flush=True)
 
-        print(f"Unindexed: {'[OK] 0' if not unindexed else f'[WARN]{len(unindexed)}'}", flush=True)
+        print(f"Unindexed: {'✅ 0' if not unindexed else f'⚠️ {len(unindexed)}'}", flush=True)
         for u in unindexed[:10]:
             print(f"  - {u}", flush=True)
 
-        print(f"Stale _INBOX refs: {'[OK] 0' if not stale else f'[WARN]{len(stale)}'}", flush=True)
+        print(f"Stale _INBOX refs: {'✅ 0' if not stale else f'⚠️ {len(stale)}'}", flush=True)
         for s in stale[:10]:
             print(f"  - {s[0]}: {s[1]}", flush=True)
 
         sp_sc = sp.get('stale_count', 0)
-        print(f"source_path: {'[OK] OK' if sp_sc == 0 else '[WARN]' + str(sp_sc) + ' stale'}", flush=True)
+        print(f"source_path: {'✅ OK' if sp_sc == 0 else '⚠️ ' + str(sp_sc) + ' stale'}", flush=True)
         for iss in sp['issues'][:10]:
             print(f"  - {iss['file']}: {iss['current']} → {iss['expected']}", flush=True)
 
-        print(f"Webpack quality: {'[OK] OK' if not webpack_q else f'[WARN]{len(webpack_q)} issues'}", flush=True)
+        print(f"Webpack quality: {'✅ OK' if not webpack_q else f'⚠️ {len(webpack_q)} issues'}", flush=True)
         for w in webpack_q[:10]:
             print(f"  - {w['webpack']}: {w['issue']}", flush=True)
 

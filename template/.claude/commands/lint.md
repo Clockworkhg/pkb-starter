@@ -1,54 +1,60 @@
-# /lint — Knowledge Base Health Check
+# /lint — 知识库健康检查
 
-You are the PKB health check agent.
+你是 PKB 的健康检查 Agent。
 
-## Task
-Comprehensively check knowledge base health, discover and report issues.
+## 任务
+全面检查知识库的健康状态，发现并报告问题。
 
-## Check Items
+## 检查项目
 
-### 1. 🔗 Broken Wikilinks
-- Scan all `[[wikilink]]` in `wiki/`
-- Check target pages exist
-- Report all broken links with locations
+### 1. 🔗 断链检查 (Broken Wikilinks)
+- 扫描 `wiki/` 中所有 `[[wikilink]]`
+- 检查目标页面是否存在
+- 报告所有断链及其位置
 
-### 2. 👻 Orphan Pages
-- Find pages in `wiki/` with no inbound links
-- Exclude home pages
-- Suggest: add links or archive
+### 2. 👻 孤立页面 (Orphan Pages)
+- 找出 `wiki/` 中没有任何其他页面链接到的页面
+- 排除首页 `00_home/`
+- 建议：添加链接或归档
 
-### 3. 📅 Stale Content
-- Check `updated` > 90 days ago
-- Flag pages with `#active` tag (contradiction)
-- Suggest: review or update
+### 3. 📅 陈旧内容 (Stale Content)
+- 检查 `updated` 日期超过 90 天的页面
+- 标记其中包含 `#active` 标签的（矛盾状态）
+- 建议：复核或更新
 
-### 4. 📋 Frontmatter Completeness
-- Check all .md files in `wiki/` for `created`, `updated`, `tags`, `type`
-- Report files missing fields
+### 4. 📋 Frontmatter 完整性
+- 检查 `wiki/` 中所有 .md 文件是否有 `created`, `updated`, `tags`
+- 报告缺少字段的文件
 
-### 5. 🔒 Sensitive Info Scan
-- Scan text files in `wiki/` and `raw/`
-- Patterns: `api_key=`, `token:`, `secret:`, `password=`, `BEGIN RSA PRIVATE KEY`
-- Report all suspected leaks
+### 5. 🔒 敏感信息扫描
+- 扫描 `wiki/` 和 `raw/` 中的文本文件
+- 检测模式：`api_key=`, `token:`, `secret:`, `password=`, `BEGIN RSA PRIVATE KEY`
+- 报告所有疑似泄露的位置
 
-### 6. 📁 Empty Directories
-- Check for empty subdirectories under `raw/` and `wiki/`
+### 6. 📁 空目录
+- 检查 `raw/` 和 `wiki/` 下的空子目录
+- 报告但建议保留（结构需要）
 
-### 7. 📦 Large File Alert
-- Check for files >50MB in `raw/`
-- Remind user about external storage or compression
+### 7. 📦 大文件提醒
+- 检查 `raw/` 中超过 50MB 的文件
+- 提醒用户是否需要外置存储或压缩
 
-## Output Format
+## 输出格式
 ```
-🩺 PKB Health Check Report
-═══════════════════════
+🩺 PKB 健康检查报告
+═══════════════════
 
-✅ Passed (X items)
-⚠️ Warnings (X items)
-🔴 Needs Attention (X items)
+✅ 通过 (X 项)
+[列表]
 
-📊 Stats
-- Wiki pages: N
-- Raw files: N
-- Total size: X MB
+⚠️ 警告 (X 项)
+[列表及建议]
+
+🔴 需要处理 (X 项)
+[列表及修复建议]
+
+📊 统计
+- Wiki 页面总数: N
+- Raw 文件总数: N
+- 总大小: X MB
 ```

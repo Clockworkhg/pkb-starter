@@ -1,113 +1,125 @@
-# CLAUDE.md — PKB Quick Reference
+# CLAUDE.md — PKB 快速参考
 
-> Loaded automatically every Claude Code session. See [AGENTS.md](AGENTS.md) for full rules.
+> 每次 Claude Code 会话自动加载。详细规则见 [AGENTS.md](AGENTS.md)。
 
-## Project Identity
+## 项目身份
 
-**PKB** = a compiled personal knowledge base following the Karpathy LLM Wiki pattern.
-Three-layer architecture: `raw/` (immutable source materials) → `wiki/` (LLM-maintained structured knowledge) → `skills/` (agent automation rules).
+**PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
+三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
 
-## Key Paths
+## 关键路径
 
 ```
-raw/webpacks/        Web collection packs (web_pack.py output)
-raw/papers/          Paper PDFs + manifest.json
-wiki/concepts/       Atomic concept notes
-wiki/sources/        Knowledge source index (with literature map)
-wiki/projects/       Project notes
-.claude/commands/    Slash Commands
-.claude/hooks/       Harness Hooks
-tools/               Python helper scripts
+raw/webpacks/        网页素材包（web_pack.py v3 产出）
+raw/papers/          论文 PDF + manifest.json
+wiki/concepts/       原子化概念笔记
+wiki/sources/        知识来源索引（含文献地图）
+wiki/projects/       项目笔记
+.claude/skills/      Agent Skills（39+）
+.claude/commands/    Slash Commands（35+）
+.claude/hooks/       Harness Hooks（6 个自动化钩子）
+tools/               Python 工具脚本（10+）
 ```
 
-## Skill Routing Reference
+## Skill 路由速查
 
-| User Intent | Command |
-|-------------|---------|
-| Ingest anything | `/pkb <anything>` |
-| Privacy cleanup | `/sanitize` |
-| Health check | `/lint` |
+| 用户意图 | 调用 |
+|---------|------|
+| 丢任何东西入库 | `/pkb <anything>` |
+| 知网论文搜索/下载 | `/pkb-cnki search\|fill-gaps\|download` |
+| 学术研究（论文/综述/引用） | `/research` `/paper` `/literature-*` |
+| 文档格式转换 | `/doc` `/ocr` |
+| Excel/Markdown 表格 | `/z-excel-editor` `/z-md-excel` |
+| 隐私清理 | `/sanitize` |
+| 看板管理 | `/kanban` |
+| 代码审查/简化 | `/simplify` |
+| 创建新 Skill | `/make-skill` |
 
-## Coding Conventions
+## 编码约定
 
-- **Wiki pages**: YAML frontmatter must include `created`/`updated`/`tags`/`type`
-- **Wikilinks**: Use `[[wikilink]]` within wiki, Markdown links across layers
-- **raw/ is immutable**: Append only, never modify or delete; metadata in manifest.json
-- **Python tools**: `encoding='utf-8', errors='replace'` (Windows compatibility)
-- **Git commit format**: `[PKB] <domain>: <summary>`
+- **Wiki 页面**: YAML frontmatter 必须含 `created`/`updated`/`tags`/`type`
+- **双链**: wiki 内用 `[[wikilink]]`，跨层用 Markdown 链接
+- **raw/ 不可变**: 只增不删，元数据在 manifest.json
+- **Python 工具**: `encoding='utf-8', errors='replace'`（Windows 兼容）
+- **PowerShell**: 用 cmdlet 不用 bash 语法；`shell=True` 跑外部命令
+- **Git commit**: 格式 `[PKB] <domain>: <summary>`
 
-## Tools Reference
+## 工具速查
 
-| Tool | Purpose |
-|------|---------|
-| `tools/check_collectors.py` | Collector availability detection — run before any web collection (`--json` / `--recommend`) |
-| `tools/web_pack.py` | Structured web collection |
-| `tools/pkb_auto.py` | Auto ingest + health check |
-| `tools/docs_update.py` | Documentation freshness check and safe apply (`--check`/`--apply`/`--json`/`--summary`) |
-| `tools/import_to_inbox.py` | File import to _INBOX |
-| `tools/sanitize.py` | Privacy pattern scanner |
-| `tools/pkb_update_client.py` | Check and apply pkb-starter updates |
-| `tools/zskill_bridge.py` | Z-skills compatibility bridge |
+| 工具 | 用途 |
+|------|------|
+| `tools/web_pack.py` | 网页完整采集 v3（readability + yt-dlp + GitHub Collector） |
+| `tools/pkb_auto.py` | 全自动入库 + 健康检查 |
+| `tools/pkb_ingest.py` | 本地文件入库编排器（import→markitdown→cache→wiki，正文在 .pkb-cache/）（Phase 1.5） |
+| `tools/markitdown_convert.py` | 本地文档→MD 预提取引擎（PDF/DOCX/PPTX/XLSX/XLS，动态版本）（Phase 1.5） |
+| `tools/docs_update.py` | 文档新鲜度检测（`--json`/`--summary`） |
+| `tools/cnki_setup.py` | CNKI 基础设施一键诊断 + 修复 |
+| `tools/download_papers.py` | 批量论文下载协调器 |
+| `tools/download_papers_r2.py` | R2 学术源论文下载 |
+| `tools/download_papers_r3.py` | R3 学术源论文下载 |
+| `tools/scihub_fetch.py` | Sci-Hub 论文获取 |
+| `tools/import_to_inbox.py` | 文件导入 _INBOX |
+| `tools/sync_to_starter.py` | PKB → pkb-starter 系统同步（dev-only） |
 
-## Common Workflows
+## Hooks 速查
 
-### Auto Ingest (most common)
+| Hook | 触发 | 功能 |
+|------|------|------|
+| `01_session_start` | SessionStart | 环境验证 + 上下文卡片 + 文档新鲜度 |
+| `02_pre_tool_use` | PreToolUse | 🛡️ 安全门控（拦截 secret commit / raw 删除 / 敏感文件写入） |
+| `03_post_tool_use` | PostToolUse (Write\|Edit) | wiki 快速 frontmatter 检查 + commit 后全量健康检查 |
+| `04_post_tool_use_failure` | PostToolUseFailure | 错误分类（11 类）+ 恢复建议 |
+| `05_stop` | Stop | 未提交提醒 + INBOX 过期预警 + 会话摘要 |
+| `06_user_prompt_submit` | UserPromptSubmit | 智能路由建议（URL/路径/CNKI/论文） |
+
+> Hooks 由 harness 级事件驱动，不在 `/pkb` 指令中执行。配置见 `.claude/settings.json`。
+> 共享库 `hook_lib.py` 提供幂等性（冷却窗口）、超时、安全扫描等基础能力。
+
+## 常用工作流
+
+### 自动入库（最常用）
 ```
-/pkb <file/URL/anything>
+/pkb <文件/URL/任何东西>
 ```
-Fully automatic: collect → compile wiki → archive → health check → commit. No questions.
+全自动：采集 → 编译 wiki → 归档 → 健康检查 → commit。不询问。
 
-### Save
+### 保存
 ```
-/save "commit message"
+/save "提交信息"
 ```
-Auto-update docs → health check → commit. Omitting the message auto-generates one.
+自动更新文档 → 健康检查 → commit。省略消息则自动生成。
 
-### Document Update
+### 文档更新
 ```
 /docs-update
 ```
-Diagnose + fix project docs, no commit. `/save` includes this step.
+诊断 + 修复项目文档，不 commit。`/save` 内含此步骤。
 
-## Collector Priority
+### CNKI 论文
+```
+python tools/cnki_setup.py --fix     # 一次性安装
+powershell tools/launch_chrome.ps1   # 启动 Chrome 调试
+/pkb-cnki fill-gaps                  # 补齐缺失 PDF
+```
+⚠️ 需 Chrome DevTools MCP 连接 + 知网登录。MCP 仅会话启动时加载。
 
-When collecting web content, run `python tools/check_collectors.py --json` first. Priority order:
+## 行为准则
 
-1. **z-web-pack** — if fully installed, audited, adapter enabled, and bridge executable
-2. **PKB built-in web_pack** — if Python deps (requests, bs4) are importable
-3. **WebFetch** — always available as ultimate fallback (single-page only)
-4. **gstack** — if registered as an available skill (complex JS pages)
+1. **默认全自动** — `/pkb` 不停顿、不询问"下一步"
+2. **安全优先** — 检测到 API key/token/password/私钥 → 阻止并警告
+3. **操作透明** — 每次操作给出清晰变更报告
+4. **不破坏原始资料** — 不移动/删除 raw/ 中文件
+5. **维护一致性** — 导入新资料后自动更新索引和日志
 
-**Never assume z-web-pack is available.** Always run the health check. Always auto-fallback — never fail because a specific collector is missing.
+## 暂停条件
 
-## Code of Conduct
-
-1. **Fully automatic by default** — `/pkb` never pauses to ask "next step?"
-2. **Safety first** — Detect and block API keys, tokens, passwords, private keys
-3. **Transparent** — Clear change report after every operation
-4. **Never destroy source material** — Don't move or delete files in raw/
-5. **Maintain consistency** — Auto-update indices and logs after imports
-
-## Pause Conditions
-
-Only pause to ask the user when:
-- Sensitive info detected (API key / token / password / private key / PII)
-- File deletion requested
-- File cannot be parsed (corrupted or unsupported format)
-- Wiki page naming conflict that cannot auto-merge
-- Git commit pre-flight secret scan fails
-
-## Hooks
-
-| Hook | Event | Purpose |
-|------|-------|---------|
-| `01_session_start.py` | SessionStart | Environment validation + context card + docs freshness |
-| `02_pre_tool_use.py` | PreToolUse | Security gate: blocks secret commits, raw/ deletion |
-| `03_post_tool_use.py` | PostToolUse | Wiki frontmatter + post-commit health check |
-| `04_post_tool_use_failure.py` | PostToolUseFailure | 11-category error classification + recovery |
-| `05_stop.py` | Stop | Uncommitted change reminder + session summary |
-| `06_user_prompt_submit.py` | UserPromptSubmit | Smart routing suggestions |
+仅在以下情况暂停询问用户：
+- 发现敏感信息（API key / token / password / 私钥 / 身份证号）
+- 需要删除文件
+- 文件无法解析（格式损坏或不支持）
+- 同名 wiki 页面冲突且无法自动合并
+- Git commit 前 secret scan 失败
 
 ---
 
-*Keep in sync with [AGENTS.md](AGENTS.md). Last updated: 2026-06-13*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-12 (hooks v1.0)*

@@ -4,6 +4,10 @@
       "Bash(python tools/*)",
       "Bash(python .claude/hooks/*)",
       "Bash(powershell tools/*)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(python skills/_vendor/tjxj-z-skills/z-excel-editor/scripts/*)",
+      "Bash(python skills/_vendor/tjxj-z-skills/z-md-excel/scripts/*)",
       "Bash(pip install:*)",
       "Bash(git:*)",
       "WebSearch",
@@ -98,6 +102,6 @@
     ]
   },
   "env": {
-    "PKB_ROOT": "__PKB_ROOT__"
+    "PKB_ROOT": "<PKB_ROOT>"
   }
 }

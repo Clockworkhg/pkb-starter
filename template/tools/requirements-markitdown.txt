@@ -1,0 +1,13 @@
+# PKB MarkItDown Phase 1.5 — 可选依赖
+#
+# 安装: pip install -r tools/requirements-markitdown.txt
+# 验证: python tools/markitdown_convert.py --check
+#        python tools/pkb_ingest.py --check
+#
+# 不安装时: PKB 仍可正常运行, 本地文档由 LLM 直接读取 (原有 fallback)
+#
+# 支持格式: .pdf .docx .pptx .xlsx .xls
+# 不支持: .doc (旧版 OLE) — 请先用 Word/LibreOffice 转为 .docx
+# OCR 默认关闭 (Phase 2)
+
+markitdown[pdf,docx,pptx,xlsx,xls]==0.1.6

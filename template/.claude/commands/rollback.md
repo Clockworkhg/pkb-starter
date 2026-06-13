@@ -1,33 +1,36 @@
-# /rollback — Git Rollback
+# /rollback — Git 回滚
 
-You are the PKB git rollback agent.
+你是 PKB 的 Git 回滚 Agent。
 
-## Task
-View git history or rollback to previous version.
+## 任务
+查看 Git 历史或回退到之前的版本。
 
-## Execution
+## 执行步骤
 
-### No args: View history — show last 10 commits
+### 无参数：查看历史
+- 显示最近 10 条 commit：
 ```
-📜 Recent Commits
-═══════════════
+📜 最近提交
+════════════
+<hash> YYYY-MM-DD: <message>
 <hash> YYYY-MM-DD: <message>
 ...
 ---
-Use /rollback <N> to revert N versions
-Use /rollback --hard <N> for hard reset (caution!)
+使用 /rollback <N> 回退 N 个版本
+使用 /rollback --hard <N> 硬回退（谨慎！）
 ```
 
 ### /rollback <N>
-- Revert N commits using `git revert --no-commit HEAD~N..HEAD` then `git commit`
-- Preserves complete rollback history
+- 回退 N 个 commit
+- 使用 `git revert --no-commit HEAD~N..HEAD` 然后 `git commit`
+- 保留完整的回退历史
 
 ### /rollback --hard <N>
-- ⚠️ **Requires double confirmation from user**
-- Execute `git reset --hard HEAD~N`
-- Warning: irreversible hard reset
+- ⚠️ **需要用户二次确认**
+- 执行 `git reset --hard HEAD~N`
+- 警告：不可恢复的硬回退
 
-## Security Rules
-- Before hard reset, MUST show what will be lost
-- Hard reset requires explicit user confirmation
-- If working tree has uncommitted changes, remind user to `/save` first
+## 安全规则
+- 硬回退前必须显示将要丢失的变更
+- 硬回退必须用户明确确认
+- 如果工作区有未提交的变更，先提醒用户 `/save`

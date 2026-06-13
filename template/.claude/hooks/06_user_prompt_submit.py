@@ -10,6 +10,7 @@ Routing table:
   - WeChat article URL  → /pkb <url>
   - Generic URL         → /pkb <url> or /web <url>
   - File path           → /pkb <path>
+  - CNKI/知网 terms     → /pkb-cnki search <query>
   - Paper/literature    → /paper or /research
   - Save/commit         → /save
 
@@ -32,6 +33,7 @@ ROUTING_PATTERNS = [
     (r'^https?://', '/pkb <url> or /web <url>', 'URL'),
     (r'^[A-Za-z]:[\\/]', '/pkb <path>', 'Windows path'),
     (r'^~/[a-zA-Z]', '/pkb <path>', 'Unix path'),
+    (r'知网|cnki|CNKI', '/pkb-cnki search ...', 'CNKI/知网'),
     (r'论文|paper|文献综述|literature\s*review', '/paper or /research', 'Academic'),
     (r'保存|commit|提交', '/save "message"', 'Save/commit'),
     (r'检查|lint|健康检查|health\s*check', '/lint', 'Health check'),

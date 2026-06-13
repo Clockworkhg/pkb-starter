@@ -92,6 +92,7 @@ tmp/
 temp/
 downloads/
 .cache/
+.pkb-cache/
 
 # === Privacy: raw/personal — NEVER track anything in this directory ===
 raw/personal/*
