@@ -7,8 +7,10 @@ Actions:
   2. Warn if critical files are modified (settings.json, AGENTS.md, CLAUDE.md)
   3. Check for stale files in _INBOX/imported/ (> 24h old)
   4. Print session summary (files changed, wiki pages, recent commits)
+  5. Update active task state timestamp if task exists
 
 Always returns 0 — never blocks exit.
+Bun/claude-mem failures are silently ignored (these are optional MCP services).
 
 Usage:
   python .claude/hooks/05_stop.py            # normal mode
@@ -18,6 +20,7 @@ Usage:
 import os
 import sys
 import time
+import json
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,6 +37,7 @@ CRITICAL_FILES = [
     "AGENTS.md",
     "CLAUDE.md",
     ".gitignore",
+    ".mcp.json",
 ]
 
 
@@ -72,6 +76,24 @@ def check_stale_inbox(hours: int = 24) -> list:
     except Exception:
         pass
     return stale
+
+
+def touch_active_task():
+    """Update the active task's updated_at timestamp if it exists. Non-fatal."""
+    root = get_root()
+    task_file = root / ".pkb-local" / "state" / "active-task.json"
+    if not task_file.exists():
+        return
+    try:
+        from datetime import datetime, timezone
+        data = json.loads(task_file.read_text(encoding="utf-8"))
+        data["updated_at"] = datetime.now(timezone.utc).astimezone().isoformat()
+        # Atomic write via tmp
+        tmp = task_file.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        tmp.replace(task_file)
+    except Exception:
+        pass  # Never fail the stop hook
 
 
 def print_session_summary():
@@ -150,6 +172,9 @@ def main():
         info(f"  Stale inbox: {len(stale)} files")
         return 0
 
+    # Touch active task timestamp (non-fatal)
+    touch_active_task()
+
     print_session_summary()
     return 0
 
@@ -160,5 +185,7 @@ if __name__ == "__main__":
     except SystemExit:
         raise
     except Exception as e:
+        # Silently handle all errors — Stop hook must never block exit.
+        # This includes Bun/claude-mem unavailability (optional MCP services).
         print(f"[PKB Hook ⚠️] Stop hook error: {e}", file=sys.stderr)
         sys.exit(0)

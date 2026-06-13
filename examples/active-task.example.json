@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "task_id": "example-literature-review",
+  "title": "示例：文献综述任务",
+  "status": "active",
+  "goal": "对某领域进行系统文献检索、筛选和综述",
+  "completed": [
+    "完成英文文献初步检索",
+    "生成中文文献初步清单"
+  ],
+  "next_action": "连接 Chrome DevTools MCP 后进入知网检索",
+  "blocked_by": [],
+  "required_capabilities": [
+    "chrome-devtools"
+  ],
+  "artifacts": [
+    "wiki/sources/lit-example.md"
+  ],
+  "notes": [
+    "这是一个示例文件，展示任务状态的结构。真实状态文件位于 .pkb-local/state/active-task.json（不进入 Git）。"
+  ],
+  "created_at": "2026-06-13T00:00:00+08:00",
+  "updated_at": "2026-06-13T00:00:00+08:00"
+}

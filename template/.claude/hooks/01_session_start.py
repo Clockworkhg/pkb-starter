@@ -6,7 +6,8 @@ Actions:
   1. Verify PKB environment (PKB_ROOT, essential directories)
   2. Run docs_update.py --summary (quick staleness check)
   3. Print session context card (wiki stats, recent commits, INBOX status)
-  4. Re-print after compaction recovery (helps Agent restore context)
+  4. Inject active task context from .pkb-local/state/active-task.json
+  5. Re-print after compaction recovery (helps Agent restore context)
 
 Cooldown: 5 minutes between context card prints.
 Always returns 0 — never blocks session start.
@@ -14,6 +15,7 @@ Always returns 0 — never blocks session start.
 
 import os
 import sys
+import json
 import subprocess
 from pathlib import Path
 
@@ -28,14 +30,70 @@ from hook_lib import (
 def check_mcp_availability() -> dict:
     """Quick check if Chrome DevTools MCP server is reachable."""
     import urllib.request
-    result = {"chrome_devtools": False}
+    # Check both localhost and 127.0.0.1
+    for host in ("127.0.0.1", "localhost"):
+        try:
+            url = f"http://{host}:9222/json"
+            req = urllib.request.Request(url, method="HEAD")
+            urllib.request.urlopen(req, timeout=2)
+            return {"chrome_devtools": True, "host": host}
+        except Exception:
+            pass
+    return {"chrome_devtools": False, "host": None}
+
+
+def load_active_task() -> dict:
+    """Read active task state safely."""
+    root = get_root()
+    task_file = root / ".pkb-local" / "state" / "active-task.json"
+    if not task_file.exists():
+        return None
     try:
-        req = urllib.request.Request("http://localhost:9222/json", method="HEAD")
-        urllib.request.urlopen(req, timeout=3)
-        result["chrome_devtools"] = True
-    except Exception:
-        pass
-    return result
+        data = json.loads(task_file.read_text(encoding="utf-8"))
+        # Basic validation
+        if not isinstance(data, dict) or "task_id" not in data:
+            return None
+        return data
+    except (json.JSONDecodeError, Exception):
+        return None
+
+
+def inject_task_context(task: dict):
+    """Print active task context for session injection."""
+    if not task or task.get("status") == "completed":
+        return
+
+    status_icon = {"active": "🟢", "blocked": "🔴"}.get(task.get("status"), "❓")
+
+    print()
+    print("┌" + "─" * 60 + "┐")
+    print(f"│ 📋 Current Active Task".ljust(61) + "│")
+    print("├" + "─" * 60 + "┤")
+    print(f"│ {status_icon} {task.get('title', 'Untitled')}".ljust(61) + "│")
+    print("├" + "─" * 60 + "┤")
+
+    completed = task.get("completed", [])
+    if completed:
+        print(f"│ Completed:".ljust(61) + "│")
+        for c in completed[:5]:  # Limit to 5 items
+            print(f"│   ✅ {c[:54]}".ljust(61) + "│")
+
+    next_action = task.get("next_action", "")
+    if next_action:
+        print(f"│ Next: {next_action[:54]}".ljust(61) + "│")
+
+    required = task.get("required_capabilities", [])
+    if required:
+        print(f"│ Capabilities needed: {', '.join(required)[:50]}".ljust(61) + "│")
+
+    blocked = task.get("blocked_by", [])
+    if blocked:
+        print(f"│ Blocked by:".ljust(61) + "│")
+        for b in blocked[:3]:
+            print(f"│   🛑 {b[:54]}".ljust(61) + "│")
+
+    print("└" + "─" * 60 + "┘")
+    print()
 
 
 def check_docs_freshness() -> dict:
@@ -126,6 +184,10 @@ def main():
         env = check_pkb_env()
         info(f"  PKB env: {'OK' if env['ok'] else 'ISSUES'}")
         print_context_card({"ok": True, "stale": False, "summary": "[dry run]"})
+        # Show task injection
+        task = load_active_task()
+        if task:
+            info(f"  Would inject task: {task.get('title')}")
         return 0
 
     # Verify environment (always, fast)
@@ -144,6 +206,11 @@ def main():
     # Context card
     if show_card:
         print_context_card(docs_status)
+
+    # Inject active task context (without cooldown — always show on session start)
+    task = load_active_task()
+    if task:
+        inject_task_context(task)
 
     return 0
 
