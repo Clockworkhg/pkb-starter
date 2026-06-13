@@ -49,7 +49,7 @@
 
 ## 🚀 默认全自动模式（无 flag）
 
-### 完整流程（10 步，不停顿）
+### 完整流程（11 步，不停顿）
 
 #### Step 1: 参数解析
 扫描输入，自动分类：本地文件 / 文件夹 / GitHub / Gist / 微信 / 普通网页 / 已存在 webpack。
@@ -79,40 +79,67 @@
 - GitHub/Gist → `wiki/sources/` + `wiki/concepts/`
 - 不确定 → `wiki/sources/` + frontmatter 标记 `review_needed: true`
 
-#### Step 4: 更新索引
+#### Step 4: 学术元数据增强（新增）
+对于新生成的 wiki 页面，自动检测并增强学术文献元数据：
+- 运行 `python tools/scholarly_enrich.py <page.md> --write`
+- 检测是否为学术文献（DOI、frontmatter type、来源 URL 等信号）
+- 学术页面自动补充：期刊排名、引用格式、学术指标、元数据匹配
+- **Fail-open**：Crossref/OpenAlex 失败不阻断 /pkb 流程
+- **不调用此步骤的页面**：普通网页、文档、代码、笔记等非学术内容
+- 增强失败时在报告中给出重试命令
+
+> 详细配置见 `docs/SCHOLARLY_METADATA.md`。
+> 关闭自动增强：在 `pkb.config.json` 中设置 `"scholarly": {"auto_enrich_on_pkb": false}`。
+
+#### Step 5: 更新索引
 - 更新 `wiki/index.md`（新页面一行摘要）
 - 更新根 `index.md`（新概念链接，如适用）
 
-#### Step 5: 自动归档
+#### Step 6: 自动归档
 - `_INBOX/imported/` 已处理文件 → `raw/imported_processed/`
 - 更新 `raw/imported_processed/manifest.json`
 - 修复所有 source-note 的 `source_path` 为新路径
 
-#### Step 6: 更新日志
+#### Step 7: 更新日志
 - 更新 `wiki/log.md`（知识级 ingest 记录）
 - 更新根 `log.md`（项目级事件记录）
 
-#### Step 7: 健康检查
+#### Step 8: 健康检查
 运行 `python tools/pkb_auto.py --check`：
 - frontmatter 完整、零破损双链、零未索引页面、无 stale 路径
 
-#### Step 8: 决策
-- 健康检查通过 → 进 Step 9
+#### Step 9: 决策
+- 健康检查通过 → 进 Step 10
 - 健康检查失败 → 报告问题列表，**不 commit**
 
-#### Step 9: Git commit
+#### Step 10: Git commit
 ```bash
 git add -A
 git commit -m "[PKB] auto ingest: YYYY-MM-DD — <summary>"
 ```
 
-#### Step 10: 输出报告
+#### Step 11: 输出报告
 ```
 📊 自动入库完成
    Commit: <hash>
    新增: N 个页面
    更新: M 个页面
    健康检查: ✅ 通过
+```
+如果触发了学术增强，在报告中附加：
+```
+📚 Scholarly metadata:
+   - DOI: 10.xxxx/xxxx
+   - Journal: 示例期刊
+   - Rankings: CSSCI 2025-2026
+   - OpenAlex citations: 16
+   - Citation: GB/T 7714 generated
+```
+增强失败降级时：
+```
+📚 Scholarly metadata:
+   - Crossref unavailable; page saved without enrichment
+   - Retry: python tools/scholarly_enrich.py "wiki/xxx.md" --write
 ```
 
 ---

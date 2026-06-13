@@ -1,0 +1,18 @@
+# PKB Scholarly Metadata Enrichment — optional dependencies
+#
+# Install: pip install -r tools/requirements-scholarly.txt
+#
+# Core dependencies (already in base requirements):
+#   requests — HTTP client for Crossref + OpenAlex
+#
+# Optional:
+#   citeproc-py — CSL citation processor for GB/T 7714, APA, etc.
+#   If not installed, the GBT7714FallbackFormatter is used instead.
+#
+# Without these, PKB still runs; citations use the built-in fallback formatter.
+
+# CSL citation processor (optional — fallback formatter available)
+citeproc-py>=0.7.0
+
+# CSL styles bundle (provides GB/T 7714, APA, etc. CSL files)
+citeproc-py-styles>=0.1.0

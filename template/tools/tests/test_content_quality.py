@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 # 确保 tools/ 在 sys.path 中
-_TOOLS_DIR = Path(__file__).resolve().parent.parent
+_TOOLS_DIR = Path(__file__).resolve().parent.parent / "tools"
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 

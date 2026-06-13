@@ -18,7 +18,7 @@ import pytest
 
 pytest.importorskip("playwright", reason="Playwright is optional; install with: playwright install chromium")
 
-_TOOLS_DIR = Path(__file__).resolve().parent.parent
+_TOOLS_DIR = Path(__file__).resolve().parent.parent / "tools"
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 

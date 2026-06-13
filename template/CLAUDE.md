@@ -65,6 +65,9 @@ tools/               Python 工具脚本（10+）
 | `tools/download_papers_r2.py` | R2 学术源论文下载 |
 | `tools/download_papers_r3.py` | R3 学术源论文下载 |
 | `tools/scihub_fetch.py` | Sci-Hub 论文获取 |
+| `tools/scholarly_enrich.py` | 学术元数据增强 CLI（DOI 查询 + 批量扫描 + 写入）（Phase 1B） |
+| `tools/filter_literature.py` | 结构化文献筛选器（按期刊等级/年份/被引/DOI 过滤）（Phase 1B） |
+| `tools/import_journal_rankings.py` | 期刊目录导入（CSSCI/北大核心/AMI/CSCD/自定义） |
 | `tools/import_to_inbox.py` | 文件导入 _INBOX |
 | `tools/sync_to_starter.py` | PKB → pkb-starter 系统同步（dev-only） |
 
