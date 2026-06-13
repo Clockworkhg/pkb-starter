@@ -46,8 +46,8 @@ def copy_template(target: Path, force: bool = False) -> list[str]:
     for src in TEMPLATE_DIR.rglob("*"):
         if src.is_dir():
             continue
-        # Skip __pycache__ and other artifacts
-        if any(p.startswith("__") for p in src.parts):
+        # Skip __pycache__ and other artifact directories, but NOT __init__.py
+        if src.name != "__init__.py" and any(p.startswith("__") for p in src.parts):
             continue
 
         rel = src.relative_to(TEMPLATE_DIR)

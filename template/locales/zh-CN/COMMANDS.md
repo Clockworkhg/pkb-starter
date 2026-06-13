@@ -82,6 +82,23 @@
 | `/project:literature-search <查询>` | 多源学术搜索 |
 | `/project:literature-review <主题>` | 文献综述，多视角对话 |
 
+### 📚 学术元数据增强 (Phase 1B.1)
+
+`/project:pkb` 采集学术文献时**自动**补全元数据。也可独立使用：
+
+| 命令 | 功能 |
+|------|------|
+| `python tools/scholarly_enrich.py --scan wiki/ --write` | 批量增强已有文献 |
+| `python tools/scholarly_enrich.py --scan wiki/ --write --only-missing` | 只补全缺失数据 |
+| `python tools/scholarly_enrich.py --scan wiki/ --write --resume` | 从中断恢复 |
+| `python tools/filter_literature.py --ranking CSSCI` | 按 CSSCI 筛选文献 |
+| `python tools/filter_literature.py --ranking CSSCI --year-from 2023 --min-citations 5` | 多条件 AND 筛选 |
+| `python tools/import_journal_rankings.py import rankings.csv` | 导入期刊目录 |
+| `python tools/import_journal_rankings.py list` | 查看已导入期刊体系 |
+
+> 详细文档：`docs/SCHOLARLY_METADATA.md`
+> 关闭自动增强：在 `pkb.config.json` 中设置 `{"scholarly": {"enabled": false}}`
+
 ### 工具命令
 
 | 命令 | 功能 |

@@ -15,7 +15,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, PropertyMock, patch
 
 # 确保 tools/ 在 sys.path 中
-_TOOLS_DIR = Path(__file__).resolve().parent.parent / "tools"
+_TOOLS_DIR = Path(__file__).resolve().parent.parent
+if not (_TOOLS_DIR / "scholarly").is_dir() and not (_TOOLS_DIR / "content_quality.py").exists():
+    _TOOLS_DIR = _TOOLS_DIR / "tools"
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 

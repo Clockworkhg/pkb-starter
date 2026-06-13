@@ -154,6 +154,8 @@ class GBT7714FallbackFormatter:
             style=CitationStyle.GBT7714_NUMERIC,
             formatted=citation,
             csl_json=to_csl_json(record),
+            engine_used="fallback",
+            strict=True,
         )
 
     def format_author_date(self, record: ScholarlyRecord) -> CitationData:
@@ -195,6 +197,8 @@ class GBT7714FallbackFormatter:
             style=CitationStyle.GBT7714_AUTHOR_DATE,
             formatted=citation,
             csl_json=to_csl_json(record),
+            engine_used="fallback",
+            strict=True,
         )
 
     # ── Internal helpers ──

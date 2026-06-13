@@ -35,5 +35,8 @@ update_report.md
 update_client_report.md
 RELEASE_CHECK*.md
 
+# User data (never git-tracked)
+.pkb_local/
+
 # Local test directories
 test-pkb-*/

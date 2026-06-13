@@ -218,12 +218,24 @@ def _parse_simple_yaml(raw: str) -> Dict[str, Any]:
 
 def _serialise_simple_yaml(fm: Dict[str, Any]) -> str:
     """Serialise a nested dict back to YAML with proper indentation."""
+    def _format_value(v: Any) -> str:
+        """Format a scalar value, quoting if needed for YAML safety."""
+        s = str(v)
+        # Quote if value contains ':' followed by space (YAML key-value ambiguity)
+        if isinstance(v, str) and (': ' in s or s.startswith('[') or s.startswith('{')):
+            return f"'{s}'"
+        return s
+
     lines = []
     for key, value in fm.items():
         if isinstance(value, dict):
+            if not value:
+                continue  # skip empty dicts
             lines.append(f"{key}:")
             for k, v in value.items():
                 if isinstance(v, dict):
+                    if not v:
+                        continue
                     lines.append(f"  {k}:")
                     for k2, v2 in v.items():
                         if isinstance(v2, list):
@@ -234,7 +246,7 @@ def _serialise_simple_yaml(fm: Dict[str, Any]) -> str:
                         elif isinstance(v2, bool):
                             lines.append(f"    {k2}: {'true' if v2 else 'false'}")
                         else:
-                            lines.append(f"    {k2}: {v2}")
+                            lines.append(f"    {k2}: {_format_value(v2)}")
                 elif isinstance(v, list):
                     items = ", ".join(
                         f"'{x}'" if " " in str(x) else str(x) for x in v
@@ -243,14 +255,16 @@ def _serialise_simple_yaml(fm: Dict[str, Any]) -> str:
                 elif isinstance(v, bool):
                     lines.append(f"  {k}: {'true' if v else 'false'}")
                 else:
-                    lines.append(f"  {k}: {v}")
+                    lines.append(f"  {k}: {_format_value(v)}")
         elif isinstance(value, list):
+            if not value:
+                continue  # skip empty lists
             items = ", ".join(f"'{v}'" if " " in str(v) else str(v) for v in value)
             lines.append(f"{key}: [{items}]")
         elif isinstance(value, bool):
             lines.append(f"{key}: {'true' if value else 'false'}")
         else:
-            lines.append(f"{key}: {value}")
+            lines.append(f"{key}: {_format_value(value)}")
     return "\n".join(lines)
 
 
@@ -453,23 +467,24 @@ def _build_scholarly_frontmatter(
             citation[c.style.value] = entry
 
     # ── metadata_match ──
-    metadata_match: Dict[str, Any] = {}
+    result_dict = {
+        "scholarly": scholarly,
+    }
+    if journal_rankings:
+        result_dict["journal_rankings"] = journal_rankings
+    if metrics:
+        result_dict["metrics"] = metrics
+    if citation:
+        result_dict["citation"] = citation
     if result.match_result:
         mr = result.match_result
-        metadata_match = {
+        result_dict["metadata_match"] = {
             "method": mr.method.value,
             "confidence": round(mr.confidence, 2),
         }
         if mr.needs_review:
-            metadata_match["needs_review"] = True
-
-    return {
-        "scholarly": scholarly,
-        "journal_rankings": journal_rankings,
-        "metrics": metrics,
-        "citation": citation,
-        "metadata_match": metadata_match,
-    }
+            result_dict["metadata_match"]["needs_review"] = True
+    return result_dict
 
 
 def _is_idempotent(
@@ -666,14 +681,12 @@ def enrich_wiki_page_if_scholarly(
 
     # ── 9. Merge into frontmatter ──
     new_fm = dict(fm)
-    # Only overwrite controlled keys
+    # Overwrite or remove controlled keys
     for key in _CONTROLLED_TOP_KEYS:
         if key in new_scholarly:
             new_fm[key] = new_scholarly[key]
-    # Preserve all unknown keys
-    for key in fm:
-        if key not in _CONTROLLED_TOP_KEYS and key not in new_scholarly:
-            pass  # Already in new_fm
+        elif key in new_fm:
+            del new_fm[key]  # Remove old controlled key no longer present
 
     # ── 10. Write back ──
     new_fm_yaml = _serialise_simple_yaml(new_fm)

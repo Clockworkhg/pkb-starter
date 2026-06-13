@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+# Add tools/ to Python path so tests can import from scholarly, content_quality, etc.
+# Tests are at tools/tests/ and modules are at tools/
+pythonpath = ["tools"]

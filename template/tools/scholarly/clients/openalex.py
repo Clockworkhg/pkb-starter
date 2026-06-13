@@ -266,9 +266,9 @@ class OpenAlexClient:
             page = str(first_page)
 
         # Type
-        pub_type = data.get("type", "journal-article") or "journal-article"
+        pub_type = data.get("type", "article-journal") or "article-journal"
         if pub_type == "article":
-            pub_type = "journal-article"
+            pub_type = "article-journal"
 
         # Metrics
         metrics: List[MetricSnapshot] = []

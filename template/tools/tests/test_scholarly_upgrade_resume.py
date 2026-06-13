@@ -18,7 +18,9 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-_TOOLS_DIR = Path(__file__).resolve().parent.parent / "tools"
+_TOOLS_DIR = Path(__file__).resolve().parent.parent
+if not (_TOOLS_DIR / "scholarly").is_dir() and not (_TOOLS_DIR / "content_quality.py").exists():
+    _TOOLS_DIR = _TOOLS_DIR / "tools"
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 
@@ -186,7 +188,14 @@ class TestUpgradeProtection:
 
     def test_dotgitignore_protects_scholarly_dir(self):
         """Verify .gitignore contains .pkb_local/scholarly/ protections."""
-        gitignore = Path(__file__).resolve().parent.parent / ".gitignore"
+        # Find .gitignore by searching upward from this file
+        gitignore = Path(__file__).resolve().parent
+        for _ in range(6):
+            candidate = gitignore / ".gitignore"
+            if candidate.is_file():
+                gitignore = candidate
+                break
+            gitignore = gitignore.parent
         content = gitignore.read_text(encoding='utf-8')
         assert ".pkb_local/scholarly/" in content or ".pkb_local" in content
 

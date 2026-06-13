@@ -214,7 +214,7 @@ class ScholarlyRecord:
     publisher: str = ""
 
     # Type
-    pub_type: str = "journal-article"   # CSL type
+    pub_type: str = "article-journal"   # CSL type
 
     # Status for each data source
     crossref_status: SourceStatus = SourceStatus.UNAVAILABLE

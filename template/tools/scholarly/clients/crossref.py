@@ -261,7 +261,7 @@ class CrossrefClient:
         publisher = msg.get("publisher", "") or ""
 
         # Type
-        pub_type = msg.get("type", "journal-article") or "journal-article"
+        pub_type = msg.get("type", "article-journal") or "article-journal"
 
         # Journal identity
         journal_identity = None

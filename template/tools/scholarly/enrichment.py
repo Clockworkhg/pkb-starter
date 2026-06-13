@@ -323,7 +323,7 @@ class ScholarlyEnricher:
             page=payload.get("page", ""),
             article_number=payload.get("article_number", ""),
             publisher=payload.get("publisher", ""),
-            pub_type=payload.get("pub_type", "journal-article"),
+            pub_type=payload.get("pub_type", "article-journal"),
             crossref_status=SourceStatus.AVAILABLE,
             crossref_cache_status=CacheStatus.HIT,
             retrieved_at=payload.get("retrieved_at", ""),
