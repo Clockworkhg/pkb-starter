@@ -1,6 +1,6 @@
 ---
 created: 2026-06-11
-updated: 2026-06-12
+updated: 2026-06-13
 tags: [home, index]
 ---
 
@@ -72,8 +72,15 @@ tags: [home, index]
 - `.claude/hooks/` — 6 个 harness hooks（安全门控 + 健康检查 + 路由 + 错误恢复）
 
 ### 🛠 工具
-- `tools/web_pack.py` — 网页完整采集（v3，z-web-pack 对齐）
+- `tools/web_pack.py` — 网页完整采集 v3.1（readability + Playwright DOM/Network + yt-dlp + GitHub Collector）
+- `tools/content_quality.py` — 正文质量评分（静态采集与动态渲染触发判定）
+- `tools/playwright_renderer.py` — Playwright DOM 渲染 fallback（Chromium 浏览器自动化）
+- `tools/network_capture.py` — XHR/Fetch 网络响应捕获
+- `tools/network_content.py` — 网络正文候选提取与去重
+- `tools/selection_engine.py` — HTTP/Playwright DOM/Playwright Network 三方选择引擎
 - `tools/pkb_auto.py` — 全自动入库 + 健康检查
+- `tools/pkb_ingest.py` — 本地文件入库编排器（import→markitdown→cache→wiki）
+- `tools/markitdown_convert.py` — 本地文档→MD 预提取引擎（PDF/DOCX/PPTX/XLSX/XLS）
 - `tools/docs_update.py` — 项目文档自动更新
 - `tools/cnki_setup.py` — CNKI 基础设施一键诊断 + 自动修复
 - `tools/launch_chrome.ps1` — Chrome 远程调试智能启动器
@@ -86,4 +93,4 @@ tags: [home, index]
 
 ---
 
-*由 PKB 系统维护。最后更新: 2026-06-12 (hooks v1.0)*
+*由 PKB 系统维护。最后更新: 2026-06-13 (web_pack v3.1 / MarkItDown Phase 1.5)*

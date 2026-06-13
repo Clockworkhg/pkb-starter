@@ -6,12 +6,14 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
+项目版本：`v0.6.7-alpha` | 组件：`web_pack v3.1`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
 ```
-raw/webpacks/        网页素材包（web_pack.py v3 产出）
+raw/webpacks/        网页素材包（web_pack.py v3.1 产出，Playwright 动态渲染）
 raw/papers/          论文 PDF + manifest.json
+.pkb-cache/          文档转换缓存（MarkItDown 预提取）
 wiki/concepts/       原子化概念笔记
 wiki/sources/        知识来源索引（含文献地图）
 wiki/projects/       项目笔记
@@ -48,7 +50,12 @@ tools/               Python 工具脚本（10+）
 
 | 工具 | 用途 |
 |------|------|
-| `tools/web_pack.py` | 网页完整采集 v3（readability + yt-dlp + GitHub Collector） |
+| `tools/web_pack.py` | 网页完整采集 v3.1（readability + Playwright DOM + Network + yt-dlp + GitHub Collector） |
+| `tools/content_quality.py` | 正文质量评分（Playwright 动态渲染触发判定） |
+| `tools/playwright_renderer.py` | Playwright DOM 渲染 fallback（Chromium 浏览器自动化） |
+| `tools/network_capture.py` | XHR/Fetch 网络响应捕获 |
+| `tools/network_content.py` | 网络正文候选提取 + 去重 |
+| `tools/selection_engine.py` | HTTP / Playwright DOM / Playwright Network 三方选择 |
 | `tools/pkb_auto.py` | 全自动入库 + 健康检查 |
 | `tools/pkb_ingest.py` | 本地文件入库编排器（import→markitdown→cache→wiki，正文在 .pkb-cache/）（Phase 1.5） |
 | `tools/markitdown_convert.py` | 本地文档→MD 预提取引擎（PDF/DOCX/PPTX/XLSX/XLS，动态版本）（Phase 1.5） |
@@ -122,4 +129,4 @@ powershell tools/launch_chrome.ps1   # 启动 Chrome 调试
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-12 (hooks v1.0)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-13 (web_pack v3.1 / MarkItDown Phase 1.5)*

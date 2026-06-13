@@ -48,7 +48,8 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <what changed>"
 
 ### Version History
 
-- **v0.6.6-alpha**: Current. Fixes update client remote tag detection, stale cache reporting, and hook path pollution. Adds `--doctor` diagnostic mode. Built-in web_pack remains the default.
+- **v0.6.7-alpha**: Current. Adds MarkItDown document ingestion (Phase 1.5), web_pack v3.1 with Playwright dynamic content fallback (DOM rendering, network capture, three-way selection), content quality scoring, and `--render`/`--headed`/`--debug-network` flags. 145 Web Pack unit tests + 10 Chromium integration tests + 89 MarkItDown regression tests.
+- **v0.6.6-alpha**: Fixes update client remote tag detection, stale cache reporting, and hook path pollution. Adds `--doctor` diagnostic mode. Built-in web_pack remains the default.
 - **v0.6.5-alpha**: Adds optional z-web-pack compatibility layer (`tools/pkb_compat/`), collector health check (`tools/check_collectors.py`), and bridge execution support. Built-in web_pack remains the default.
 - **v0.6.4-alpha**: Fixes default starter_repo_url placeholder, official update source for fresh installs.
 - **v0.6.3-alpha**: Fresh install self-consistency, docs-update safety, recovery from v0.6.2-alpha.

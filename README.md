@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.6--alpha-blue)
+# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.7--alpha-blue)
 
 > **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
 >
-> **Current version**: v0.6.6-alpha
+> **Current version**: v0.6.7-alpha
 
 Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -209,14 +209,59 @@ See the full catalog: `python scripts/skill_manager.py --target "D:\MyKB" --list
 - **NOT a search engine** — it searches YOUR knowledge, not the web
 - **NOT a backup tool** — use proper backups; PKB uses git for versioning
 
-## Web Collector
+## Web Collector (v3.1)
 
-PKB Starter v0.1.0 ships with a **basic web collector** (`tools/web_pack.py`) that handles:
+PKB Starter ships with **web_pack v3.1** (`tools/web_pack.py`) that handles:
 - Public web page fetching (requests + BeautifulSoup)
+- Content quality scoring (triggers dynamic fallback when needed)
+- Optional Playwright Chromium DOM rendering (`--render`)
+- XHR/Fetch network response extraction (`--render`)
+- Three-way content selection: HTTP static / Playwright DOM / Playwright Network
 - Content extraction (title, body, links, images)
 - Markdown conversion (markdownify)
 - GitHub blob/raw URL handling
 - Standard output structure (README, manifest, inventories)
+
+### Playwright (optional)
+
+For JavaScript-heavy sites where static extraction yields insufficient content:
+
+```bash
+pip install -r tools/requirements-playwright.txt
+playwright install chromium
+```
+
+```bash
+python tools/web_pack.py --url "<URL>" --render              # Enable browser fallback
+python tools/web_pack.py --url "<URL>" --render --headed     # Visible browser (manual login)
+python tools/web_pack.py --url "<URL>" --render --debug-network  # Sanitized diagnostics
+```
+
+| Flag | Behavior |
+|------|----------|
+| `--render` | Enables Playwright only when static extraction quality is insufficient |
+| `--headed` | Visible Chromium window (auto-enables `--render`) |
+| `--debug-network` | Sanitized network diagnostics (no body/headers/cookies saved) |
+
+- Playwright is **optional** — static site users do not need it
+- Chromium is NOT auto-downloaded with pip; `playwright install chromium` is separate
+- Uses a PKB-dedicated browser profile, not your daily Chrome profile
+- Safe mode does not persist login state
+- Does NOT bypass login, CAPTCHA, or access controls
+- App-only pages may still be uncollectable
+
+### MarkItDown (optional)
+
+For local document ingestion (PDF, DOCX, PPTX, XLSX, XLS):
+
+```bash
+pip install -r tools/requirements-markitdown.txt
+```
+
+- MarkItDown is **optional** — PKB falls back to LLM direct read when not installed
+- Legacy `.doc` files return an explicit unsupported status (use Word/LibreOffice to convert)
+- OCR is not enabled by default (Phase 2+)
+- Conversion cache in `.pkb-cache/` (gitignored)
 
 **Z-Web-Pack (optional local install)**: Users may optionally install [z-web-pack](https://github.com/tjxj/z-skills/tree/main/z-web-pack) as an alternative collector backend. PKB Starter does NOT distribute z-skills or z-web-pack code. The user must:
 1. Explicitly opt in: `/project:skills --install z-skills`

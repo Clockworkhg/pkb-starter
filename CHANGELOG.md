@@ -4,6 +4,54 @@ All notable changes to PKB Starter.
 
 ---
 
+## [0.6.7-alpha] — 2026-06-13
+
+### Added — MarkItDown Document Ingestion (Phase 1.5)
+
+- Added `tools/markitdown_convert.py` — local document-to-Markdown pre-extraction engine (PDF, DOCX, PPTX, XLSX, XLS).
+- Added `tools/pkb_ingest.py` — local file ingest orchestrator (import → MarkItDown → cache → wiki).
+- Added conversion cache (`.pkb-cache/extractions/`) — avoids repeated extraction.
+- Added runtime version detection via `importlib.metadata.version("markitdown")`.
+- Added `ExtractionResult` and `IngestResult` metadata for extraction tracking.
+- Added fallback state machine: MarkItDown success → LLM Read from cache; MarkItDown failure → LLM direct read from `_INBOX`; still fails → `_PENDING_CONVERSION.md`.
+- Added dependency missing graceful degradation (MarkItDown is optional).
+- Added DOCX, PDF, PPTX, XLSX, XLS test fixtures and 89 regression tests.
+- Added `requirements-markitdown.txt` with pinned optional dependencies.
+- Legacy `.doc` returns explicit `legacy_doc_unsupported` status (not silently ignored).
+- OCR not enabled by default (Phase 2+).
+
+### Added — Web Pack Dynamic Content Fallback (v3.1)
+
+- Added `tools/content_quality.py` — content quality scoring to decide when Playwright fallback is needed.
+- Added `tools/playwright_renderer.py` — optional Playwright Chromium DOM rendering fallback.
+- Added `tools/network_capture.py` — XHR/Fetch network response candidate extraction.
+- Added `tools/network_content.py` — network body candidate extraction with deduplication.
+- Added `tools/selection_engine.py` — three-way selector: HTTP static → Playwright DOM → Playwright Network.
+- Added `--render` flag: enables Playwright fallback only when static extraction quality is insufficient.
+- Added `--headed` flag: visible browser window for manual login (auto-enables `--render`).
+- Added `--debug-network` flag: sanitized network diagnostics (no body/headers/cookies output).
+- Added `requirements-playwright.txt` with Playwright optional dependencies.
+- Added 6 test files: 145 unit tests + 10 Chromium integration tests.
+- Added 4 dynamic site test fixtures (local HTTP server for integration testing).
+- Sensitive URL parameter sanitization in debug and network capture output.
+- Default static web collection behavior unchanged — Chromium not launched unless quality gates trigger.
+- PKB-dedicated browser profile (not user's daily Chrome profile); safe mode does not persist login state.
+- App-only pages may still be uncollectable; xiaoheihe and similar sites are validation cases, not guarantees.
+
+### Fixed
+
+- `--force` sync no longer corrupts binary test fixtures on re-sync.
+- Test import paths corrected for pkb-starter directory layout (tests at `tools/tests/`).
+
+### Safety
+
+- Web Pack `--render` does NOT bypass login, CAPTCHA, or access controls.
+- `--debug-network` does NOT save response body, headers, or cookies.
+- Private PKB is NEVER pushed; only pkb-starter receives public commits.
+- All sensitive patterns in sync source are sanitized before reaching public repository.
+
+---
+
 ## [0.6.6-alpha] — 2026-06-13
 
 ### Fixed
