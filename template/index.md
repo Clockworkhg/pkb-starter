@@ -1,11 +1,12 @@
 ---
 created: 2026-06-11
-updated: 2026-06-13
+updated: 2026-06-18
 tags: [home, index]
 ---
 
 # PKB 个人知识库
 
+> ⚡ **DEVELOPER EDITION** — pkb-starter 开发源 | [`/sync-to-starter`](COMMANDS.md) 同步系统变更到模板
 
 > 🏠 **项目级首页** — PKB 系统的导航入口。知识内容目录请见 [[wiki/index]]。
 
@@ -90,7 +91,14 @@ tags: [home, index]
 - `tools/scihub_fetch.py` — Sci-Hub 论文获取
 - `tools/import_to_inbox.py` — 文件导入 inbox
 - `tools/sync_to_starter.py` — PKB → pkb-starter 系统同步（dev-only）
+- `tools/scholarly_enrich.py` — 学术元数据增强 CLI（DOI 查询 + 批量扫描 + 写入）
+- `tools/filter_literature.py` — 结构化文献筛选器（期刊等级/年份/被引/DOI）
+- `tools/import_journal_rankings.py` — 期刊目录导入（CSSCI/北大核心/AMI/CSCD）
+- `tools/pkb_doctor.py` — 运行时诊断（18 项 PASS/WARN/FAIL/SKIP 检查）
+- `tools/pkb_task.py` — 活动任务状态管理（show/start/update/block/complete/clear）
+- `tools/check_collectors.py` — 采集器健康检查 + z-web-pack bridge
+- `tools/zskill_bridge.py` — Z-Skills 兼容桥接层
 
 ---
 
-*由 PKB 系统维护。最后更新: 2026-06-13 (web_pack v3.1 / MarkItDown Phase 1.5)*
+*由 PKB 系统维护。最后更新: 2026-06-18 (scholarly v0.6.10 / web_pack v3.1)*

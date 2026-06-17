@@ -11,16 +11,20 @@
 ## 关键路径
 
 ```
+.mcp.json            项目 MCP 配置（chrome-devtools，Claude Code 标准位置）
+pkb.ps1              统一启动器（start/status/cnki/doctor/resume）
 raw/webpacks/        网页素材包（web_pack.py v3.1 产出，Playwright 动态渲染）
 raw/papers/          论文 PDF + manifest.json
 .pkb-cache/          文档转换缓存（MarkItDown 预提取）
+.pkb-local/          本地运行时状态（任务、Chrome profile、日志 — 不提交）
 wiki/concepts/       原子化概念笔记
 wiki/sources/        知识来源索引（含文献地图）
 wiki/projects/       项目笔记
 .claude/skills/      Agent Skills（39+）
 .claude/commands/    Slash Commands（35+）
 .claude/hooks/       Harness Hooks（6 个自动化钩子）
-tools/               Python 工具脚本（10+）
+tools/               Python 工具脚本（14+）
+examples/            示例文件（任务状态模板等）
 ```
 
 ## Skill 路由速查
@@ -50,6 +54,8 @@ tools/               Python 工具脚本（10+）
 
 | 工具 | 用途 |
 |------|------|
+| `tools/pkb_task.py` | 🆕 活动任务状态管理（show/start/update/block/complete/clear） |
+| `tools/pkb_doctor.py` | 🆕 运行时诊断（18 项 PASS/WARN/FAIL/SKIP 检查） |
 | `tools/web_pack.py` | 网页完整采集 v3.1（readability + Playwright DOM + Network + yt-dlp + GitHub Collector） |
 | `tools/content_quality.py` | 正文质量评分（Playwright 动态渲染触发判定） |
 | `tools/playwright_renderer.py` | Playwright DOM 渲染 fallback（Chromium 浏览器自动化） |
@@ -70,6 +76,8 @@ tools/               Python 工具脚本（10+）
 | `tools/import_journal_rankings.py` | 期刊目录导入（CSSCI/北大核心/AMI/CSCD/自定义） |
 | `tools/import_to_inbox.py` | 文件导入 _INBOX |
 | `tools/sync_to_starter.py` | PKB → pkb-starter 系统同步（dev-only） |
+| `tools/check_collectors.py` | 采集器健康检查 + z-web-pack bridge 支持 |
+| `tools/zskill_bridge.py` | Z-Skills 兼容桥接层 |
 
 ## Hooks 速查
 
@@ -93,6 +101,15 @@ tools/               Python 工具脚本（10+）
 ```
 全自动：采集 → 编译 wiki → 归档 → 健康检查 → commit。不询问。
 
+### 统一启动器（🆕 v0.6.9）
+```powershell
+.\pkb.ps1              # 默认：环境检查 + 状态摘要
+.\pkb.ps1 status       # 完整状态
+.\pkb.ps1 cnki         # CNKI 工作流（Chrome + MCP）
+.\pkb.ps1 doctor       # 18 项诊断
+.\pkb.ps1 resume       # 恢复 Claude Code 会话 + 加载 MCP
+```
+
 ### 保存
 ```
 /save "提交信息"
@@ -107,9 +124,9 @@ tools/               Python 工具脚本（10+）
 
 ### CNKI 论文
 ```
-python tools/cnki_setup.py --fix     # 一次性安装
-powershell tools/launch_chrome.ps1   # 启动 Chrome 调试
-/pkb-cnki fill-gaps                  # 补齐缺失 PDF
+.\pkb.ps1 cnki             # 一键启动 Chrome + MCP
+.\pkb.ps1 resume           # 恢复会话（claude --continue --mcp-config .mcp.json）
+/pkb-cnki fill-gaps        # 补齐缺失 PDF
 ```
 ⚠️ 需 Chrome DevTools MCP 连接 + 知网登录。MCP 仅会话启动时加载。
 
@@ -132,4 +149,4 @@ powershell tools/launch_chrome.ps1   # 启动 Chrome 调试
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-13 (web_pack v3.1 / Scholarly Phase 1B.2)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-18 (scholarly v0.6.10 / web_pack v3.1)*
