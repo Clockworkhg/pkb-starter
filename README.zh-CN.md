@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.8--alpha-blue)
+# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.10--alpha-blue)
 
 > **一个命令管理你的知识。** `/pkb <任何东西>` — 丢入 URL、文件或想法，LLM 自动整理一切。
 >
-> **当前版本**：v0.6.8-alpha
+> **当前版本**：v0.6.10-alpha
 
 语言：[English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -308,6 +308,8 @@ python scripts/update_pkb.py "D:\MyKB" --dry-run
 MIT — 参见 [LICENSE](LICENSE)
 
 ## 当前版本
+
+**v0.6.10-alpha** — Code Review 加固：P0 崩溃修复（SourceStatus 导入、DOI 编码、null primary_location、JSON 解析错误）、P1 数据完整性（CRLF 写入、journal_rankings 兼容、缓存安全）、P2 确定性（稳定 CSL ID、detection_threshold 配置、locked 保留、作者姓名格式）、P3 可观测性。web_pack 非 JSON 响应加固。
 
 **v0.6.8-alpha** — 新增学术元数据增强：文献检测、Crossref/OpenAlex 元数据、本地期刊等级目录、GB/T 7714 与 APA 引用、`/pkb` 同步集成、批量断点恢复和结构化文献筛选。
 

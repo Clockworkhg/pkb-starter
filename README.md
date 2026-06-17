@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.9--alpha-blue)
+# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.10--alpha-blue)
 
 > **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
 >
-> **Current version**: v0.6.9-alpha
+> **Current version**: v0.6.10-alpha
 
 Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -355,7 +355,8 @@ See [SCHOLARLY_METADATA.md](docs/SCHOLARLY_METADATA.md) for full documentation.
 
 ## Version History
 
-- **v0.6.8-alpha**: Current. Adds scholarly metadata enrichment: literature detection, Crossref/OpenAlex metadata, local journal-ranking registry, GB/T 7714 and APA citations, `/pkb` integration, batch resume, and structured literature filtering.
+- **v0.6.10-alpha**: Current. Code review hardening: P0 crash fixes (SourceStatus import, DOI encoding, null primary_location, JSON decode errors), P1 data integrity (CRLF write, journal_rankings compatibility, cache safety), P2 determinism (stable CSL IDs, detection_threshold config, locked preservation, author name formatting), P3 observability. web_pack non-JSON response hardening.
+- **v0.6.8-alpha**: Adds scholarly metadata enrichment: literature detection, Crossref/OpenAlex metadata, local journal-ranking registry, GB/T 7714 and APA citations, `/pkb` integration, batch resume, and structured literature filtering.
 - **v0.6.7-alpha**: Adds MarkItDown document ingestion and web_pack v3.1 Playwright dynamic-content fallback.
 
 ## Contributing

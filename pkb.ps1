@@ -340,7 +340,7 @@ function Invoke-Resume {
 function Invoke-Start {
     Write-Host ""
     Write-Host "══════════════════════════════════════════════════"
-    Write-Host "  PKB v0.6.9-alpha — Session Continuity & MCP Bootstrap"
+    Write-Host "  PKB v0.6.10-alpha — Code Review Hardening & Web Pack Fix"
     Write-Host "══════════════════════════════════════════════════"
     Write-Host ""
 

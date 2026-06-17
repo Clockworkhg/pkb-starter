@@ -4,6 +4,36 @@ All notable changes to PKB Starter.
 
 ---
 
+## [0.6.10-alpha] — 2026-06-18
+
+### Fixed — Scholarly Enrichment Hardening (Code Review)
+
+- Fixed `NameError` crash in `--scan --write` path due to missing `SourceStatus` import.
+- Fixed Crossref DOI `/` being URL-encoded as `%2F` causing API lookup failures.
+- Fixed `AttributeError` crash when OpenAlex responds with `primary_location: null`.
+- Fixed year-only OpenAlex `publication_date` (e.g. `"2026"`) being parsed as `year=0`.
+- Fixed Crossref/OpenAlex HTTP 200 responses with non-JSON bodies causing unhandled `JSONDecodeError`. Both clients now raise `APIError(200, ...)`.
+- Fixed Windows CRLF text-mode write producing `\r\r\n` in Markdown files. Switched to binary write (`write_bytes`) to preserve original line endings.
+- Fixed `_detect_crlf()` returning `False` for all inputs due to incorrect early-slice logic.
+- Fixed `journal_rankings` dict format not recognized by `filter_literature.py`, only list format was accepted. Both formats are now compatible.
+- Fixed write failures not recorded in resume job state, causing them to be silently skipped on `--resume`.
+- Fixed `_NO_CACHE` sentinel being passed to SQLite cache methods, causing `AttributeError` crashes when cache was explicitly disabled.
+- Fixed CSL-JSON `id` field using Python's `hash()` which is randomized across processes (`PYTHONHASHSEED`). Replaced with SHA-256 (`_make_stable_id()`).
+- Fixed `detection_threshold` configuration not being honored — `should_auto_enrich()` always used hardcoded 0.90.
+- Fixed `locked` metadata flag being dropped during frontmatter merge.
+- Fixed CJK author names rendered without separator (e.g. `DoeJohn`). Added `_format_author_name()` with CJK-aware formatting.
+- Fixed `except Exception: pass` silently swallowing cache write failures. Replaced with `logging.warning()`.
+
+### Fixed — Web Pack
+
+- Fixed `fetch_github_api_contents()` crashing on HTTP 200 responses with HTML, empty body, or JSON `null` body — `resp.json()` `ValueError` was not caught by the outer `requests.RequestException` handler. Non-JSON 200 responses now print a warning and return `None` consistent with existing fallback behavior. `KeyboardInterrupt`, `SystemExit`, and `MemoryError` are not suppressed.
+
+### Tests
+
+- Added 49 regression tests (42 scholarly + 7 web_pack).
+- Full test suite: 645 passed, 0 failed.
+- Smoke tests verified: LF/CRLF preservation, cache-disabled enrichment, cross-process stable CSL IDs, journal_rankings dict/list compatibility, and API error handling on non-JSON responses.
+
 ## [0.6.8-alpha] — 2026-06-13
 
 ### Added — Scholarly Metadata Enrichment
