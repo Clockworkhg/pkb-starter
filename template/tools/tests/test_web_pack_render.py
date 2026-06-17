@@ -873,3 +873,99 @@ def test_configure_stdout_utf8_non_callable_reconfigure():
     fake.reconfigure = "not_a_function"
     with patch.object(sys, 'stdout', fake):
         configure_stdout_utf8()  # 不应抛出异常
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Test 30–35: fetch_github_api_contents JSON decode hardening
+# ═══════════════════════════════════════════════════════════════════
+
+def _make_github_mock_resp(status_code=200, json_data=None, text_body=None):
+    """Create a mock response for GitHub API testing."""
+    resp = MagicMock()
+    resp.status_code = status_code
+    if json_data is not None:
+        resp.json.return_value = json_data
+    elif text_body is not None:
+        resp.text = text_body
+        resp.json.side_effect = ValueError("Expecting value: line 1 column 1")
+    else:
+        # Empty body
+        resp.text = ""
+        resp.json.side_effect = ValueError("Expecting value: line 1 column 1")
+    return resp
+
+
+def test_github_api_normal_json_returns_data():
+    """HTTP 200 + normal JSON → returns parsed list."""
+    from web_pack import fetch_github_api_contents
+    expected = [{"name": "README.md", "type": "file", "size": 1024}]
+
+    with patch("web_pack.requests.get") as mock_get:
+        mock_get.return_value = _make_github_mock_resp(200, json_data=expected)
+        result = fetch_github_api_contents("owner", "repo", "")
+        assert result == expected
+
+
+def test_github_api_html_body_returns_none():
+    """HTTP 200 + HTML (非 JSON) → returns None, no crash."""
+    from web_pack import fetch_github_api_contents
+
+    with patch("web_pack.requests.get") as mock_get:
+        mock_get.return_value = _make_github_mock_resp(200, text_body="<html>API error</html>")
+        result = fetch_github_api_contents("owner", "repo", "")
+        assert result is None
+
+
+def test_github_api_empty_body_returns_none():
+    """HTTP 200 + empty body → returns None, no crash."""
+    from web_pack import fetch_github_api_contents
+
+    with patch("web_pack.requests.get") as mock_get:
+        mock_get.return_value = _make_github_mock_resp(200)  # no json_data, no text_body
+        result = fetch_github_api_contents("owner", "repo", "")
+        assert result is None
+
+
+def test_github_api_json_null_returns_none():
+    """HTTP 200 + JSON null → returns None (not NoneType error downstream)."""
+    from web_pack import fetch_github_api_contents
+
+    with patch("web_pack.requests.get") as mock_get:
+        mock_get.return_value = _make_github_mock_resp(200, json_data=None)
+        result = fetch_github_api_contents("owner", "repo", "")
+        assert result is None
+
+
+def test_github_api_403_rate_limit_returns_none():
+    """HTTP 403 → returns None (rate limit)."""
+    from web_pack import fetch_github_api_contents
+
+    with patch("web_pack.requests.get") as mock_get:
+        mock_resp = _make_github_mock_resp(403, json_data={"message": "API rate limit exceeded"})
+        mock_get.return_value = mock_resp
+        result = fetch_github_api_contents("owner", "repo", "")
+        assert result is None
+
+
+def test_github_api_network_error_returns_none():
+    """Network error (ConnectionError) → returns None."""
+    from web_pack import fetch_github_api_contents
+    import requests as req
+
+    with patch("web_pack.requests.get") as mock_get:
+        mock_get.side_effect = req.ConnectionError("Connection refused")
+        result = fetch_github_api_contents("owner", "repo", "")
+        assert result is None
+
+
+def test_github_api_keyboard_interrupt_not_suppressed():
+    """KeyboardInterrupt must NOT be suppressed by the JSON decode fix."""
+    from web_pack import fetch_github_api_contents
+
+    with patch("web_pack.requests.get") as mock_get:
+        mock_get.side_effect = KeyboardInterrupt()
+        try:
+            fetch_github_api_contents("owner", "repo", "")
+            assert False, "KeyboardInterrupt should propagate"
+        except KeyboardInterrupt:
+            pass  # Expected — not suppressed

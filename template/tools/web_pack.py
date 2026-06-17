@@ -1230,7 +1230,15 @@ def fetch_github_api_contents(owner: str, repo: str, path: str, branch: str = "m
             print(f"   ⚠️  GitHub API rate limit 触发")
             return None
         resp.raise_for_status()
-        return resp.json()
+        try:
+            data = resp.json()
+        except ValueError:
+            print(f"   ⚠️  GitHub API 返回非 JSON 响应体")
+            return None
+        if data is None:
+            print(f"   ⚠️  GitHub API 返回 null")
+            return None
+        return data
     except requests.RequestException as e:
         print(f"   ❌ GitHub API 失败: {e}")
         return None
