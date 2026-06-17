@@ -531,14 +531,18 @@ def _detect_type(
     return "article-journal"  # Default assumption for scholarly works
 
 
-def should_auto_enrich(result: ScholarlyDetectionResult) -> bool:
+def should_auto_enrich(result: ScholarlyDetectionResult, threshold: float = 0.90) -> bool:
     """Determine if auto-enrichment should proceed based on detection result.
 
     Rules:
       - User disabled → never
       - User declared (type: literature, scholarly.detected) → always
-      - confidence >= 0.90 AND at least one strong signal → auto-enrich
+      - confidence >= threshold AND at least one strong signal → auto-enrich
       - Otherwise → skip auto-enrichment
+
+    Args:
+        result: Detection result to evaluate.
+        threshold: Minimum confidence threshold (default 0.90).
     """
     if result.user_disabled:
         return False
@@ -546,7 +550,7 @@ def should_auto_enrich(result: ScholarlyDetectionResult) -> bool:
         return True
     if not result.is_scholarly:
         return False
-    if result.confidence < 0.90:
+    if result.confidence < threshold:
         return False
     if not result.strong_signals:
         return False

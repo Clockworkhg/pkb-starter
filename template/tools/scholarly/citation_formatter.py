@@ -14,6 +14,7 @@ CSL-JSON spec: https://github.com/citation-style-language/schema
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from datetime import datetime, timezone
@@ -40,6 +41,24 @@ except ImportError:
 # CSL-JSON conversion
 # ─────────────────────────────────────────────
 
+def _make_stable_id(record: ScholarlyRecord) -> str:
+    """Generate a stable, deterministic ID from title + year + first author.
+
+    Uses SHA-256 instead of Python's hash() to guarantee the same ID across
+    all Python processes regardless of PYTHONHASHSEED.
+    """
+    parts = []
+    if record.title:
+        parts.append(record.title.strip().lower())
+    if record.year:
+        parts.append(str(record.year))
+    if record.authors and record.authors[0].get("family"):
+        parts.append(record.authors[0]["family"].strip().lower())
+    identity = "|".join(parts)
+    digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:8]
+    return f"pkb-{digest}"
+
+
 def to_csl_json(record: ScholarlyRecord) -> Dict[str, Any]:
     """Convert a ScholarlyRecord to CSL-JSON format.
 
@@ -47,7 +66,7 @@ def to_csl_json(record: ScholarlyRecord) -> Dict[str, Any]:
     Phase 1A: only journal-article is reliably tested.
     """
     csl: Dict[str, Any] = {
-        "id": record.doi or f"pkb-{hash(record.title) & 0x7fffffff:08x}",
+        "id": record.doi or _make_stable_id(record),
         "type": record.pub_type or "article-journal",
     }
 
@@ -408,14 +427,15 @@ def export_bibtex(record: ScholarlyRecord, cite_key: str = "") -> CitationData:
     if not cite_key:
         cite_key = _make_bibtex_key(record)
 
+    pub_type = record.pub_type or "article-journal"
     entry_type = "article"  # default
-    if record.pub_type in ("article-journal", "article"):
+    if pub_type in ("article-journal", "article"):
         entry_type = "article"
-    elif "book" in record.pub_type:
+    elif "book" in pub_type:
         entry_type = "book"
-    elif "chapter" in record.pub_type:
+    elif "chapter" in pub_type:
         entry_type = "incollection"
-    elif "thesis" in record.pub_type:
+    elif "thesis" in pub_type:
         entry_type = "phdthesis"
 
     lines = [f"@{entry_type}{{{cite_key},"]
@@ -476,6 +496,8 @@ def _make_bibtex_key(record: ScholarlyRecord) -> str:
 
 def _format_authors_bibtex(authors: List[Dict[str, str]]) -> str:
     """Format authors for BibTeX: Last, First and Last, First"""
+    if not authors:
+        return ""
     formatted = []
     for a in authors:
         family = a.get("family", "").strip()

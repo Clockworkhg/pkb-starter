@@ -125,7 +125,7 @@ class CrossrefClient:
         if not doi_norm or not is_doi_like(doi_norm):
             raise DOIParseError(f"Invalid DOI: {doi!r}")
 
-        url = f"{CROSSREF_API_BASE}/works/{quote(doi_norm, safe='')}"
+        url = f"{CROSSREF_API_BASE}/works/{quote(doi_norm, safe='/:')}"
         resp_data = self._request_with_retry("GET", url)
         return self._parse_work(resp_data, doi_norm)
 
@@ -141,7 +141,10 @@ class CrossrefClient:
                 resp = self.session.request(method, url, timeout=self.timeout)
 
                 if resp.status_code == 200:
-                    return resp.json()
+                    try:
+                        return resp.json()
+                    except ValueError:
+                        raise APIError(200, "Crossref returned non-JSON response body")
 
                 if resp.status_code == 404:
                     raise NonRetryableError(404, f"DOI not found in Crossref: {url}")

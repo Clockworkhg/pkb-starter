@@ -351,6 +351,27 @@ def _is_locked(fm: Dict[str, Any]) -> bool:
     return False
 
 
+def _format_author_display(family: str, given: str) -> str:
+    """Format a single author name for display in frontmatter.
+
+    - CJK names: family + given, no space (e.g. 张三)
+    - Non-CJK names: family + ' ' + given (e.g. Doe John)
+    """
+    import re as _re
+    family = family.strip()
+    given = given.strip()
+    if not family and not given:
+        return ""
+    if not family:
+        return given
+    if not given:
+        return family
+    has_cjk = bool(_re.search(r'[一-鿿㐀-䶿豈-﫿]', family + given))
+    if has_cjk:
+        return f"{family}{given}"
+    return f"{family} {given}"
+
+
 def _build_scholarly_frontmatter(
     result: EnrichmentResult,
     detection: ScholarlyDetectionResult,
@@ -387,7 +408,8 @@ def _build_scholarly_frontmatter(
         scholarly["title"] = rec.title
     if rec.authors:
         scholarly["authors"] = [
-            f"{a.get('family', '')}{a.get('given', '')}" for a in rec.authors
+            _format_author_display(a.get('family', ''), a.get('given', ''))
+            for a in rec.authors
         ]
     if rec.year:
         scholarly["year"] = str(rec.year)
@@ -593,7 +615,7 @@ def enrich_wiki_page_if_scholarly(
         return result
 
     # ── 4. Check if should enrich ──
-    if not force and not should_auto_enrich(detection):
+    if not force and not should_auto_enrich(detection, threshold=config.detection_threshold):
         result.skipped_reason = (
             f"confidence {detection.confidence} below threshold {config.detection_threshold}"
         )

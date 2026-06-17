@@ -39,6 +39,7 @@ from scholarly.models import (
     JournalRanking,
     MatchResult,
     MetricSnapshot,
+    SourceStatus,
 )
 
 
@@ -61,6 +62,30 @@ def parse_frontmatter(content: str) -> Tuple[Dict[str, Any], str, str]:
     # Simple key: value parser (not full YAML — avoids pyyaml dependency)
     fm = _parse_simple_yaml(fm_raw)
     return fm, body, fm_raw
+
+
+def _format_author_name(family: str, given: str) -> str:
+    """Format a single author name for display.
+
+    - CJK names (Chinese/Japanese/Korean): family + given, no space (e.g. 张三)
+    - Non-CJK names: family + space + given (e.g. Doe John)
+    - Only family: just family
+    - Only given: just given
+    - Both empty: empty string
+    """
+    family = family.strip()
+    given = given.strip()
+    if not family and not given:
+        return ""
+    if not family:
+        return given
+    if not given:
+        return family
+    # Detect CJK characters (Unicode ranges for CJK Unified Ideographs)
+    has_cjk = bool(re.search(r'[一-鿿㐀-䶿豈-﫿]', family + given))
+    if has_cjk:
+        return f"{family}{given}"
+    return f"{family} {given}"
 
 
 def _parse_simple_yaml(raw: str) -> Dict[str, Any]:
@@ -128,10 +153,19 @@ def _merge_frontmatter(fm: Dict[str, Any], result: EnrichmentResult) -> Dict[str
     # ── scholarly namespace ──
     rec = result.record
     scholarly: Dict[str, Any] = {}
+
+    # Preserve locked flag from existing frontmatter
+    existing_scholarly = fm.get("scholarly", {})
+    if isinstance(existing_scholarly, dict) and existing_scholarly.get("locked"):
+        scholarly["locked"] = True
+
     if rec.title:
         scholarly["title"] = rec.title
     if rec.authors:
-        scholarly["authors"] = [f"{a.get('family','')}{a.get('given','')}" for a in rec.authors]
+        scholarly["authors"] = [
+            _format_author_name(a.get('family', ''), a.get('given', ''))
+            for a in rec.authors
+        ]
     if rec.year:
         scholarly["year"] = str(rec.year)
     if rec.doi:
@@ -209,7 +243,7 @@ def _detect_crlf(filepath: Path) -> bool:
     try:
         with open(filepath, 'rb') as f:
             raw = f.read(4096)
-            return b'\r\n' in raw.split(b'\n')[0] if b'\n' in raw else b'\r\n' in raw
+            return b'\r\n' in raw
     except Exception:
         return False
 
@@ -263,17 +297,20 @@ def update_markdown_file(filepath: Path, result: EnrichmentResult) -> bool:
     new_fm_yaml = _serialise_simple_yaml(new_fm)
     new_content = f"---\n{new_fm_yaml}\n---\n\n{body}"
 
-    # Preserve original line endings
+    # Preserve original line endings when writing
     if uses_crlf:
         new_content = new_content.replace('\n', '\r\n')
 
-    # Determine write encoding
+    # Determine write encoding — use binary write to avoid text-mode \n→\r\n translation
     write_encoding = "utf-8-sig" if has_bom else "utf-8"
 
     # Write to temp file in same directory
     tmp_path = filepath.parent / (filepath.name + ".tmp")
     try:
-        tmp_path.write_text(new_content, encoding=write_encoding)
+        encoded = new_content.encode("utf-8")
+        if has_bom:
+            encoded = b'\xef\xbb\xbf' + encoded
+        tmp_path.write_bytes(encoded)
 
         # Flush + fsync for durability
         try:
@@ -322,7 +359,7 @@ def _display_result(result: EnrichmentResult):
     # Authors
     if rec.authors:
         authors_str = ", ".join(
-            f"{a.get('family','')}{a.get('given','')}" for a in rec.authors
+            _format_author_name(a.get('family',''), a.get('given','')) for a in rec.authors
         )
         print(f"  Authors: {authors_str}")
 
@@ -843,6 +880,9 @@ Examples:
                     if not args.jsonl:
                         print(f"[{idx}/{total}] error     {fp} (write failed)")
                     warned += 1
+                    if job:
+                        job.setdefault("failed", []).append(fp_str)
+                        job.setdefault("errors", []).append(f"{fp_str}: write failed")
             elif is_dry:
                 if not args.jsonl:
                     status_label = "would enrich" if result.record.crossref_status in (

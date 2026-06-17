@@ -157,21 +157,34 @@ def _parse_simple_yaml(raw: str) -> Dict[str, Any]:
 
 def _has_ranking(fm: Dict[str, Any], scheme: str, edition: Optional[str],
                  level: Optional[str]) -> bool:
-    """Check if frontmatter matches a journal ranking filter."""
+    """Check if frontmatter matches a journal ranking filter.
+
+    Accepts both list and dict journal_rankings formats:
+      - list:  [{"scheme": "CSSCI", "edition": "2025-2026", "level": "source"}, ...]
+      - dict:  {"cssci": {"edition": "2025-2026", "level": "source"}, ...}
+    """
     rankings = fm.get("journal_rankings", [])
-    if not isinstance(rankings, list):
-        return False
-    for r in rankings:
-        if not isinstance(r, dict):
-            continue
-        scheme_match = r.get("scheme", "").upper() == scheme.upper()
-        if not scheme_match:
-            continue
-        if edition and r.get("edition", "") != edition:
-            continue
-        if level and r.get("level", "").lower() != level.lower():
-            continue
-        return True
+    if isinstance(rankings, list):
+        for r in rankings:
+            if not isinstance(r, dict):
+                continue
+            scheme_match = r.get("scheme", "").upper() == scheme.upper()
+            if not scheme_match:
+                continue
+            if edition and r.get("edition", "") != edition:
+                continue
+            if level and r.get("level", "").lower() != level.lower():
+                continue
+            return True
+    elif isinstance(rankings, dict):
+        # Dict format: key = scheme name (case-insensitive), value = {edition, level}
+        r = rankings.get(scheme.lower())
+        if isinstance(r, dict):
+            if edition and r.get("edition", "") != edition:
+                return False
+            if level and r.get("level", "").lower() != level.lower():
+                return False
+            return True
     return False
 
 

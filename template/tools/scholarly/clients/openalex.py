@@ -161,7 +161,10 @@ class OpenAlexClient:
                     self._last_diagnostics = {"status_code": resp.status_code}
 
                 if resp.status_code == 200:
-                    return resp.json()
+                    try:
+                        return resp.json()
+                    except ValueError:
+                        raise APIError(200, "OpenAlex returned non-JSON response body")
 
                 if resp.status_code == 404:
                     raise NonRetryableError(404, f"Not found in OpenAlex: {url}")
@@ -239,17 +242,19 @@ class OpenAlexClient:
         source_info = (primary.get("source") or {}) if primary else {}
         journal_name = (source_info.get("display_name") or "")
 
-        # Source details
-        issn_l = data.get("primary_location", {}).get("source", {}).get("issn_l", "") or ""
+        # Source details — use the already-normalised source_info variable
+        issn_l = source_info.get("issn_l", "") or "" if source_info else ""
         issns_raw = (source_info.get("issn") or []) if source_info else []
         issn_list: List[str] = list(issns_raw) if issns_raw else []
 
         # Publication date
         pub_date = data.get("publication_date", "") or ""
         year = 0
-        if pub_date and "-" in str(pub_date):
+        if pub_date:
+            pub_date_str = str(pub_date)
             try:
-                year = int(str(pub_date).split("-")[0])
+                # Handle both "YYYY-MM-DD" and "YYYY" formats
+                year = int(pub_date_str.split("-")[0])
             except (ValueError, IndexError):
                 pass
 

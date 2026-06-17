@@ -165,10 +165,11 @@ class ScholarlyEnricher:
             try:
                 crossref = CrossrefClient(email=self.config.crossref_email)
                 record = crossref.lookup_doi(doi_norm)
-                # Cache the result
-                self.cache.set(NS_CROSSREF, doi_norm,
-                               self._record_to_cache_payload(record),
-                               ttl=TTL_STATIC)
+                # Cache the result (if cache is available)
+                if cache_obj is not None:
+                    cache_obj.set(NS_CROSSREF, doi_norm,
+                                  self._record_to_cache_payload(record),
+                                  ttl=TTL_STATIC)
             except Exception as e:
                 errors.append(f"Crossref error: {e}")
                 record = ScholarlyRecord(
@@ -179,7 +180,10 @@ class ScholarlyEnricher:
         # ── Step 3: OpenAlex lookup ──
         if not self.config.skip_openalex and not self.config.offline and not self.config.cache_only:
             oa_cache_key = f"work:{doi_norm}"
-            oa_hit, oa_payload = self.cache.get(NS_OPENALEX_WORK, oa_cache_key)
+            oa_hit = False
+            oa_payload = None
+            if cache_obj is not None:
+                oa_hit, oa_payload = cache_obj.get(NS_OPENALEX_WORK, oa_cache_key)
             if oa_hit and oa_payload:
                 record = self._merge_openalex_cache(record, oa_payload)
             else:
@@ -209,13 +213,18 @@ class ScholarlyEnricher:
                         metrics=oa_record.metrics,
                         retrieved_at=datetime.now(timezone.utc).isoformat(),
                     )
-                    try:
-                        self.cache.set(NS_OPENALEX_WORK, oa_cache_key,
-                                       {"metrics": [self._metric_to_dict(m) for m in oa_record.metrics],
-                                        "openalex_id": oa_record.openalex_id},
-                                       ttl=TTL_DYNAMIC)
-                    except Exception:
-                        pass  # Cache failure is non-fatal
+                    if cache_obj is not None:
+                        try:
+                            cache_obj.set(NS_OPENALEX_WORK, oa_cache_key,
+                                          {"metrics": [self._metric_to_dict(m) for m in oa_record.metrics],
+                                           "openalex_id": oa_record.openalex_id},
+                                          ttl=TTL_DYNAMIC)
+                        except Exception as e:
+                            import logging
+                            logging.getLogger("scholarly").warning(
+                                "OpenAlex cache write failed for key=%s: %s: %s",
+                                oa_cache_key, type(e).__name__, e
+                            )
                 except Exception as e:
                     warnings.append(f"OpenAlex error: {e}")
                     record = ScholarlyRecord(
