@@ -6,7 +6,7 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
-项目版本：`v0.6.10-alpha` | 组件：`web_pack v3.1`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
+项目版本：`v0.6.11-alpha` | 组件：`web_pack v3.1` | 🆕 全局知识库查询：`/ask-pkb`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
@@ -20,7 +20,7 @@ raw/papers/          论文 PDF + manifest.json
 wiki/concepts/       原子化概念笔记
 wiki/sources/        知识来源索引（含文献地图）
 wiki/projects/       项目笔记
-.claude/skills/      Agent Skills（39+）
+.claude/skills/      Agent Skills（39+，含全局 `/ask-pkb`）
 .claude/commands/    Slash Commands（35+）
 .claude/hooks/       Harness Hooks（6 个自动化钩子）
 tools/               Python 工具脚本（14+）
@@ -38,6 +38,7 @@ examples/            示例文件（任务状态模板等）
 | Excel/Markdown 表格 | `/z-excel-editor` `/z-md-excel` |
 | 隐私清理 | `/sanitize` |
 | 看板管理 | `/kanban` |
+| 全局知识库查询 | `/ask-pkb`（任意窗口可用） |
 | 代码审查/简化 | `/simplify` |
 | 创建新 Skill | `/make-skill` |
 
@@ -149,4 +150,4 @@ examples/            示例文件（任务状态模板等）
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-18 (scholarly v0.6.10 / web_pack v3.1)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-18 (v0.6.11 / web_pack v3.1)*

@@ -21,6 +21,7 @@
 | `/web <url>` | 🌐 采集网页 | `/web https://example.com` |
 | `/clip` | 📋 采集剪贴板 | `/clip` |
 | `/ask <问题>` | 🔍 查询知识库 | `/ask transformer 原理` |
+| `/ask-pkb <问题>` | 🌐 全局知识库查询 | `/ask-pkb 费尔巴哈` |
 | `/research <主题>` | 🔬 深度研究 | `/research LLM 推理优化` |
 | `/paper <path\|url>` | 📄 分析论文 | `/paper https://arxiv.org/abs/...` |
 | `/zotero <key>` | 📚 Zotero 导入 | `/zotero` |

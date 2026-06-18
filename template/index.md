@@ -6,7 +6,6 @@ tags: [home, index]
 
 # PKB 个人知识库
 
-> ⚡ **DEVELOPER EDITION** — pkb-starter 开发源 | [`/sync-to-starter`](COMMANDS.md) 同步系统变更到模板
 
 > 🏠 **项目级首页** — PKB 系统的导航入口。知识内容目录请见 [[wiki/index]]。
 
@@ -60,7 +59,7 @@ tags: [home, index]
 - [[elderly-care-hearing-project]] — 养老服务模拟听证会
 
 ### ⚙️ 系统
-- [COMMANDS](COMMANDS.md) — 命令手册（35+ 命令）
+- [COMMANDS](COMMANDS.md) — 命令手册（35+ 命令，含全局 `/ask-pkb`）
 - [AGENTS](AGENTS.md) — 系统规则（Agent 读，含 §15 Hooks 系统）
 - [CLAUDE](CLAUDE.md) — 快速参考（每次会话自动加载）
 - [log](log.md) — 项目级变更日志
@@ -101,4 +100,4 @@ tags: [home, index]
 
 ---
 
-*由 PKB 系统维护。最后更新: 2026-06-18 (scholarly v0.6.10 / web_pack v3.1)*
+*由 PKB 系统维护。最后更新: 2026-06-18 (v0.6.11 / web_pack v3.1)*

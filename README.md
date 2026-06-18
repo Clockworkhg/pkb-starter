@@ -1,376 +1,176 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.10--alpha-blue)
+# PKB — 个人知识库系统
 
-> **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
->
-> **Current version**: v0.6.10-alpha
+> 基于 Obsidian + LLM Wiki + Agent Skills 的本地个人知识库。
+> 不是普通 RAG，是"编译式知识库"。
+> **当前版本：v0.6.11-alpha** | 组件：web_pack v3.1 | 🆕 全局知识库查询：`/ask-pkb` | 公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)
 
-Languages: [English](README.md) | [简体中文](README.zh-CN.md)
-
-PKB Starter is a **Claude Code plugin + project template** that gives you a local, LLM-maintained personal knowledge base in minutes. Based on Karpathy's [LLM Wiki](https://karpathy.bearblog.dev/llm-wiki/) concept.
-
-## What It Does
+## 架构
 
 ```
-You: /project:pkb https://karpathy.bearblog.dev/llm-wiki/
-PKB: [auto-collects → extracts → classifies → creates wiki page → links concepts → git commits]
-     Done. 2 wiki pages created. Health: [OK]
+raw/          ← 原始资料（不可变，只增不删）
+wiki/         ← LLM 维护的结构化知识
+skills/       ← Agent 技能定义
+AGENTS.md     ← 系统规则（Agent 读）
+COMMANDS.md   ← 命令手册（人读）
 ```
 
-## Features
+## 快速开始
 
-- 🚀 **One command**: `/pkb <anything>` — fully automatic ingest
-- 🧠 **LLM-organized**: AI classifies, links, and maintains your knowledge
-- 📄 **Rich collection**: Web pages, PDFs, DOCX, PPTX, GitHub repos, videos
-- 🔗 **Obsidian-compatible**: `[[wikilink]]` graph, open wiki/ as vault
-- 🔒 **Local-first, no cloud sync, no telemetry**; when using Claude Code for organization, content that enters model context is handled per the model provider's data usage policies
-- 🩺 **Self-healing**: Health checks find broken links, stale content, orphans
-- 💾 **Git-native**: Every change is a commit, full rollback support
+### 丢进去就完事了（默认全自动）
 
-## Quick Install
+```
+/pkb "文件路径或链接"
+/inbox
+```
+
+把任何东西丢给 `/pkb`，自动完成：导入 → 分类 → 编译 wiki → 归档 → 健康检查 → git commit。
+**不询问、不暂停、不废话。** 仅安全风险/无法解析/命名冲突时停下。
+
+### 手动控制（如需）
+
+| 命令 | 行为 |
+|------|------|
+| `/pkb --manual <...>` | 采集后询问下一步 |
+| `/pkb --collect-only <...>` | 只采集到 raw，不编译 wiki |
+| `/pkb --plan <...>` | 只生成处理计划 |
+
+## 常用命令
+
+| 命令 | 作用 |
+|------|------|
+| `/pkb <anything>` | 🚀 全自动入库（默认） |
+| `/inbox` | 📥 查看或自动处理 _INBOX |
+| `/web <url>` | 🌐 底层采集命令（只到 raw/webpacks） |
+| `/ask <问题>` | 🔍 项目内查询知识库 |
+| `/ask-pkb <问题>` | 🌐 全局知识库查询（任意窗口可用） |
+| `/lint` | 🩺 健康检查 |
+| `/save` | 💾 Git 保存 |
+
+> `/web` 是底层采集命令，只生成 raw/webpacks。`/pkb` 是完整入口，包含采集 + 编译 + 归档 + commit。
+> 日常只需要用 `/pkb`。
+
+完整命令列表：`/help`
+
+## /web 网页采集 (v3.1 — Playwright 动态渲染)
+
+`/web` 是 Raw 层采集命令，使用 **PKB web_pack v3.1**，已对齐 [z-web-pack](https://github.com/tjxj/z-skills/tree/main/z-web-pack) 功能标准。
 
 ```bash
-git clone https://github.com/Clockworkhg/pkb-starter.git
-cd pkb-starter
-python scripts/install.py "D:\MyKB"
-cd "D:\MyKB"
-pip install -r requirements.txt
-claude
+# 默认 full 模式（完整图片管线 + GitHub Collector v2）
+python tools/web_pack.py --topic "主题" --url "https://..."
+
+# safe 模式（无 cookie/视频/登录态）
+python tools/web_pack.py --topic "主题" --url "https://..." --mode safe
+
+# Playwright 动态渲染（仅在普通采集不完整时启用）
+python tools/web_pack.py --topic "主题" --url "https://..." --render
+python tools/web_pack.py --topic "主题" --url "https://..." --render --headed
+python tools/web_pack.py --topic "主题" --url "https://..." --render --debug-network
+
+# 关键参数
+--mode full|safe --videos off|direct|all --download-media
+--render --headed --debug-network
+--browser-cookies chrome --max-image-mb 20 --max-video-mb 300
 ```
 
-> **Path is up to you**: `D:\MyKB` is an example. Install anywhere — `E:\KnowledgeBase`, `C:\Users\...\Documents\PKB`, `F:\ResearchKB`, etc. The first positional argument to `install.py` is your chosen target directory. ASCII paths are recommended to avoid encoding issues with Python, Git, and shell tools.
+**能力**:
+- 正文: readability-lxml → trafilatura → BeautifulSoup → Jina
+- 动态页面: Playwright Chromium DOM 渲染（可选，`--render`）
+- 网络捕获: XHR/Fetch 响应正文提取（`--render`）
+- 正文选择: HTTP / Playwright DOM / Playwright Network 三方质量评分
+- 图片: 16 项（srcset, magic bytes, SHA256 去重, tracking 过滤...）
+- 视频: yt-dlp 平台视频 + 字幕/封面
+- GitHub: API → git clone --depth 1 (v2 Collector)
 
-In Claude Code (project mode):
-```
-/project:help                        # See all commands
-/project:pkb https://example.com     # Start collecting
-```
-
-> **Note**: Commands use `/project:<name>` format. Bare `/pkb` is only available if pkb-starter is installed as a Claude Code plugin. See [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) if commands aren't found.
-
-[Full Quick Start →](docs/QUICKSTART.md)
-
-## Architecture
-
-```
-raw/          Immutable raw materials (web collections, PDFs, files)
-wiki/         LLM-maintained structured knowledge (Markdown + [[wikilinks]])
-skills/       Agent automation rules (7 skills)
-tools/        Python helper scripts (web_pack, import, sanitize, etc.)
-```
-
-[Design Deep Dive →](docs/DESIGN.md)
-
-## Commands
-
-| Command | What It Does |
-|---------|-------------|
-| `/project:pkb <anything>` | Smart entry — auto-detects type and processes |
-| `/project:web <url>` | Collect web content to raw/webpacks |
-| `/project:inbox` | Process pending files |
-| `/project:ask <question>` | Search your knowledge base |
-| `/project:lint` | Health check |
-| `/project:save` | Git commit with auto doc update |
-| `/project:rollback` | View/rollback git history |
-| `/project:sanitize` | Privacy scan |
-| `/project:skills` | Manage optional skill packs |
-| `/project:update` | Update system files from pkb-starter |
-
-## Usage with Obsidian
-
-PKB's `wiki/` directory is a standard [Obsidian](https://obsidian.md/) vault — open it directly as your vault folder. All wiki pages use `[[wikilinks]]` for cross-referencing, giving you a rich knowledge graph out of the box.
-
-### Getting Started
-
-1. [Download Obsidian](https://obsidian.md/) (free, Windows/Mac/Linux)
-2. Open Obsidian → "Open folder as vault" → select your PKB's `wiki/` directory
-3. The graph view will show your knowledge connections automatically
-
-### Example Scenarios
-
-**Researcher — Literature Review**
-
+**Playwright 可选依赖**:
 ```bash
-# Collect papers and web resources
-/project:pkb https://arxiv.org/abs/1706.03762   # "Attention Is All You Need"
-/project:pkb ~/Downloads/transformer-survey.pdf
-/project:pkb https://karpathy.bearblog.dev/llm-wiki/
-```
-
-Then in Obsidian:
-- Open graph view (`Ctrl+G`) — see papers, concepts, and sources linked automatically
-- Click any node to navigate to that wiki page
-- Use `[[` autocomplete to link new ideas as you write
-- Search across all your knowledge with `Ctrl+Shift+F`
-
-**Student — Course Notes**
-
-```bash
-/project:pkb ~/Notes/CS229-lecture01.pdf        # Lecture slides
-/project:pkb https://ocw.mit.edu/course/notes    # Course page
-/project:pkb ~/Downloads/assignment-solution.pdf  # Your work
-```
-
-Then in Obsidian:
-- Each lecture becomes a wiki page linked to core concepts
-- The local graph (`Ctrl+G` → "Local graph") shows only this course's connections
-- Use tags (`#cs229`, `#exam`) in wiki frontmatter to organize by topic
-- Canvas (`Ctrl+P` → "New canvas") to arrange concepts spatially
-
-**Developer — Project Documentation**
-
-```bash
-/project:pkb https://github.com/oven-sh/bun       # Repo research
-/project:pkb ~/Projects/design-doc.md             # Your work
-/project:pkb https://docs.python.org/3/whatsnew/   # Reference
-```
-
-Then in Obsidian:
-- Project notes appear alongside referenced documentation
-- `[[wikilinks]]` connect your design decisions to their sources
-- Daily Notes plugin → log development progress linked to wiki pages
-- Dataview plugin → query all pages tagged `#project-x` or `#decision`
-
-**Writer — Topic Research**
-
-```bash
-/project:pkb https://en.wikipedia.org/wiki/Knowledge_graph
-/project:pkb https://blog.research.google/2023/05/
-/project:pkb ~/Downloads/interview-notes.md
-```
-
-Then in Obsidian:
-- Use Outline pane to see the structure of long wiki pages
-- Split panes (`Ctrl+Click`) — read source on one side, draft on the other
-- Bookmarks plugin → pin frequently referenced concept pages
-- The graph shows gaps: clusters with few connections = topics to research deeper
-
-### Recommended Plugins
-
-These Obsidian community plugins pair well with PKB's auto-generated wiki:
-
-| Plugin | Why |
-|--------|-----|
-| **Dataview** | Query wiki pages by tag, date, or metadata |
-| **Calendar** | Navigate daily notes linked to wiki concepts |
-| **Excalidraw** | Sketch diagrams alongside concept pages |
-| **Omnisearch** | Faster full-text search across your wiki |
-| **Tag Wrangler** | Rename/merge tags across all wiki pages at once |
-
-> **Tip**: PKB auto-commits every change. If you edit wiki pages in Obsidian while Claude Code is running, save the file — PKB's `/save` or auto-commit hooks will pick up your changes in the next cycle.
-
-[Obsidian →](https://obsidian.md/)
-
-## Optional Skills
-
-PKB Starter ships with zero external dependencies. Extend it with **optional skill packs** from a catalog of 43 entries across 9 tracked external repositories (plus z-skills as user-approved local install):
-
-```bash
-# During installation
-python scripts/install.py "D:\MyKB" --profile student    # 8 skills — academic essentials
-python scripts/install.py "D:\MyKB" --profile developer  # 7 skills — docs + projects
-python scripts/install.py "D:\MyKB" --profile research   # 12 skills — full pipeline
-python scripts/install.py "D:\MyKB" --interactive-skills # pick from 42 entries
-
-# Anytime after installation
-python scripts/skill_manager.py --target "D:\MyKB" --list
-python scripts/skill_manager.py --target "D:\MyKB" --install-profile student
-python scripts/skill_manager.py --target "D:\MyKB" --install deep-research-skills
-```
-
-Or from Claude Code:
-```
-/project:skills                       # See status
-/project:skills --list                # Browse catalog
-/project:skills --describe <id>       # Learn about a skill
-/project:skills --install-profile student
-/project:skills --audit
-```
-
-Profiles: **Core** (0 external) | **Student** (8) | **Research** (12) | **Developer** (7) | **Creator** (7) | **Output** (7) | **Security** (3) | **Full** (24) | **Custom** (interactive)
-
-Every skill shows its description, risk level, and requirements before installation. Third-party skills are cloned to `skills/_vendor/` — never auto-executed, never auto-configured. Start with Core, add skills as needed.
-
-See the full catalog: `python scripts/skill_manager.py --target "D:\MyKB" --list`
-
-[Optional Skills Guide →](docs/OPTIONAL_SKILLS.md)
-
-## Who Is This For?
-
-- **Researchers**: Collect papers, build literature maps, auto-generate citations
-- **Developers**: Document projects, collect code references, maintain design decisions
-- **Writers**: Research topics, organize sources, build concept maps
-- **Students**: Course notes, paper analysis, exam prep
-- **Anyone** who wants a "second brain" that maintains itself
-
-## What PKB Is NOT
-
-- **NOT a cloud service** — everything is local files on your disk
-- **NOT a note-taking app** — use Obsidian for that; PKB is the auto-organizer
-- **NOT a search engine** — it searches YOUR knowledge, not the web
-- **NOT a backup tool** — use proper backups; PKB uses git for versioning
-
-## Web Collector (v3.1)
-
-PKB Starter ships with **web_pack v3.1** (`tools/web_pack.py`) that handles:
-- Public web page fetching (requests + BeautifulSoup)
-- Content quality scoring (triggers dynamic fallback when needed)
-- Optional Playwright Chromium DOM rendering (`--render`)
-- XHR/Fetch network response extraction (`--render`)
-- Three-way content selection: HTTP static / Playwright DOM / Playwright Network
-- Content extraction (title, body, links, images)
-- Markdown conversion (markdownify)
-- GitHub blob/raw URL handling
-- Standard output structure (README, manifest, inventories)
-
-### Playwright (optional)
-
-For JavaScript-heavy sites where static extraction yields insufficient content:
-
-```bash
-pip install -r tools/requirements-playwright.txt
+pip install -r requirements-playwright.txt
 playwright install chromium
 ```
 
-```bash
-python tools/web_pack.py --url "<URL>" --render              # Enable browser fallback
-python tools/web_pack.py --url "<URL>" --render --headed     # Visible browser (manual login)
-python tools/web_pack.py --url "<URL>" --render --debug-network  # Sanitized diagnostics
+输出结构：
+```
+raw/webpacks/YYYY-MM-DD-主题/
+├── README.md, 00–04 inventory, manifest.json
+├── MAIN-xx-*.md / LINKED-xx-*.md
+└── assets/
 ```
 
-| Flag | Behavior |
-|------|----------|
-| `--render` | Enables Playwright only when static extraction quality is insufficient |
-| `--headed` | Visible Chromium window (auto-enables `--render`) |
-| `--debug-network` | Sanitized network diagnostics (no body/headers/cookies saved) |
+完成后用 `/inbox` 编译进 wiki。
 
-- Playwright is **optional** — static site users do not need it
-- Chromium is NOT auto-downloaded with pip; `playwright install chromium` is separate
-- Uses a PKB-dedicated browser profile, not your daily Chrome profile
-- Safe mode does not persist login state
-- Does NOT bypass login, CAPTCHA, or access controls
-- App-only pages may still be uncollectable
+## 学术元数据增强 (Phase 1B.1)
 
-### MarkItDown (optional)
+`/pkb` 采集学术文献时**自动**检测并补全元数据：
 
-For local document ingestion (PDF, DOCX, PPTX, XLSX, XLS):
+- **自动检测**：识别 DOI/arXiv/PMID/ISSN + 作者 + 年份 + 期刊 等学术信号
+- **自动增强**：通过 Crossref/OpenAlex 补全标题、作者、期刊、被引次数
+- **期刊等级匹配**：支持 CSSCI/北大核心/AMI/CSCD 等本地导入的期刊目录
+- **引用生成**：GB/T 7714 顺序编码制 & 著者-出版年、APA 7、BibTeX、RIS
+- **Fail-open**：Crossref/OpenAlex 不可用时不影响 `/pkb` 正常流程
 
-```bash
-pip install -r tools/requirements-markitdown.txt
-```
-
-- MarkItDown is **optional** — PKB falls back to LLM direct read when not installed
-- Legacy `.doc` files return an explicit unsupported status (use Word/LibreOffice to convert)
-- OCR is not enabled by default (Phase 2+)
-- Conversion cache in `.pkb-cache/` (gitignored)
-
-**Z-Web-Pack (optional local install)**: Users may optionally install [z-web-pack](https://github.com/tjxj/z-skills/tree/main/z-web-pack) as an alternative collector backend. PKB Starter does NOT distribute z-skills or z-web-pack code. The user must:
-1. Explicitly opt in: `/project:skills --install z-skills`
-2. Audit license: `/project:skills --audit z-skills`
-3. Enable adapter: `/project:skills --enable z-web-pack-local`
-4. Use: `/project:web --collector z-web-pack <url>`
-
-See [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) for capability comparison and the z-skills compatibility module.
-
-## Updating
-
-PKB Starter tracks its version in `pkb.config.json`. When you update pkb-starter from GitHub, your installed KB can be upgraded without reinstalling.
-
-**Recommended — use the update client installed in your KB:**
-
-```bash
-cd "D:\MyKB"
-python tools/pkb_update_client.py              # Preview (dry-run by default)
-python tools/pkb_update_client.py --apply      # Apply changes
-```
-
-Or in Claude Code:
-```
-/project:update                  # Dry-run by default
-/project:update --apply          # Apply changes
-```
-
-**Alternative — for users with a local pkb-starter clone:**
-
-```bash
-python tools/pkb_update_client.py --starter-path "D:\pkb-starter"
-```
-
-**Advanced — direct update_pkb.py:**
-
-```bash
-python scripts/update_pkb.py "D:\MyKB" --dry-run
-```
-
-Every update creates a timestamped backup in `.pkb_backup/`. User data (`raw/`, `wiki/`, `_INBOX/`, `skills/_vendor/`, `.pkb_local/`) is **never** touched. Config fields (`language`, `install_path`, `starter_repo_url`) are **always preserved**.
-
-[Update Guide →](docs/UPDATING.md)
-
-## Privacy
-
-- **Local-first**, no cloud sync, no telemetry — files stay on your machine
-- When using Claude Code for organization, content that enters model context is handled per the model provider's data usage policies
-- Sensitive info detection (API keys, tokens, PII)
-- `.gitignore` with comprehensive security rules
-- [Security Guide →](docs/SECURITY.md)
-
-## Requirements
-
-- **Claude Code** (with Claude API access)
-- **Python 3.9+**
-- **Git**
-- Optional: Obsidian (for visual browsing)
-
-## Documentation
-
-| Doc | Content |
-|-----|---------|
-| [QUICKSTART.md](docs/QUICKSTART.md) | 5-minute setup |
-| [DESIGN.md](docs/DESIGN.md) | Architecture deep dive |
-| [SECURITY.md](docs/SECURITY.md) | Privacy & safety |
-| [Z_WEB_PACK_PARITY.md](docs/Z_WEB_PACK_PARITY.md) | web_pack capabilities |
-| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues |
-| [OPTIONAL_SKILLS.md](docs/OPTIONAL_SKILLS.md) | Optional skill packs |
-| [UPDATING.md](docs/UPDATING.md) | Update and migration guide |
-| [SCHOLARLY_METADATA.md](docs/SCHOLARLY_METADATA.md) | Scholarly metadata enrichment |
-| [EXAMPLES.md](docs/EXAMPLES.md) | Usage examples |
-
-## Scholarly Metadata Enrichment
-
-PKB Starter now detects scholarly literature automatically and enriches wiki pages with structured metadata:
-
-- **Auto-detection**: Recognizes academic papers via explicit declarations, DOI/ISSN identifiers, journal names, and citation patterns
-- **Metadata enrichment**: Crossref + optional OpenAlex (work metrics, source rankings)
-- **Local journal registry**: User-imported CSSCI, PKU Core, AMI, CSCD, and custom datasets
-- **Citation formatting**: GB/T 7714 numeric/author-date (verified fallback), APA 7 (citeproc-py), BibTeX, RIS, CSL-JSON
-- **Batch processing**: Scan, dry-run, write, --only-missing, --resume with job recovery
-- **Literature filtering**: Structured multi-criteria selection (ranking scheme, year, citations, DOI)
-
-Enabled by default in `/pkb`. Configure via `pkb.config.json`:
+### 配置
 
 ```json
+// pkb.config.json
 {"scholarly": {"enabled": true, "auto_enrich_on_pkb": true}}
 ```
 
-See [SCHOLARLY_METADATA.md](docs/SCHOLARLY_METADATA.md) for full documentation.
+关闭自动增强：`{"scholarly": {"enabled": false}}`
 
-## Version History
+### 批量工具
 
-- **v0.6.10-alpha**: Current. Code review hardening: P0 crash fixes (SourceStatus import, DOI encoding, null primary_location, JSON decode errors), P1 data integrity (CRLF write, journal_rankings compatibility, cache safety), P2 determinism (stable CSL IDs, detection_threshold config, locked preservation, author name formatting), P3 observability. web_pack non-JSON response hardening.
-- **v0.6.8-alpha**: Adds scholarly metadata enrichment: literature detection, Crossref/OpenAlex metadata, local journal-ranking registry, GB/T 7714 and APA citations, `/pkb` integration, batch resume, and structured literature filtering.
-- **v0.6.7-alpha**: Adds MarkItDown document ingestion and web_pack v3.1 Playwright dynamic-content fallback.
+```bash
+# 批量增强已有文献
+python tools/scholarly_enrich.py --scan wiki/ --write
+python tools/scholarly_enrich.py --scan wiki/ --write --only-missing
+python tools/scholarly_enrich.py --scan wiki/ --write --resume
 
-## Contributing
+# 文献筛选
+python tools/filter_literature.py --ranking CSSCI
+python tools/filter_literature.py --ranking CSSCI --year-from 2023 --min-citations 5
 
-Contributions welcome! Areas we'd love help with:
-- Additional content type classifiers
-- More source format support
-- Platform-specific install scripts
-- Documentation improvements
+# 导入期刊目录（用户自行获取合法来源）
+python tools/import_journal_rankings.py import rankings.csv
+```
 
-## License
+### 外部网络请求说明
 
-MIT — see [LICENSE](LICENSE)
+学术增强默认会向 **Crossref** 和 **OpenAlex** 发起网络请求（均为免费公开 API）。
 
----
+- **Crossref**：查询 DOI 文献元数据（无需密钥，建议配置邮箱 `CROSSREF_EMAIL`）
+- **OpenAlex**：查询被引次数与指标（无需密钥，建议配置 API Key `OPENALEX_API_KEY` 提升限额）
+- 本地 PDF/文档中的 DOI 可能被发送到上述服务进行解析
+- 缓存位置：`.pkb_local/scholarly/cache.sqlite3`（不进入 Git）
+- 使用 `--cache-only` 或 `--offline` 可跳过网络请求
 
-*Built on the idea that knowledge management should be 1% human effort, 99% AI organization.*
+> 详细文档：`docs/SCHOLARLY_METADATA.md`
+
+## 外部 Skills 安装状态
+
+| Skill | 状态 | 安装方式 |
+|-------|------|---------|
+| **obsidian-skills** | ✅ 已安装 | Plugin Marketplace (user scope) |
+| **academic-research-skills** | ✅ 已安装 | Plugin Marketplace (user scope) |
+| **deep-research-skills** | 🔍 已审核 | 见 `skills/_vendor/` — 待用户决定 |
+| **agent-research-skills** | 🔍 已审核 | 见 `skills/_vendor/` — 推荐 Tier 1 安装 |
+
+详细 Skill 索引：`SKILL_LINKS.md`
+
+## 新增可用命令（来自已安装 Skills）
+
+### Obsidian Skills
+Obsidian Markdown 编辑、Canvas 白板、Bases 数据库、Web Clipper
+
+### Academic Research Skills (14 个命令)
+`/ars-full` `/ars-plan` `/ars-outline` `/ars-abstract` `/ars-lit-review` `/ars-citation-check` `/ars-format-convert` `/ars-reviewer` `/ars-revision` `/ars-revision-coach` `/ars-disclosure` `/ars-mark-read` `/ars-unmark-read` `/ars-cache-invalidate`
+
+## 依赖
+
+- [Obsidian](https://obsidian.md/) — Markdown 知识库编辑器
+- [Claude Code](https://claude.ai/code) — LLM Agent
+- Python 3 — 运行辅助工具（`tools/`）
+  - `pip install requests beautifulsoup4 markdownify`
+
+## 目录结构
+
+参见 `AGENTS.md` 或运行 `/help`。

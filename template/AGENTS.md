@@ -126,9 +126,11 @@ AGENTS.md     ← 第四层：Schema（本文件，定义规则）
 
 ---
 
-## 五、/ask 查询规则
+## 五、/ask 与 /ask-pkb 查询规则
 
-当用户使用 `/ask <问题>` 时：
+### 5.1 /ask — 项目内查询
+
+当用户在当前 PKB 项目内使用 `/ask <问题>` 时：
 
 1. 搜索 `wiki/` 目录中的 Markdown 文件（全文搜索或按 frontmatter tags 搜索）
 2. 搜索 `raw/` 目录中的相关文件
@@ -137,6 +139,16 @@ AGENTS.md     ← 第四层：Schema（本文件，定义规则）
    - 相关来源列表（链接到 raw/ 或 wiki/ 页面）
    - 知识缺口提示（如无相关内容）
 4. 如果问题可以生成一个新概念笔记，建议用户保存到 `wiki/concepts/`
+
+### 5.2 /ask-pkb — 全局跨项目查询
+
+当用户在**任意项目**中使用 `/ask-pkb <问题>` 时（v0.6.11+）：
+
+1. 按优先级确定 PKB 根路径：`PKB_ROOT` 环境变量 → 自动检测（向上查找 `pkb.ps1` + `CLAUDE.md` + `wiki/` + `raw/`） → `~/.pkb/config.json` → 提示用户设置
+2. 先读 `<PKB_ROOT>/wiki/index.md`（知识库地图），再全文搜索 `wiki/`
+3. 禁止「瞎猜模式」（不读 index 直接搜）、「假装有」（编造不存在的知识）
+4. 返回结构化回答 + 知识缺口提示
+5. 安装：`SKILL.md` 位于 `~/.claude/skills/ask-pkb/`（全局）或 PKB 项目的 `.claude/skills/ask-pkb/`
 
 ---
 

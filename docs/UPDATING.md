@@ -1,5 +1,62 @@
 # PKB 升级指南
 
+## v0.6.9 → v0.6.11 迁移
+
+### 新特性
+
+- **`/ask-pkb` 全局知识库查询**：在任意项目中查询 PKB wiki，无需切换窗口
+  - 路径检测：`PKB_ROOT` 环境变量 → 自动检测 → `~/.pkb/config.json`
+  - 安装：`SKILL.md` 已内置在 `.claude/skills/ask-pkb/`，使用符号链接或复制到 `~/.claude/skills/` 即可全局使用
+  - 与 `pkb.ps1` 共用 `PKB_ROOT` 环境变量约定
+
+### 手动步骤
+
+1. **设置环境变量**（推荐）：
+   ```powershell
+   # PowerShell — 添加到 $PROFILE
+   $env:PKB_ROOT = "D:\你的PKB路径"
+   ```
+2. **或创建配置文件**：`~/.pkb/config.json` → `{"pkb_root": "D:\\你的PKB路径"}`
+3. **验证**：在任意项目里 `/ask-pkb "知识库有哪些概念"`
+
+## v0.6.7 → v0.6.9 迁移
+
+### 新特性
+
+- 统一启动器 `.\pkb.ps1`（`start`/`status`/`cnki`/`doctor`/`resume`）
+- MCP 配置标准化到 `.mcp.json`（项目根目录）
+- 活动任务状态系统（`.pkb-local/state/active-task.json`）
+- 会话恢复支持（`claude --continue` + MCP 自动加载）
+
+### 自动变更
+
+以下变更由更新器自动处理：
+
+| 变更 | 方式 |
+|------|------|
+| `.mcp.json` 创建 | NEW — 如果不存在则创建 |
+| `.claude/mcp.json` | MERGE — 保留不动，工具兼容两处 |
+| `.gitignore` 更新 | MERGE — 新增 `.pkb-local/` 等条目 |
+| `pkb.ps1` | NEW — 统一启动器 |
+| `tools/pkb_task.py` | NEW — 任务状态管理 |
+| `tools/pkb_doctor.py` | NEW — 诊断工具 |
+| `tools/launch_chrome.ps1` | MERGE — 更新为 PKB 专用 profile |
+| Hooks 更新 | MERGE — 新增任务注入 |
+| 文档 | NEW — `docs/MCP.md` 等 |
+
+### 手动检查
+
+更新后建议运行：
+
+```powershell
+.\pkb.ps1 doctor     # 诊断环境
+.\pkb.ps1 status     # 查看状态
+```
+
+### 不兼容变更
+
+**无**。v0.6.9 完全向后兼容。
+
 ## 系统更新时用户数据保护
 
 PKB 更新不会覆盖以下用户数据目录：

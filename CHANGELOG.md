@@ -1,429 +1,129 @@
-# Changelog
+# PKB Changelog
 
-All notable changes to PKB Starter.
-
----
-
-## [0.6.10-alpha] — 2026-06-18
-
-### Fixed — Scholarly Enrichment Hardening (Code Review)
-
-- Fixed `NameError` crash in `--scan --write` path due to missing `SourceStatus` import.
-- Fixed Crossref DOI `/` being URL-encoded as `%2F` causing API lookup failures.
-- Fixed `AttributeError` crash when OpenAlex responds with `primary_location: null`.
-- Fixed year-only OpenAlex `publication_date` (e.g. `"2026"`) being parsed as `year=0`.
-- Fixed Crossref/OpenAlex HTTP 200 responses with non-JSON bodies causing unhandled `JSONDecodeError`. Both clients now raise `APIError(200, ...)`.
-- Fixed Windows CRLF text-mode write producing `\r\r\n` in Markdown files. Switched to binary write (`write_bytes`) to preserve original line endings.
-- Fixed `_detect_crlf()` returning `False` for all inputs due to incorrect early-slice logic.
-- Fixed `journal_rankings` dict format not recognized by `filter_literature.py`, only list format was accepted. Both formats are now compatible.
-- Fixed write failures not recorded in resume job state, causing them to be silently skipped on `--resume`.
-- Fixed `_NO_CACHE` sentinel being passed to SQLite cache methods, causing `AttributeError` crashes when cache was explicitly disabled.
-- Fixed CSL-JSON `id` field using Python's `hash()` which is randomized across processes (`PYTHONHASHSEED`). Replaced with SHA-256 (`_make_stable_id()`).
-- Fixed `detection_threshold` configuration not being honored — `should_auto_enrich()` always used hardcoded 0.90.
-- Fixed `locked` metadata flag being dropped during frontmatter merge.
-- Fixed CJK author names rendered without separator (e.g. `DoeJohn`). Added `_format_author_name()` with CJK-aware formatting.
-- Fixed `except Exception: pass` silently swallowing cache write failures. Replaced with `logging.warning()`.
-
-### Fixed — Web Pack
-
-- Fixed `fetch_github_api_contents()` crashing on HTTP 200 responses with HTML, empty body, or JSON `null` body — `resp.json()` `ValueError` was not caught by the outer `requests.RequestException` handler. Non-JSON 200 responses now print a warning and return `None` consistent with existing fallback behavior. `KeyboardInterrupt`, `SystemExit`, and `MemoryError` are not suppressed.
-
-### Tests
-
-- Added 49 regression tests (42 scholarly + 7 web_pack).
-- Full test suite: 645 passed, 0 failed.
-- Smoke tests verified: LF/CRLF preservation, cache-disabled enrichment, cross-process stable CSL IDs, journal_rankings dict/list compatibility, and API error handling on non-JSON responses.
-
-## [0.6.8-alpha] — 2026-06-13
-
-### Added — Scholarly Metadata Enrichment
-
-- Added automatic scholarly-document detection with explicit declarations, structured identifiers, exclusion safeguards, and confidence-based routing.
-- Added Crossref metadata enrichment and optional OpenAlex work/source metrics.
-- Added local journal-ranking registry with user-imported CSSCI, PKU Core, AMI, CSCD, and custom datasets.
-- Added journal matching by DOI-resolved ISSN, ISSN, EISSN, ISSN-L, normalized journal name, and reviewed fuzzy matching.
-- Added GB/T 7714 journal-article formatting, APA 7 through citeproc-py, BibTeX, RIS, and CSL-JSON export.
-- Added synchronous `/pkb` scholarly enrichment before commit with fail-open behavior.
-- Added batch enrichment with dry-run, write, only-missing, JSONL, resumable jobs, locked-page protection, and byte-identical idempotency.
-- Added structured literature filtering by ranking, edition, level, year, journal, DOI, citation count, review state, and missing fields.
-- Added `.pkb_local/scholarly/` cache, ranking, style, and job storage with update protection.
-
-### Changed
-
-- `/pkb` now detects and enriches scholarly literature synchronously before the final commit.
-- GB/T journal articles use the validated fallback formatter by default.
-- APA 7 uses citeproc-py only and never silently falls back to an unverified formatter.
-- Scholarly detection now distinguishes explicit declarations, verified identifiers, hard exclusions, and soft exclusions.
-- Template test layout now supports direct execution from `template/`.
-
-### Safety
-
-- Private PKB content, imported ranking datasets, caches, job states, and API keys are never synchronized to the public template.
-- OpenAlex requires `OPENALEX_API_KEY`; missing keys degrade gracefully.
-- Crossref and OpenAlex failures do not block normal `/pkb` ingestion.
-- Complete proprietary journal-ranking lists are not bundled or downloaded automatically.
-- No PostToolUse background writes are used.
-- The private PKB repository remains local and is never pushed.
-
-### Testing
-
-- Private PKB full suite: 611 passed.
-- pkb-starter template suite: 568 passed.
-- Fresh temporary installation: module imports, three scholarly CLIs, and 568 tests passed.
-
-## [0.6.7-alpha] — 2026-06-13
-
-### Added — MarkItDown Document Ingestion (Phase 1.5)
-
-- Added `tools/markitdown_convert.py` — local document-to-Markdown pre-extraction engine (PDF, DOCX, PPTX, XLSX, XLS).
-- Added `tools/pkb_ingest.py` — local file ingest orchestrator (import → MarkItDown → cache → wiki).
-- Added conversion cache (`.pkb-cache/extractions/`) — avoids repeated extraction.
-- Added runtime version detection via `importlib.metadata.version("markitdown")`.
-- Added `ExtractionResult` and `IngestResult` metadata for extraction tracking.
-- Added fallback state machine: MarkItDown success → LLM Read from cache; MarkItDown failure → LLM direct read from `_INBOX`; still fails → `_PENDING_CONVERSION.md`.
-- Added dependency missing graceful degradation (MarkItDown is optional).
-- Added DOCX, PDF, PPTX, XLSX, XLS test fixtures and 89 regression tests.
-- Added `requirements-markitdown.txt` with pinned optional dependencies.
-- Legacy `.doc` returns explicit `legacy_doc_unsupported` status (not silently ignored).
-- OCR not enabled by default (Phase 2+).
-
-### Added — Web Pack Dynamic Content Fallback (v3.1)
-
-- Added `tools/content_quality.py` — content quality scoring to decide when Playwright fallback is needed.
-- Added `tools/playwright_renderer.py` — optional Playwright Chromium DOM rendering fallback.
-- Added `tools/network_capture.py` — XHR/Fetch network response candidate extraction.
-- Added `tools/network_content.py` — network body candidate extraction with deduplication.
-- Added `tools/selection_engine.py` — three-way selector: HTTP static → Playwright DOM → Playwright Network.
-- Added `--render` flag: enables Playwright fallback only when static extraction quality is insufficient.
-- Added `--headed` flag: visible browser window for manual login (auto-enables `--render`).
-- Added `--debug-network` flag: sanitized network diagnostics (no body/headers/cookies output).
-- Added `requirements-playwright.txt` with Playwright optional dependencies.
-- Added 6 test files: 145 unit tests + 10 Chromium integration tests.
-- Added 4 dynamic site test fixtures (local HTTP server for integration testing).
-- Sensitive URL parameter sanitization in debug and network capture output.
-- Default static web collection behavior unchanged — Chromium not launched unless quality gates trigger.
-- PKB-dedicated browser profile (not user's daily Chrome profile); safe mode does not persist login state.
-- App-only pages may still be uncollectable; xiaoheihe and similar sites are validation cases, not guarantees.
-
-### Fixed
-
-- `--force` sync no longer corrupts binary test fixtures on re-sync.
-- Test import paths corrected for pkb-starter directory layout (tests at `tools/tests/`).
-
-### Safety
-
-- Web Pack `--render` does NOT bypass login, CAPTCHA, or access controls.
-- `--debug-network` does NOT save response body, headers, or cookies.
-- Private PKB is NEVER pushed; only pkb-starter receives public commits.
-- All sensitive patterns in sync source are sanitized before reaching public repository.
+All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<patch>-<stage>`.
 
 ---
 
-## [0.6.6-alpha] — 2026-06-13
+## v0.6.11-alpha (2026-06-18) — Global Knowledge Bridge
 
-### Fixed
+### ✨ New Features
 
-- Fixed update client failing to detect newer remote tags (e.g. v0.6.5-alpha not found from v0.6.4-alpha).
-- Fixed stale starter cache causing `/update` to report the installed version as latest.
-- Fixed update flows that could resolve Claude hook paths under `.pkb_system/starter_cache/`.
-- Fixed `update_pkb.py` running with `cwd` in starter cache instead of KB root — now uses `cwd=KB_ROOT`.
-- `pkb_update_client.py` now always fetches remote tags (`git fetch --tags --force`) before checking versions.
-- Version discovery no longer relies solely on hardcoded `CURRENT_VERSION` — also queries `git ls-remote --tags`.
-- Cache auto-refresh: if cache is on detached HEAD, checkout master before fetching.
+- **`/ask-pkb` Global Skill**: Query PKB wiki from ANY project
+  - Intelligent path detection (env var → auto-detect → config file → prompt)
+  - Uses `PKB_ROOT` env var (same convention as `pkb.ps1`)
+  - Falls back to walking up from cwd looking for PKB markers (`pkb.ps1` + `CLAUDE.md` + `wiki/` + `raw/`)
+  - Supports `~/.pkb/config.json` as explicit config
+  - Anti-pattern coding: "guess mode", "skip index", "dump all", "hallucination"
+  - Structured 6-step execution with checkpoints
+- **Path-agnostic design**: Sync-safe for pkb-starter distribution
+  - Existing `sanitize_patterns` cover `D:\PKB_个人知识库 → <PKB_ROOT>` replacement
 
-### Added
+### 📝 Changes
 
-- Added `--doctor` diagnostic mode to `pkb_update_client.py` — runs 10 checks for update system health.
-- Added hook path pollution detection and repair in doctor mode.
-- Added automatic hook path repair on `--apply` (fixes `starter_cache` references in `.claude/settings.json`).
-- Added CWD safety check: aborts if running from inside `.pkb_system/starter_cache/`.
-- Update output now shows: installed version, latest remote tag, selected checkout, cache path, cache refresh status.
-
-### Safety
-
-- Dry-run still does NOT modify any KB files.
-- Git cache refresh in `.pkb_system/` is allowed during dry-run but only affects the cache, not KB content.
-- `.claude/settings.json` remains NEVER written by the update process.
-- Hook commands remain KB-relative paths (e.g. `python .claude/hooks/05_stop.py`).
-- "Bun not found" is documented as a non-blocking external hook issue — not a PKB update failure.
-- Existing v0.6.2-alpha, v0.6.3-alpha, v0.6.4-alpha, and v0.6.5-alpha tags remain unchanged.
+- CLAUDE.md: version bump to v0.6.11-alpha, skill routing table updated
+- starter_sync_manifest.json: `ask-pkb/SKILL.md` added to mappings
 
 ---
 
-## [0.6.5-alpha] — 2026-06-12
+## v0.6.9-alpha (2026-06-13) — Session Continuity & MCP Bootstrap
 
-### Added
+### ✨ New Features
 
-- Added optional z-web-pack compatibility layer.
-- Added PKB compatibility base (`tools/pkb_compat/web_research_pack_base.py`) for missing 1-web-research-pack dependency.
-- Added `tools/pkb_compat/run_z_web_pack.py` — standalone z-web-pack runner with runtime compat base deployment.
-- Added collector health check (`tools/check_collectors.py`) — detects availability of built-in web_pack, z-web-pack, WebFetch, and gstack.
-- Added WebFetch and gstack collector documentation to `/web` and `/pkb` commands.
+- **Unified Launcher** (`pkb.ps1`): Single entry point for all PKB workflows
+  - `.\pkb.ps1` — Environment check + status summary
+  - `.\pkb.ps1 status` — Full status report
+  - `.\pkb.ps1 cnki` — CNKI workflow (Chrome + MCP + session)
+  - `.\pkb.ps1 doctor` — Comprehensive diagnostics (18 checks)
+  - `.\pkb.ps1 resume` — Resume session with MCP reload
+- **MCP Configuration Standardization**: `.mcp.json` at project root (Claude Code standard)
+  - Environment variable override: `CHROME_DEBUG_URL`
+  - Default: `http://127.0.0.1:9222`
+  - Legacy `.claude/mcp.json` still supported by tools
+- **Active Task State System** (`.pkb-local/state/active-task.json`)
+  - `tools/pkb_task.py` — Atomic task state manager
+  - Commands: `show`, `start`, `update`, `block`, `complete`, `clear`, `inject`
+  - Corrupt file auto-backup + recovery
+  - Schema versioning (v1)
+  - Automatic timestamp updates
+- **MCP Doctor / Pre-Flight** (`tools/pkb_doctor.py`)
+  - 18 diagnostic checks: Python, Node, npx, Bun, Chrome, MCP, hooks, gitignore, privacy
+  - Clear PASS/WARN/FAIL/SKIP output
+  - `--json` for machine-readable output
+  - `--quiet` for exit-code-only mode
+- **SessionStart Task Context Injection**: Active task automatically shown at session start
+- **CNKI Skill Capability Declarations**: `required_capabilities` in SKILL.md frontmatter
+  - Honest degradation: never substitutes WebSearch for CNKI without disclosure
+  - Automatic task blocking when capabilities missing
 
-### Changed
+### 🔧 Improvements
 
-- `zskill_bridge.py run` now executes z-skill scripts through `subprocess.run()` instead of only printing instructions.
-- `/web` and `/pkb` collector routing now checks collector health before choosing a collector.
-- Built-in web_pack remains the default recommended collector; z-web-pack is opt-in.
-- `check_collectors.py` supports `--json`, `--recommend`, and `--quiet` flags for CI/automation use.
+- **Chrome Launcher** (`tools/launch_chrome.ps1`):
+  - PKB-specific profile in `.pkb-local/chrome-profile/`
+  - Preserves CNKI login state across sessions
+  - Detects non-PKB Chrome instances on debug port
+  - Paths with spaces, Chinese characters handled
+  - Environment variable overrides (`CHROME_DEBUG_HOST`, `CHROME_DEBUG_PORT`)
+- **Stop Hook**: Now touches active task timestamp on exit; `.mcp.json` added to critical file watch list
+- **cnki_setup.py**: Now reads from both `.mcp.json` (standard) and `.claude/mcp.json` (legacy)
+- **SessionStart Hook**: Injects active task context from `.pkb-local/state/active-task.json`
 
-### Safety
+### 🛡️ Privacy & Security
 
-- z-web-pack remains optional and is not a PKB core dependency.
-- Video downloading defaults to `off`; `--videos all` requires explicit opt-in.
-- `--max-video-mb` defaults to 300 MB; subprocess timeout at 10 minutes.
-- Compatibility files are deployed at runtime to `.agent/skills/` (gitignored) — third-party vendor source code is never modified.
-- Dummy readability module only bypasses import pre-check; real readability API calls will raise errors and trigger fallback.
+- `.pkb-local/` directory added to `.gitignore`
+- Chrome profile, task state, logs all kept local — never committed
+- `.claude/handoff_*.md` added to `.gitignore`
+- Experimental version markers (`=*`) ignored
+- Private path leakage check in doctor
+- Example task file at `examples/active-task.example.json`
 
----
+### 📚 Documentation
 
-## [0.6.4-alpha] — 2026-06-12
+- New: `docs/MCP.md` — MCP configuration and troubleshooting
+- New: `docs/SESSION_CONTINUITY.md` — Session resume and task continuity
+- Updated: `docs/UPDATING.md` — v0.6.9 migration notes
+- Updated: `docs/CNKI.md` — CNKI workflow with new launcher
+- Updated: `README.md` — Version bump, new commands
+- Updated: `CLAUDE.md` — Version bump, new paths
+- New: `CHANGELOG.md` (this file)
 
-### Fixed
+### 🧪 Testing
 
-- Fixed default `starter_repo_url` still using the `<your-username>` placeholder in fresh installs — now defaults to the official repo `https://github.com/Clockworkhg/pkb-starter.git`.
-- Fixed `pkb_update_client.py` to detect old placeholder `starter_repo_url` and guide users to fix it (with `--repo-url` flag).
-- `pkb_update_client.py --apply` now writes the `--repo-url` back to `pkb.config.json` so future `/update` calls work without repeating the flag.
-- Preserved `--repo-url` override behavior for fork users.
-- Confirmed dry-run does not modify `pkb.config.json` and `--apply` writes back the selected repo URL safely.
+- New: `tests/test_pkb_task.py` — Task state management (12 tests)
+- New: `tests/test_pkb_doctor.py` — Doctor diagnostics (14 tests)
+- New: `tests/test_hooks_v069.py` — Hook updates with task injection
+- Updated: `tests/test_cnki_skill_capabilities.py` — Skill capability validation
 
-### Migration
+### ⬆️ Migration from v0.6.7
 
-Users on v0.6.2-alpha or v0.6.3-alpha should update to v0.6.4-alpha:
-```bash
-python tools/pkb_update_client.py --checkout v0.6.4-alpha          # dry-run (safe)
-python tools/pkb_update_client.py --checkout v0.6.4-alpha --apply  # apply changes
-```
-
-If `starter_repo_url` is still the `<your-username>` placeholder, use:
-```bash
-python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha
-python tools/pkb_update_client.py --repo-url "https://github.com/Clockworkhg/pkb-starter.git" --checkout v0.6.4-alpha --apply
-```
-
-After `--apply`, the official repo URL is saved to `pkb.config.json` and future `/update` calls work without the `--repo-url` flag.
-
-See [UPDATING.md](docs/UPDATING.md) and [RECOVER_FROM_0.6.2_ALPHA.md](docs/RECOVER_FROM_0.6.2_ALPHA.md).
-
----
-
-## [0.6.3-alpha] — 2026-06-12
-
-### Fixed
-
-- Fixed fresh installs reporting stale documentation immediately after installation (replaced `YYYY-MM-DD` placeholders with actual dates in all template files).
-- Fixed `docs_update.py` incorrectly rewriting version strings into malformed values such as `v06-12` (version and date fields are now handled separately with context-anchored regex).
-- Fixed `/docs-update` behavior so protected rule files (`CLAUDE.md`, `AGENTS.md`) are reported for manual review instead of being overwritten.
-- Updated starter template docs (`index.md`, `log.md`, `AGENTS.md` EN/ZH) so v0.6.3-alpha installs are self-consistent with stale count = 0 on fresh install.
-- Updated version references in `install.py`, `pkb_update_client.py`, `update.md`, `README`, `QUICKSTART`, and `UPDATING` docs to v0.6.3-alpha.
-- Added `--check` and `--apply` flags to `docs_update.py` with safe, context-aware version/date replacement.
-- Updated `/docs-update` command to default to diagnostic mode, require explicit confirmation for apply, and never bypass ARS scope guard.
-- Added recovery instructions for users who installed v0.6.2-alpha (`docs/RECOVER_FROM_0.6.2_ALPHA.md` EN+ZH).
-- Confirmed PKB Starter has zero Bun dependencies — all hooks and tools are Python 3.9+.
-
-### Added
-
-- `docs/RECOVER_FROM_0.6.2_ALPHA.md` — English recovery guide for v0.6.2-alpha users.
-- `docs/zh-CN/RECOVER_FROM_0.6.2_ALPHA.md` — Chinese recovery guide for v0.6.2-alpha users.
-- Protected-file awareness in `docs_update.py`: `CLAUDE.md` and `AGENTS.md` are check-only, never auto-modified.
-
-### Migration
-
-Users on v0.6.2-alpha should update to v0.6.4-alpha using:
-```bash
-python tools/pkb_update_client.py --checkout v0.6.4-alpha          # dry-run (safe)
-python tools/pkb_update_client.py --checkout v0.6.4-alpha --apply  # apply changes
-```
-
-See [UPDATING.md](docs/UPDATING.md) and [RECOVER_FROM_0.6.2_ALPHA.md](docs/RECOVER_FROM_0.6.2_ALPHA.md).
+1. `.mcp.json` now at project root (updates will place it there)
+2. Existing `.claude/mcp.json` is **not deleted** — tools read both locations
+3. `.pkb-local/` directory auto-created on first use
+4. No breaking changes to existing workflows
 
 ---
 
-## [0.6.2-alpha] — 2026-06-12
+## v0.6.7-alpha (2026-06-12)
 
-This alpha release adds custom install paths, a built-in update client, and enhanced user data protection.
+### ✨ New Features
 
-### Added
+- **Scholarly Metadata Enrichment** (Phase 1B.1): Auto-detect DOI/arXiv/PMID, enrich via Crossref/OpenAlex
+- **Literature Filtering** (`tools/filter_literature.py`): Filter by journal ranking, year, citations
+- **Journal Ranking Import** (`tools/import_journal_rankings.py`): CSSCI/北大核心/AMI/CSCD
+- **Citation Formatting**: GB/T 7714, APA 7, BibTeX, RIS
+- **Web Pack v3.1**: Playwright dynamic rendering, network capture, selection engine
+- **MarkItDown Phase 1.5**: Local document → Markdown conversion (PDF/DOCX/PPTX/XLSX)
 
-**Custom Install Path**
-- `install.py` now accepts any target directory — no default path is forced
-- `--interactive` mode for guided setup with path, language, skills, and repo URL prompts
-- `--repo-url` parameter to configure a custom pkb-starter fork at install time
-- Path guidance in all docs: `D:\MyKB` is an example, users choose their own path
+### 🔧 Improvements
 
-**Built-in Update Client**
-- `tools/pkb_update_client.py` — installed in every KB, supports three update modes:
-  - Online update (clone/pull from configured `starter_repo_url`)
-  - Local starter update (`--starter-path`)
-  - Specific version checkout (`--checkout v0.6.2-alpha`)
-- Client defaults to **dry-run** — preview changes before applying
-- `--apply` flag required to actually modify files
-- Generates `update_client_report.md` with protected data, preserved fields, and change summary
-
-**Enhanced Config Preservation**
-- `install_path` — preserved across updates, never modified
-- `starter_repo_url` — preserved, never reset to default
-- `starter_update_channel` — preserved (alpha/beta/stable)
-- `starter_cache_dir` — preserved (`.pkb_system/starter_cache` default)
-- `language`, `wiki_language`, `output_language` — all preserved
-- `skills.*` state — fully preserved including installed, enabled, disabled, vendor downloads, adapters
-
-**Report Improvements**
-- `update_client_report.md` — generated by the update client, distinct from update_report.md
-- `update_report.md` — generated by update_pkb.py with config fields preserved section
-- Both reports clearly distinguish dry-run from live mode
-
-**User Data Protection**
-- Protected directories: `raw/`, `wiki/`, `_INBOX/`, `skills/_vendor/`, `.pkb_local/`
-- Protected files: `zskill_audit_report.md`, `skill_manager_report.md`
-- `install.py` refuses non-empty directories without `--force`
-- Backup created before every update in `.pkb_backup/`
-
-**.gitignore Updates**
-- Root and template `.gitignore` include: `.pkb_system/`, `update_client_report.md`, `update_report.md`, `test-pkb-*/`
-- Template `.gitignore` includes: `skills/_vendor/`, `.pkb_local/`, `update_client_report.md`
-
-### Changed
-
-- `install.py` now writes `starter_update_channel` and `starter_cache_dir` to config
-- `update_pkb.py` config whitelist expanded to include all new preserved fields
-- `README.md` and `QUICKSTART.md` now display current version prominently
-- Doc examples use `D:\MyKB` as illustrative path, not a fixed requirement
-- All path references are parameterized; users choose their install location
+- CNKI Skills integration (search, download, fill-gaps)
+- MCP configuration for chrome-devtools
+- 6 harness hooks (SessionStart, PreToolUse, PostToolUse, PostToolUseFailure, Stop, UserPromptSubmit)
 
 ---
 
-## [0.5.0-alpha] — 2026-06-12
+## Version History
 
-This alpha release turns PKB Starter from a one-time project template into a maintainable local LLM Wiki system.
-
-### Added
-
-**Update & Migration Workflow**
-- `/project:update` command — check and update installed PKB system files
-- `scripts/update_pkb.py` — safe updater with backup, migration, and report
-- `migrations/` — incremental version migration scripts (0.4.1 -> 0.5.0)
-- Automatic backup to `.pkb_backup/YYYYMMDD_HHMMSS/` before every update
-- `update_report.md` generated after each update with full change audit
-
-**Private PKB -> pkb-starter Sync Pipeline**
-- `starter_sync_manifest.json` — controlled file mappings with never_sync rules
-- `tools/sync_to_starter.py` — sanitized one-way sync with dry-run and diff
-- `sync_report.md` — per-entry sync audit with skip/block reasons
-- License-sensitive path detection and blocking
-
-**Protected Paths & State Preservation**
-- Explicit protection for `raw/`, `wiki/`, `_INBOX/`, `skills/_vendor/`, `.pkb_local/`
-- `zskill_audit_report.md` and `skill_manager_report.md` never overwritten
-- Skills state fully preserved across updates:
-  - `installed_profiles`, `installed_skills`, `enabled_skills`, `disabled_skills`
-  - `vendor_downloads`, `enabled_adapters`, `pending_audit`
-
-**Version Tracking**
-- `pkb.config.json` now includes `starter_version`, `schema_version`, `last_updated_at`
-- New installs default to `starter_version: "0.5.0-alpha"`
-- Version comparison handles `-alpha`, `-beta`, `-rc` suffixes
-
-**Documentation**
-- `docs/UPDATING.md` — complete update + sync guide
-- `CHANGELOG.md` — this file
-
-### Changed
-
-- Migration baseline: v0.4.1-alpha (Z-Skills Compatibility Module, commit `9e8d33b`)
-- `scripts/install.py` now writes `starter_version`, `schema_version`, `last_updated_at`
-- `.gitignore` (root and template) includes `.pkb_backup/`
-
----
-
-## [0.4.1-alpha] — 2026-06-12
-
-### Added
-
-**Z-Skills Compatibility Module**
-- `tools/zskill_bridge.py` — bridge for optional z-skills integration
-- `skill_adapters/z_skills_adapter.md` — z-skills output routing
-- `docs/Z_WEB_PACK_PARITY.md` — web_pack capability comparison
-- z-web-pack-local adapter in skills registry
-- Audit report: `zskill_audit_report.md`
-
-**Principles**
-- No third-party code redistribution — user must explicitly opt in
-- Three-stage lifecycle: install -> audit -> enable
-- Bridge architecture: locate, audit, status, run, import-output, patch
-- Default collector unchanged (built-in web_pack is default)
-
----
-
-## [0.4.0] — 2026-06
-
-### Added
-
-**Runtime Optional Skill Manager**
-- `scripts/skill_manager.py` — manage skills on live PKB installation
-- `/project:skills` command with full lifecycle:
-  - `--list` — browse catalog
-  - `--describe <id>` — detailed view
-  - `--install <id>` — single skill
-  - `--install-profile <name>` — batch install
-  - `--audit` — license and structure check
-  - `--enable / --disable` — toggle without delete
-- State model in `pkb.config.json` skills section
-- Skill lifecycle: install -> audit -> enable (three stages)
-- Risk classification: low / medium / high / reference_only
-
----
-
-## [0.3.0] — 2026-06
-
-### Added
-
-**Expanded Skill Registry**
-- 43 catalog entries across 9 external repos
-- `skills_registry/skill_catalog.json` with full metadata
-- `skills_registry/profiles.json` with 9 profiles
-- Profile presets: Core (0), Student (8), Research (12), Developer (7), Creator (7), Output (7), Security (3), Full (24), Custom (interactive)
-- `scripts/install.py --profile <name>` during setup
-- `scripts/install_skills.py` for post-install skill management
-
----
-
-## [0.2.0] — 2026-06
-
-### Added
-
-**Optional Skill Packs + Compatibility Adapters**
-- `skills/` directory with 6 core skills (pkb-ask, pkb-auto, pkb-inbox, pkb-init, pkb-lint, pkb-sanitize)
-- `template/skill_adapters/` — routing rules for skill output
-- Adapter pattern: maps skill output -> raw/wiki paths
-- Optional third-party skill source tracking
-
----
-
-## [0.1.0] — 2026-06
-
-### Added
-
-**Initial Release**
-- Three-layer architecture: raw/ -> wiki/ -> skills/
-- Claude Code project template with `.claude/commands/`
-- `/project:pkb` — smart ingest (auto-detect URL / file / text)
-- `/project:web` — web collection
-- `/project:inbox` — process pending files
-- `/project:ask` — search knowledge base
-- `/project:lint` — health check
-- `/project:save` — git commit with auto doc update
-- `/project:rollback` — git history rollback
-- `/project:sanitize` — privacy scan
-- `scripts/install.py` — one-shot installer
-- `scripts/check_env.py` — environment verification
-- `scripts/migrate_existing_pkb.py` — upgrade existing PKB
-- `tools/web_pack.py` — structured web collection
-- `tools/import_to_inbox.py` — file import with sensitive data detection
-- `tools/pkb_auto.py` — health check and auto-pipeline
-- `tools/sanitize.py` — privacy pattern scanner
-- `tools/docs_update.py` — documentation freshness checker
-- Obsidian-compatible `[[wikilink]]` syntax
-- Autopilot by default — no "next step?" prompts
-- Git-native: every change is a commit
-- GBK-compatible Windows tooling
+| Version | Date | Theme |
+|---------|------|-------|
+| v0.6.9-alpha | 2026-06-13 | Session Continuity & MCP Bootstrap |
+| v0.6.7-alpha | 2026-06-12 | Scholarly Metadata Enrichment |
