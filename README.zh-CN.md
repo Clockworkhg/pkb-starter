@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.12--alpha-blue)
+﻿# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.13--alpha-blue)
 
 > **一个命令管理你的知识。** `/pkb <任何东西>` — 丢入 URL、文件或想法，LLM 自动整理一切。
 >
-> **当前版本**：v0.6.12-alpha | 🆕 **scansci_bridge v1.0**：13源论文下载 | **全局查询**：`/ask-pkb` 任意窗口可用
+> **当前版本**：v0.6.13-alpha | 🆕 **scansci_bridge v1.0**：13源论文下载 | **全局查询**：`/ask-pkb` 任意窗口可用
 
 语言：[English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -76,7 +76,7 @@ tools/        Python 辅助脚本（web_pack、import、sanitize 等）
 | `/project:inbox` | 处理待入库文件 |
 | `/project:ask <问题>` | 搜索知识库（项目内） |
 | `/project:ask-pkb <问题>` | 🌐 全局知识库查询（任意窗口，v0.6.11+） |
-| `python tools/scansci_bridge.py download <DOI>` | 📄 多源论文下载（13源，v0.6.12+） |
+| `python tools/scansci_bridge.py download <DOI>` | 📄 多源论文下载（13源，v0.6.13+） |
 | `/project:lint` | 健康检查 |
 | `/project:save` | Git 提交并自动更新文档 |
 | `/project:rollback` | 查看/回滚 Git 历史 |
@@ -311,7 +311,7 @@ MIT — 参见 [LICENSE](LICENSE)
 
 ## 当前版本
 
-**v0.6.12-alpha** — 当前版本。scansci_bridge v1.0：13源论文下载引擎（scansci-pdf 并行赛马 → Sci-Hub fallback），scihub_fetch 升级多源管线，setup_beauty_stack 一键安装美化技术栈，文档同步更新。
+**v0.6.13-alpha** — 当前版本。`/install` 引导式安装 + install_skills v0.4.0：分类安装报告、内置技能检测、安装后诊断、CNKI/Zotero 主动告知。
 
 **v0.6.11-alpha** — 全局知识桥接：`/ask-pkb` 跨项目查询 skill（PKB_ROOT 环境变量 → 自动检测 → 配置文件路径检测）、v0.6.9→v0.6.11 迁移指南、全量文档同步。
 

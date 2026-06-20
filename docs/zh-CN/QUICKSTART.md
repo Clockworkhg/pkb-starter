@@ -1,8 +1,8 @@
-# PKB Starter -- 快速开始
+﻿# PKB Starter -- 快速开始
 
 > 5 分钟搭建你自己的 LLM 驱动个人知识库。
 >
-> **版本**：v0.6.12-alpha
+> **版本**：v0.6.13-alpha
 
 语言：[English](../QUICKSTART.md) | [简体中文](QUICKSTART.md)
 

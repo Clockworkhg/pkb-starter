@@ -1,7 +1,7 @@
-# AGENTS.md — PKB 个人知识库系统规则
+﻿# AGENTS.md — PKB 个人知识库系统规则
 
 > 这是 PKB 系统的"宪法"。所有 Agent 行为必须遵守此文件。
-> 版本：1.3.1 | 最后更新：2026-06-20 (hooks v1.0 / scansci_bridge v1.0)
+> 版本：1.3.2 | 最后更新：2026-06-20 (hooks v1.0 / install_skills v0.4.0 / scansci_bridge v1.0)
 >
 > 📄 快速参考见 [CLAUDE.md](CLAUDE.md) — 每次会话自动加载的精简版
 

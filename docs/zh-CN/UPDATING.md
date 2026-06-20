@@ -1,4 +1,4 @@
-# PKB Starter -- 更新指南
+﻿# PKB Starter -- 更新指南
 
 > 如何更新 pkb-starter 本身，以及已安装的 PKB 用户如何更新其系统文件。
 
@@ -48,7 +48,11 @@ git -C "D:\pkb-starter" commit -am "sync from private PKB: <变更说明>"
 
 ### 版本历史
 
-- **v0.6.12-alpha**：当前。scansci_bridge v1.0：13源论文下载引擎（scansci-pdf 并行赛马 → Sci-Hub fallback），scihub_fetch 升级多源管线，setup_beauty_stack 一键安装美化技术栈。
+
+
+- **v0.6.13-alpha**：当前。`/install` 引导式安装、install_skills v0.4.0（内置技能不再报 FAIL）、安装后自动验证、CNKI/Zotero 主动告知。
+
+- **v0.6.12-alpha**：历史版本。scansci_bridge v1.0：13源论文下载引擎（scansci-pdf 并行赛马 → Sci-Hub fallback），scihub_fetch 升级多源管线，setup_beauty_stack 一键安装美化技术栈。
 
 - **v0.6.11-alpha**：全局知识桥接：`/ask-pkb` 跨项目查询 skill（PKB_ROOT 环境变量 → 自动检测 → 配置文件三层路径检测）、v0.6.9→v0.6.11 迁移指南。
 - **v0.6.10-alpha**：当前。Code Review 加固：P0 崩溃修复（SourceStatus 导入、DOI 编码、null primary_location、JSON 解析错误）、P1 数据完整性（CRLF 写入、journal_rankings 兼容、缓存安全）、P2 确定性（稳定 CSL ID、detection_threshold 配置、locked 保留、作者姓名格式）、P3 可观测性。web_pack 非 JSON 响应加固。

@@ -1,9 +1,25 @@
-# PKB Changelog
+﻿# PKB Changelog
 
 All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<patch>-<stage>`.
 
 ---
 
+
+## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
+
+### ✨ New Features
+
+- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
+- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
+
+### 🔧 Changes
+
+- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
+- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
+- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
+- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
+
+---
 ## v0.6.12-alpha (2026-06-20) — Multi-Source Paper Download Engine
 
 ### ✨ New Features
@@ -28,6 +44,22 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
+
+## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
+
+### ✨ New Features
+
+- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
+- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
+
+### 🔧 Changes
+
+- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
+- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
+- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
+- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
+
+---
 ## v0.6.11-alpha (2026-06-18) — Global Knowledge Bridge
 
 ### ✨ New Features
@@ -49,6 +81,22 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
+
+## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
+
+### ✨ New Features
+
+- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
+- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
+
+### 🔧 Changes
+
+- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
+- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
+- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
+- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
+
+---
 ## v0.6.9-alpha (2026-06-13) — Session Continuity & MCP Bootstrap
 
 ### ✨ New Features
@@ -126,6 +174,22 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
+
+## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
+
+### ✨ New Features
+
+- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
+- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
+
+### 🔧 Changes
+
+- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
+- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
+- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
+- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
+
+---
 ## v0.6.7-alpha (2026-06-12)
 
 ### ✨ New Features
@@ -145,6 +209,22 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
+
+## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
+
+### ✨ New Features
+
+- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
+- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
+
+### 🔧 Changes
+
+- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
+- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
+- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
+- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
+
+---
 ## Version History
 
 | Version | Date | Theme |

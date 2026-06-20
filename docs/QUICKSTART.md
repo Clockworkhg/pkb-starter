@@ -1,8 +1,8 @@
-# PKB Starter — Quick Start
+﻿# PKB Starter — Quick Start
 
 > 5 minutes to your own LLM-powered personal knowledge base.
 >
-> **Version**: v0.6.12-alpha
+> **Version**: v0.6.13-alpha
 
 Languages: [English](QUICKSTART.md) | [简体中文](zh-CN/QUICKSTART.md)
 

@@ -1,6 +1,48 @@
-# PKB Starter — Updating & Migration
+﻿# PKB Starter — Updating & Migration
 
 Languages: [English](UPDATING.md) | [简体中文](zh-CN/UPDATING.md)
+
+
+
+## v0.6.12 → v0.6.13 Migration
+
+### New: `/install` Guided Installation
+
+The install flow is now standardized with a 10-step guided process:
+
+- **`/install` slash command** guides AI through the full installation
+- All options presented before any action (target dir, language, profile, git)
+- Dry-run by default — review before executing
+- High-risk skills confirmed separately before `--enable-risky` is added
+- Results categorized: ✅ success / ⚠️ skipped / ❌ failed (with solutions)
+
+### Changed: install_skills.py → v0.4.0
+
+- `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) no longer report FAIL — they are built into the PKB template
+- Install reports now categorize by type (git clone / built-in / plugin marketplace / MCP)
+
+### New: Post-Install Verification
+
+- `--verify` flag (default: on) runs `pkb_doctor.py` after install
+- Falls back to manual checks if doctor unavailable
+- Use `--no-verify` to skip
+
+### New: CNKI / Zotero Awareness
+
+- Installation completion message now lists CNKI and Zotero as optional installs
+- Includes exact commands and prerequisites
+
+### Updating an existing PKB
+
+```bash
+cd "D:\MyKB"
+python tools/pkb_update_client.py              # preview (dry-run by default)
+python tools/pkb_update_client.py --apply      # apply changes
+```
+
+This updates system files only — your wiki/, raw/, _INBOX/ data is never touched.
+
+---
 
 ## v0.6.11 → v0.6.12 Migration
 

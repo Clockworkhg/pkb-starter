@@ -1,8 +1,8 @@
-# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.12--alpha-blue)
+﻿# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.13--alpha-blue)
 
 > **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
 >
-> **Current version**: v0.6.12-alpha | 🆕 **scansci_bridge v1.0**: 13-source paper download | **Global query**: `/ask-pkb` from any project
+> **Current version**: v0.6.13-alpha | 🆕 **scansci_bridge v1.0**: 13-source paper download | **Global query**: `/ask-pkb` from any project
 
 Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -69,7 +69,7 @@ tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 | `/project:inbox` | Process pending files |
 | `/project:ask <question>` | Search your knowledge base (project-local) |
 | `/project:ask-pkb <question>` | 🌐 Global knowledge query (any project, v0.6.11+) |
-| `python tools/scansci_bridge.py download <DOI>` | 📄 Multi-source paper download (13 sources, v0.6.12+) |
+| `python tools/scansci_bridge.py download <DOI>` | 📄 Multi-source paper download (13 sources, v0.6.13+) |
 | `/project:lint` | Health check |
 | `/project:save` | Git commit with auto doc update |
 | `/project:rollback` | View/rollback git history |
@@ -357,7 +357,7 @@ See [SCHOLARLY_METADATA.md](docs/SCHOLARLY_METADATA.md) for full documentation.
 
 ## Version History
 
-- **v0.6.12-alpha**: Current. scansci_bridge v1.0: 13-source paper download engine (scansci-pdf parallel race → Sci-Hub fallback), upgraded scihub_fetch with multi-source pipeline, setup_beauty_stack quick-install, documentation sync.
+- **v0.6.13-alpha**: Current. `/install` guided setup + install_skills v0.4.0: categorized reports, built-in skill detection, post-install verification, CNKI/Zotero awareness.
 - **v0.6.11-alpha**: Global Knowledge Bridge: `/ask-pkb` skill for cross-project wiki queries, intelligent path detection (PKB_ROOT env var → auto-detect → config), v0.6.9→v0.6.11 migration guide, full documentation sweep.
 - **v0.6.10-alpha**: Code review hardening: P0 crash fixes (SourceStatus import, DOI encoding, null primary_location, JSON decode errors), P1 data integrity (CRLF write, journal_rankings compatibility, cache safety), P2 determinism (stable CSL IDs, detection_threshold config, locked preservation, author name formatting), P3 observability. web_pack non-JSON response hardening.
 - **v0.6.8-alpha**: Adds scholarly metadata enrichment: literature detection, Crossref/OpenAlex metadata, local journal-ranking registry, GB/T 7714 and APA citations, `/pkb` integration, batch resume, and structured literature filtering.

@@ -1,4 +1,4 @@
-# CLAUDE.md — PKB 快速参考
+﻿# CLAUDE.md — PKB 快速参考
 
 > 每次 Claude Code 会话自动加载。详细规则见 [AGENTS.md](AGENTS.md)。
 
@@ -6,7 +6,7 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
-项目版本：`v0.6.12-alpha` | 组件：`web_pack v3.1` | `scansci_bridge v1.0` | 🆕 全局知识库查询：`/ask-pkb`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
+项目版本：`v0.6.13-alpha` | 组件：`web_pack v3.1` | `scansci_bridge v1.0` | 🆕 `/install` 引导式安装 | `/ask-pkb` 全局查询。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
@@ -166,4 +166,4 @@ python tools/scihub_fetch.py                    # 兼容旧接口（自动走多
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-20 (v0.6.12 / web_pack v3.1 / scansci_bridge v1.0)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-20 (v0.6.13 / web_pack v3.1 / scansci_bridge v1.0)*

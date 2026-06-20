@@ -1,4 +1,4 @@
----
+﻿---
 created: 2026-06-11
 updated: 2026-06-18
 tags: [home, index]
@@ -103,4 +103,4 @@ tags: [home, index]
 
 ---
 
-*由 PKB 系统维护。最后更新: 2026-06-20 (v0.6.12 / web_pack v3.1 / scansci_bridge v1.0)*
+*由 PKB 系统维护。最后更新: 2026-06-20 (v0.6.13 / web_pack v3.1 / scansci_bridge v1.0)*

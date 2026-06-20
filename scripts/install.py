@@ -18,8 +18,13 @@ Usage:
     python scripts/install.py "<target_directory>" --lang zh-CN
     python scripts/install.py "<target_directory>" --lang bilingual
     python scripts/install.py "<target_directory>" --repo-url https://github.com/<your-fork>/pkb-starter.git
+    python scripts/install.py "<target_directory>" --verify    (default: on, runs pkb_doctor.py after install)
+    python scripts/install.py "<target_directory>" --no-verify (skip post-install verification)
     python scripts/install.py --interactive
     python scripts/install.py --interactive --dry-run
+
+For a guided AI-assisted installation, run:
+    /install
 """
 
 import os
@@ -367,6 +372,88 @@ def install_requirements(target: Path) -> bool:
         return False
 
 
+def _run_doctor(target: Path) -> dict:
+    """Run pkb_doctor.py in the target PKB directory for post-install verification.
+    Returns a dict with 'success', 'output', and 'error' keys."""
+    doctor_script = target / "tools" / "pkb_doctor.py"
+    if not doctor_script.is_file():
+        return {
+            "success": False,
+            "output": "",
+            "error": f"pkb_doctor.py not found at {doctor_script}",
+        }
+
+    try:
+        result = subprocess.run(
+            [sys.executable, str(doctor_script)],
+            cwd=str(target), timeout=60,
+            encoding="utf-8", errors="replace",
+            capture_output=True, text=True,
+        )
+        return {
+            "success": result.returncode == 0,
+            "output": result.stdout[:3000] if result.stdout else "",
+            "error": result.stderr[:1000] if result.stderr else "",
+        }
+    except subprocess.TimeoutExpired:
+        return {"success": False, "output": "", "error": "Doctor timed out (60s)"}
+    except Exception as e:
+        return {"success": False, "output": "", "error": str(e)[:500]}
+
+
+def _verify_install_manually(target: Path) -> list[tuple]:
+    """Manual checks when pkb_doctor.py is unavailable. Returns list of (check_name, status, detail)."""
+    checks = []
+
+    # Directory structure
+    for d in ["wiki", "raw", "_INBOX", "skills", "tools", "templates"]:
+        path = target / d
+        checks.append((f"Directory: {d}/", "PASS" if path.is_dir() else "FAIL", ""))
+
+    # Config file
+    config = target / "pkb.config.json"
+    checks.append(("pkb.config.json", "PASS" if config.is_file() else "FAIL", ""))
+
+    # Claude settings
+    settings = target / ".claude" / "settings.json"
+    checks.append((".claude/settings.json", "PASS" if settings.is_file() else "FAIL", ""))
+
+    # Git
+    git_dir = target / ".git"
+    checks.append(("Git repository", "PASS" if git_dir.is_dir() else "WARN", "Run git init manually"))
+
+    # Python tools
+    tools_dir = target / "tools"
+    py_files = list(tools_dir.glob("*.py")) if tools_dir.is_dir() else []
+    checks.append((f"Python tools ({len(py_files)} files)", "PASS" if py_files else "WARN", ""))
+
+    return checks
+
+
+def _print_verify_report(doctor_result: dict, manual_checks: list[tuple], target: Path):
+    """Print post-install verification report."""
+    print()
+    print("=" * 60)
+    print("  Post-Install Verification")
+    print("=" * 60)
+
+    if doctor_result and doctor_result.get("success"):
+        print("  pkb_doctor.py — PASS")
+        if doctor_result.get("output"):
+            print(doctor_result["output"])
+    elif doctor_result and doctor_result.get("error"):
+        print(f"  pkb_doctor.py — UNAVAILABLE")
+        print(f"    Reason: {doctor_result['error'][:200]}")
+        print()
+        print("  Manual checks:")
+        for name, status, detail in manual_checks:
+            icon = {"PASS": "✅", "WARN": "⚠️", "FAIL": "❌"}.get(status, "?")
+            detail_str = f" — {detail}" if detail else ""
+            print(f"    {icon} {name}: {status}{detail_str}")
+
+    print("=" * 60)
+
+
 def _run_skill_installer(target: Path, profile: str):
     """Run install_skills.py as a subprocess from the starter directory."""
     installer = Path(__file__).resolve().parent / "install_skills.py"
@@ -476,6 +563,11 @@ def main():
     skip_skills = "--skip-skills" in sys.argv
     interactive_skills = "--interactive-skills" in sys.argv
     dry_run = "--dry-run" in sys.argv
+    no_verify = "--no-verify" in sys.argv
+    verify = "--verify" in sys.argv
+
+    # --verify is on by default (unless --dry-run or --no-verify)
+    run_verify = not dry_run and not no_verify
 
     # Parse --repo-url
     repo_url = None
@@ -541,7 +633,7 @@ def main():
         if not interactive_mode:
             sys.exit(1)
 
-    print(f"=== PKB Starter Installer v0.6.12-alpha ===")
+    print(f"=== PKB Starter Installer v0.6.13-alpha ===")
     print(f"Target: {target}")
     print(f"Language: {lang}")
     if dry_run:
@@ -663,6 +755,13 @@ def main():
     print("=" * 60)
     print("  PKB initialized successfully!")
     print("=" * 60)
+
+    # Post-install verification
+    if run_verify and not dry_run:
+        doctor_result = _run_doctor(target)
+        manual_checks = _verify_install_manually(target) if not doctor_result.get("success") else []
+        _print_verify_report(doctor_result, manual_checks, target)
+
     if repo_url and "<your-username>" in repo_url:
         print(f"  [NOTE] starter_repo_url still contains '<your-username>' placeholder.")
         print(f"         Edit pkb.config.json -> starter_repo_url to your actual fork URL,")
@@ -689,6 +788,23 @@ Next steps:
   # Or from anywhere:
   claude --project "{target}"
 """)
+    # Optional high-value skills not in default profiles
+    print(f"  ╔══════════════════════════════════════════════════════════════╗")
+    print(f"  ║  📦 可选高价值技能（不在默认 Profile 中，可单独安装）        ║")
+    print(f"  ╠══════════════════════════════════════════════════════════════╣")
+    print(f"  ║  CNKI（知网）  │ 中文文献检索和下载                          ║")
+    print(f"  ║               │ 前置：Chrome MCP + 机构账号 + 验证码        ║")
+    print(f"  ║               │ 安装：python scripts/install_skills.py       ║")
+    print(f"  ║               │   --target \"{target}\" --profile custom       ║")
+    print(f"  ║               │   --enable-risky（然后选 cnki-skills）      ║")
+    print(f"  ║──────────────────────────────────────────────────────────────║")
+    print(f"  ║  Zotero       │ 引用管理器集成                               ║")
+    print(f"  ║               │ 前置：Zotero 桌面端 + Better BibTeX          ║")
+    print(f"  ║               │ 安装：同上，选 zotero-mcp + zotero-mcp-skill ║")
+    print(f"  ║──────────────────────────────────────────────────────────────║")
+    print(f"  ║  更多技能     │ python scripts/install_skills.py --list       ║")
+    print(f"  ║               │ /project:skills                              ║")
+    print(f"  ╚══════════════════════════════════════════════════════════════╝")
     print(f"  Knowledge base location: {target}")
     print(f"  Config file: {config_path}")
 
