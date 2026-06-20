@@ -6,7 +6,7 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
-项目版本：`v0.6.11-alpha` | 组件：`web_pack v3.1` | 🆕 全局知识库查询：`/ask-pkb`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
+项目版本：`v0.6.12-alpha` | 组件：`web_pack v3.1` | `scansci_bridge v1.0` | 🆕 全局知识库查询：`/ask-pkb`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
@@ -33,6 +33,7 @@ examples/            示例文件（任务状态模板等）
 |---------|------|
 | 丢任何东西入库 | `/pkb <anything>` |
 | 知网论文搜索/下载 | `/pkb-cnki search\|fill-gaps\|download` |
+| 英文论文多源下载 | `python tools/scansci_bridge.py download <DOI>` |
 | 学术研究（论文/综述/引用） | `/research` `/paper` `/literature-*` |
 | 文档格式转换 | `/doc` `/ocr` |
 | Excel/Markdown 表格 | `/z-excel-editor` `/z-md-excel` |
@@ -41,6 +42,7 @@ examples/            示例文件（任务状态模板等）
 | 全局知识库查询 | `/ask-pkb`（任意窗口可用） |
 | 代码审查/简化 | `/simplify` |
 | 创建新 Skill | `/make-skill` |
+| 美化技术栈一键安装 | `/setup-beauty-stack` |
 
 ## 编码约定
 
@@ -71,7 +73,8 @@ examples/            示例文件（任务状态模板等）
 | `tools/download_papers.py` | 批量论文下载协调器 |
 | `tools/download_papers_r2.py` | R2 学术源论文下载 |
 | `tools/download_papers_r3.py` | R3 学术源论文下载 |
-| `tools/scihub_fetch.py` | Sci-Hub 论文获取 |
+| `tools/scihub_fetch.py` | 论文获取（scansci-pdf 13源并行 → Sci-Hub fallback） |
+| `tools/scansci_bridge.py` | 🆕 scansci-pdf 桥接层（download/search/--check，多源赛马） |
 | `tools/scholarly_enrich.py` | 学术元数据增强 CLI（DOI 查询 + 批量扫描 + 写入）（Phase 1B） |
 | `tools/filter_literature.py` | 结构化文献筛选器（按期刊等级/年份/被引/DOI 过滤）（Phase 1B） |
 | `tools/import_journal_rankings.py` | 期刊目录导入（CSSCI/北大核心/AMI/CSCD/自定义） |
@@ -79,6 +82,7 @@ examples/            示例文件（任务状态模板等）
 | `tools/sync_to_starter.py` | PKB → pkb-starter 系统同步（dev-only） |
 | `tools/check_collectors.py` | 采集器健康检查 + z-web-pack bridge 支持 |
 | `tools/zskill_bridge.py` | Z-Skills 兼容桥接层 |
+| `tools/setup_beauty_stack.py` | 🆕 美化技术栈一键安装（Tailwind + shadcn/ui + Motion + Magic UI 等） |
 
 ## Hooks 速查
 
@@ -131,6 +135,18 @@ examples/            示例文件（任务状态模板等）
 ```
 ⚠️ 需 Chrome DevTools MCP 连接 + 知网登录。MCP 仅会话启动时加载。
 
+### 英文论文下载（🆕 scansci-pdf 多源管线）
+```
+python tools/scansci_bridge.py download 10.1038/s41586-020-2649-2
+python tools/scansci_bridge.py search "machine learning" --limit 5
+python tools/scansci_bridge.py --check          # 源健康诊断
+python tools/scihub_fetch.py                    # 兼容旧接口（自动走多源）
+```
+**架构**: scansci-pdf 13源并行赛马 → Sci-Hub 直接抓取 fallback
+**策略**: `fastest`（默认）| `oa_first` | `scihub_only` | `legal_only`
+**健康**: 6/6 源可达（EuropePMC/Unpaywall/SemanticScholar/OpenAlex/Crossref，CORE 偶超时）
+
+
 ## 行为准则
 
 1. **默认全自动** — `/pkb` 不停顿、不询问"下一步"
@@ -150,4 +166,4 @@ examples/            示例文件（任务状态模板等）
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-18 (v0.6.11 / web_pack v3.1)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-20 (v0.6.12 / web_pack v3.1 / scansci_bridge v1.0)*

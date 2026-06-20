@@ -53,6 +53,7 @@
 | `/docs-update` | 📋 自动检测+更新项目文档 |
 | `/save "消息"` | Git 提交（含自动文档更新） |
 | `/rollback` | 查看/回滚 Git 历史 |
+| `/setup-beauty-stack <路径> --preset <套餐>` | 🎨 美化技术栈一键安装（Tailwind/shadcn/Motion 等） |
 | `/help` | 显示此帮助 |
 
 ### 🔌 CNKI 知网命令

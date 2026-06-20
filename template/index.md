@@ -43,6 +43,7 @@ tags: [home, index]
   - [[lit-algorithmic-power]] — 算法权力（14 篇）
 - 📄 PDF 已下载: 11/35（31%），见 `raw/papers/manifest.json`
 - 🔌 CNKI 集成: `/pkb-cnki fill-gaps` 自动补齐缺失 PDF
+- 🌐 英文论文: `python tools/scansci_bridge.py download <DOI>` — scansci-pdf 13 源并行赛马
 
 ### 📄 论文/文献（其他领域）
 - [[feuerbach-thesis]] — 《费尔巴哈论》（马克思哲学）
@@ -87,7 +88,9 @@ tags: [home, index]
 - `tools/download_papers.py` — 批量论文下载协调器
 - `tools/download_papers_r2.py` — R2 学术源论文下载
 - `tools/download_papers_r3.py` — R3 学术源论文下载
-- `tools/scihub_fetch.py` — Sci-Hub 论文获取
+- `tools/scihub_fetch.py` — 论文获取（scansci-pdf 13源并行 → Sci-Hub fallback）
+- `tools/scansci_bridge.py` — 🆕 scansci-pdf 桥接层（多源赛马下载/搜索/健康检查，4 策略）
+- `tools/setup_beauty_stack.py` — 美化技术栈一键安装（Tailwind + shadcn/ui + Motion + Magic UI）
 - `tools/import_to_inbox.py` — 文件导入 inbox
 - `tools/sync_to_starter.py` — PKB → pkb-starter 系统同步（dev-only）
 - `tools/scholarly_enrich.py` — 学术元数据增强 CLI（DOI 查询 + 批量扫描 + 写入）
@@ -100,4 +103,4 @@ tags: [home, index]
 
 ---
 
-*由 PKB 系统维护。最后更新: 2026-06-18 (v0.6.11 / web_pack v3.1)*
+*由 PKB 系统维护。最后更新: 2026-06-20 (v0.6.12 / web_pack v3.1 / scansci_bridge v1.0)*
