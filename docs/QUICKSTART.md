@@ -2,7 +2,7 @@
 
 > 5 minutes to your own LLM-powered personal knowledge base.
 >
-> **Version**: v0.6.10-alpha
+> **Version**: v0.6.12-alpha
 
 Languages: [English](QUICKSTART.md) | [简体中文](zh-CN/QUICKSTART.md)
 

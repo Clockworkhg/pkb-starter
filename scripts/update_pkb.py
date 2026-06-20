@@ -48,7 +48,7 @@ SKILLS_DIR = REPO_ROOT / "skills"
 REGISTRY_DIR = REPO_ROOT / "skills_registry"
 
 # Current pkb-starter version
-CURRENT_VERSION = "0.6.10-alpha"
+CURRENT_VERSION = "0.6.12-alpha"
 CURRENT_SCHEMA_VERSION = "0.6.0"
 
 # User data paths — NEVER overwrite or delete

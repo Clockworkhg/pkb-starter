@@ -4,6 +4,30 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
+## v0.6.12-alpha (2026-06-20) — Multi-Source Paper Download Engine
+
+### ✨ New Features
+
+- **scansci_bridge v1.0** (`tools/scansci_bridge.py`): 13-source paper download engine
+  - Download: `python tools/scansci_bridge.py download <DOI>` — parallel race across 13 OA sources
+  - Search: `python tools/scansci_bridge.py search "<query>" --limit N`
+  - Health check: `python tools/scansci_bridge.py --check` — source availability diagnostic
+  - Strategies: `fastest` (default) | `oa_first` | `scihub_only` | `legal_only`
+  - 6/6 sources reachable (EuropePMC/Unpaywall/SemanticScholar/OpenAlex/Crossref)
+- **scihub_fetch upgrade**: Now acts as multi-source pipeline frontend (scansci-pdf → Sci-Hub fallback)
+- **setup_beauty_stack**: One-click beauty tech stack installer (Tailwind + shadcn/ui + Motion + Magic UI)
+
+### 📝 Changes
+
+- CLAUDE.md: version bump to v0.6.12-alpha, added scansci_bridge + setup_beauty_stack documentation
+- AGENTS.md: version bump to 1.3.1, scansci_bridge v1.0 marker
+- COMMANDS.md: added `/setup-beauty-stack`, scansci_bridge usage examples
+- README.md / README.zh-CN.md: version bump, scansci_bridge feature highlight
+- template/tools/scansci_bridge.py: new 546-line bridge layer
+- template/tools/scihub_fetch.py: new 405-line upgraded fetch module
+
+---
+
 ## v0.6.11-alpha (2026-06-18) — Global Knowledge Bridge
 
 ### ✨ New Features

@@ -2,6 +2,28 @@
 
 Languages: [English](UPDATING.md) | [简体中文](zh-CN/UPDATING.md)
 
+## v0.6.11 → v0.6.12 Migration
+
+### New: scansci_bridge v1.0 — Multi-Source Paper Download
+
+13-source parallel paper download engine with Sci-Hub fallback:
+
+```bash
+python tools/scansci_bridge.py download <DOI>
+python tools/scansci_bridge.py search "<query>" --limit 5
+python tools/scansci_bridge.py --check          # source health diagnostic
+```
+
+- Strategies: `fastest` (default) | `oa_first` | `scihub_only` | `legal_only`
+- scihub_fetch.py upgraded to multi-source pipeline frontend
+- New: setup_beauty_stack quick-install (`/setup-beauty-stack`)
+
+### New: /setup-beauty-stack
+
+One-click beauty tech stack: Tailwind + shadcn/ui + Motion + Magic UI.
+
+---
+
 ## v0.6.9 → v0.6.11 Migration
 
 ### New: /ask-pkb Global Knowledge Bridge

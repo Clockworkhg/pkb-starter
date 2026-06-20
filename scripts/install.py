@@ -541,7 +541,7 @@ def main():
         if not interactive_mode:
             sys.exit(1)
 
-    print(f"=== PKB Starter Installer v0.6.10-alpha ===")
+    print(f"=== PKB Starter Installer v0.6.12-alpha ===")
     print(f"Target: {target}")
     print(f"Language: {lang}")
     if dry_run:
