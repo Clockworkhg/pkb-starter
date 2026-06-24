@@ -130,6 +130,8 @@ zotero.sqlite.bak
 
 # === 同步报告（自动生成） ===
 update_report.md
+update_client_report.md
+RELEASE_CHECK*.md
 
 # === MCP 服务器本地配置 ===
 .claude/mcp.local.json
