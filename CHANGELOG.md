@@ -4,7 +4,7 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
-## v0.6.14-alpha (2026-06-24) — Exam Export + Retrieval Engine + Paper Pipeline
+## v0.6.14-starter (2026-06-24) — Exam Export + Retrieval Engine + Paper Pipeline
 
 ### ✨ New Features
 
@@ -16,11 +16,22 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ### 📝 Changes
 
-- CLAUDE.md: version bump to v0.6.14-alpha, tool table expanded (30 tools)
+- CLAUDE.md: version bump to v0.6.14-starter, tool table expanded (30 tools)
 - AGENTS.md: version bump to 1.3.2 (2026-06-24), hooks v1.1, pkb_retrieve v3.0
 - hooks/03_post_tool_use.py: retrieval index auto-rebuild (30s cooldown) + full health check post-commit
 - .gitignore: expanded with vendor skill repos, Zotero DB, scholarly metadata, privacy raw files
 - template/sync: ask-pkb/SKILL.md, index.md, 03_post_tool_use.py, AGENTS.md synced
+
+### 🔧 Sync Pipeline Fixes (2026-06-24)
+
+- **Critical**: sync_to_starter.py binary file corruption — added BINARY_EXTENSIONS detection + read_bytes/write_bytes
+- **Critical**: manifest sanitize_patterns double-backslash bug — 3 residual PKB paths leaked into starter
+- **High**: deleted stale root-level CLAUDE.md (v0.6.13-alpha orphan listing 6 missing tools)
+- **Medium**: removed dead `tools/tests/conftest.py` manifest mapping + duplicate target collision
+- **Medium**: deleted stale root `.obsidian/workspace.json` (orphan after vault migration)
+- **Docs**: COMMANDS.md, index.md, AGENTS.md — cnki_setup/setup_beauty_stack marked optional
+- **Docs**: README version badge → v0.6.14-starter, skills count 7→3 built-in
+- **Manifest**: +6 entries (test_pkb_retrieve.py + test-wiki fixtures), 120 mappings / 0 duplicates
 
 ---
 
@@ -145,7 +156,7 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 | Version | Date | Theme |
 |---------|------|-------|
-| v0.6.14-alpha | 2026-06-24 | Exam Export + Retrieval Engine + Paper Pipeline |
+| v0.6.14-starter | 2026-06-24 | Exam Export + Retrieval Engine + Paper Pipeline |
 | v0.6.13-alpha | 2026-06-20 | Guided Installation + Installer UX Fixes |
 | v0.6.12-alpha | 2026-06-20 | Multi-Source Paper Download Engine |
 | v0.6.11-alpha | 2026-06-18 | Global Knowledge Bridge |

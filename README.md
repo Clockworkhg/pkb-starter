@@ -357,7 +357,7 @@ See [SCHOLARLY_METADATA.md](docs/SCHOLARLY_METADATA.md) for full documentation.
 
 ## Version History
 
-- **v0.6.14-alpha**: Current. Hybrid retrieval engine (BM25 + vector RRF + cross-encoder), batch paper metadata (batch_english_papers), CNKI batch download + WebVPN, agent-skills-catalog v2 (~132 skills), expanded .gitignore security rules.
+- **v0.6.14-starter**: Current. Hybrid retrieval engine (BM25 + vector RRF + cross-encoder), batch paper metadata (batch_english_papers), CNKI batch download + WebVPN, agent-skills-catalog v2 (~132 skills), expanded .gitignore security rules.
 - **v0.6.13-alpha**: `/install` guided setup + install_skills v0.4.0: categorized reports, built-in skill detection, post-install verification, CNKI/Zotero awareness.
 - **v0.6.11-alpha**: Global Knowledge Bridge: `/ask-pkb` skill for cross-project wiki queries, intelligent path detection (PKB_ROOT env var → auto-detect → config), v0.6.9→v0.6.11 migration guide, full documentation sweep.
 - **v0.6.10-alpha**: Code review hardening: P0 crash fixes (SourceStatus import, DOI encoding, null primary_location, JSON decode errors), P1 data integrity (CRLF write, journal_rankings compatibility, cache safety), P2 determinism (stable CSL IDs, detection_threshold config, locked preservation, author name formatting), P3 observability. web_pack non-JSON response hardening.

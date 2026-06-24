@@ -1,8 +1,8 @@
-﻿# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.14--alpha-blue)
+﻿# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.14--starter-blue)
 
 > **一个命令管理你的知识。** `/pkb <任何东西>` — 丢入 URL、文件或想法，LLM 自动整理一切。
 >
-> **当前版本**：v0.6.14-alpha | 🆕 **pkb_retrieve v3.0**：混合检索（BM25 + 向量 + Cross-encoder）| **全局查询**：`/ask-pkb` 任意窗口可用
+> **当前版本**：v0.6.14-starter | 🆕 **pkb_retrieve v3.0**：混合检索（BM25 + 向量 + Cross-encoder）| **全局查询**：`/ask-pkb` 任意窗口可用
 
 语言：[English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -311,7 +311,7 @@ MIT — 参见 [LICENSE](LICENSE)
 
 ## 当前版本
 
-**v0.6.14-alpha** — 当前版本。混合检索引擎（BM25 + 向量 RRF + Cross-encoder 三阶段）、批量英文论文元数据（batch_english_papers）、CNKI 批量下载 + WebVPN、agent-skills-catalog v2（~132 skills）、.gitignore 安全规则扩展。
+**v0.6.14-starter** — 当前版本。混合检索引擎（BM25 + 向量 RRF + Cross-encoder 三阶段）、批量英文论文元数据（batch_english_papers）、CNKI 批量下载 + WebVPN、agent-skills-catalog v2（~132 skills）、.gitignore 安全规则扩展。
 
 **v0.6.13-alpha** — `/install` 引导式安装 + install_skills v0.4.0：分类安装报告、内置技能检测、安装后诊断、CNKI/Zotero 主动告知。
 
