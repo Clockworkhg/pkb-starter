@@ -9,7 +9,8 @@ import re
 from pathlib import Path
 
 # === 配置 ===
-SAVE_DIR = Path(r"D:\PKB_个人知识库\raw\papers\cnki-20250621")
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SAVE_DIR = _PROJECT_ROOT / "raw" / "papers" / "cnki-20250621"
 SAVE_DIR.mkdir(parents=True, exist_ok=True)
 
 # 从浏览器提取的 cookies

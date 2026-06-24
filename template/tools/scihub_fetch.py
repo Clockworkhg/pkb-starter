@@ -54,7 +54,7 @@ except ImportError:
 
 # ── Configuration ──────────────────────────────────────────────────────────
 
-ROOT = r"D:\PKB_个人知识库\raw\papers\youth-social-mentality"
+ROOT = str(_PROJECT_ROOT / "raw" / "papers")
 
 SCI_HUB_DOMAINS = [
     "sci-hub.shop",
