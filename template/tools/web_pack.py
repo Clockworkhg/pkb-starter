@@ -150,7 +150,7 @@ if YTDLP_PATH:
 # 配置常量
 # ───────────────────────────────────────────────────────────────
 
-PKB_ROOT = Path(os.environ.get("PKB_ROOT", r"D:\PKB_个人知识库"))
+PKB_ROOT = Path(os.environ.get("PKB_ROOT", r"<PKB_ROOT>"))
 WEBPACKS_DIR = PKB_ROOT / "raw" / "webpacks"
 
 USER_AGENT = (

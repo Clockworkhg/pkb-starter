@@ -25,7 +25,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 # --- 配置 ---
-PKB_ROOT = Path(os.environ.get("PKB_ROOT", r"D:\PKB_个人知识库"))
+PKB_ROOT = Path(os.environ.get("PKB_ROOT", r"<PKB_ROOT>"))
 INBOX_FILES = PKB_ROOT / "_INBOX" / "imported"
 INBOX_FOLDERS = PKB_ROOT / "_INBOX" / "imported-folders"
 
