@@ -328,9 +328,9 @@ id_rsa*
 
 ### 12.1 先决条件
 
-CNKI 相关 skills（`cnki-search`, `cnki-download` 等 10 个 + `/pkb-cnki`）依赖 Chrome DevTools MCP。
+CNKI 相关 skills（`cnki-search`, `cnki-download` 等 10 个 + `/pkb-cnki`）依赖 Chrome DevTools MCP。**需安装完整 PKB 后方可使用。**
 
-**一次性自动安装**（首次使用时运行）：
+**一次性自动安装**（完整 PKB 中，首次使用时运行）：
 ```bash
 python tools/cnki_setup.py --fix      # 安装 MCP 包 + 启动 Chrome 调试模式
 ```
@@ -341,6 +341,8 @@ powershell tools/launch_chrome.ps1    # 智能启动 Chrome（已跑则跳过）
 ```
 
 ### 12.2 自动化程度
+
+> ⚠️ `cnki_setup.py` 和 CNKI skills 仅在安装完整 PKB 后可用，pkb-starter 模板中不含这些文件。
 
 | 步骤 | 方式 |
 |------|------|

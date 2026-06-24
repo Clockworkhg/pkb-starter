@@ -64,7 +64,7 @@
 | `/pkb-cnki search <关键词>` | 搜索知网 → 自动创建 wiki 文献页 |
 | `/pkb-cnki download <标题>` | 单篇论文搜到即下，存入 raw/papers/ |
 | `/pkb-cnki status` | 查看 PDF 下载状态摘要 |
-| `python tools/cnki_setup.py --fix` | 一键安装 MCP + 诊断 Chrome |
+| `python tools/cnki_setup.py --fix` | 一键安装 MCP + 诊断 Chrome（安装完整 PKB 后可用） |
 | `powershell tools/launch_chrome.ps1` | 启动 Chrome 远程调试模式 |
 
 > CNKI 命令需 Chrome DevTools MCP 连接 + 用户登录知网。详见 [[cnki-skills-integration]]。

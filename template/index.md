@@ -51,11 +51,11 @@ tags: [home, index]
 - `tools/pkb_ingest.py` — 本地文件入库编排器（import→markitdown→cache→wiki）
 - `tools/markitdown_convert.py` — 本地文档→MD 预提取引擎（PDF/DOCX/PPTX/XLSX/XLS）
 - `tools/docs_update.py` — 项目文档自动更新
-- `tools/cnki_setup.py` — CNKI 基础设施一键诊断 + 自动修复
+- `tools/cnki_setup.py` — CNKI 基础设施一键诊断 + 自动修复（安装完整 PKB 后可用）
 - `tools/launch_chrome.ps1` — Chrome 远程调试智能启动器
 - `tools/scihub_fetch.py` — 论文获取（scansci-pdf 多源并行 → Sci-Hub fallback）
 - `tools/scansci_bridge.py` — 🆕 scansci-pdf 桥接层（多源赛马下载/搜索/健康检查）
-- `tools/setup_beauty_stack.py` — 美化技术栈一键安装
+- `tools/setup_beauty_stack.py` — 美化技术栈一键安装（安装完整 PKB 后可用）
 - `tools/import_to_inbox.py` — 文件导入 inbox
 - `tools/scholarly_enrich.py` — 学术元数据增强 CLI
 - `tools/filter_literature.py` — 结构化文献筛选器

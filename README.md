@@ -1,8 +1,8 @@
-﻿# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.14--alpha-blue)
+﻿# PKB Starter ![version](https://img.shields.io/badge/version-v0.6.14--starter-blue)
 
 > **One command to rule your knowledge.** `/pkb <anything>` — throw in a URL, file, or idea. The LLM organizes everything.
 >
-> **Current version**: v0.6.14-alpha | 🆕 **pkb_retrieve v3.0**: hybrid retrieval (BM25 + vector + cross-encoder) | **Global query**: `/ask-pkb` from any project
+> **Current version**: v0.6.14-starter | 🆕 **pkb_retrieve v3.0**: hybrid retrieval (BM25 + vector + cross-encoder) | **Global query**: `/ask-pkb` from any project
 
 Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -54,7 +54,7 @@ In Claude Code (project mode):
 ```
 raw/          Immutable raw materials (web collections, PDFs, files)
 wiki/         LLM-maintained structured knowledge (Markdown + [[wikilinks]])
-skills/       Agent automation rules (7 skills)
+skills/       Agent automation rules (3 built-in, expandable to 39+)
 tools/        Python helper scripts (web_pack, import, sanitize, etc.)
 ```
 
