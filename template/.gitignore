@@ -100,6 +100,7 @@ temp/
 downloads/
 .cache/
 .pkb-cache/
+.pytest_cache/
 
 # === 隐私 raw 文件（按模式排除） ===
 # 包含个人身份信息的文件

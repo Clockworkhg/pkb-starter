@@ -18,6 +18,7 @@ Usage:
 """
 
 import os
+import re
 import sys
 import time
 import json
@@ -76,6 +77,109 @@ def check_stale_inbox(hours: int = 24) -> list:
     except Exception:
         pass
     return stale
+
+
+def refresh_hot_md():
+    """Refresh wiki/hot.md with session summary.
+
+    Lists recently modified wiki pages, updates the recent operations section.
+    Controls size to ~500 words / ~3000 chars. Non-fatal.
+    """
+    root = get_root()
+    hot_path = root / "wiki" / "hot.md"
+    if not hot_path.exists():
+        return
+
+    dry = is_dry_run()
+    if dry:
+        info("[DRY RUN] Would refresh wiki/hot.md")
+        return
+
+    try:
+        from datetime import datetime, timezone
+
+        content = hot_path.read_text(encoding="utf-8", errors="replace")
+
+        # Preserve existing "当前活跃主题" section if present
+        active_topics_match = re.search(
+            r"## 当前活跃主题\r?\n(.*?)(?=\r?\n## |\Z)", content, re.DOTALL
+        )
+        active_topics_section = ""
+        if active_topics_match:
+            active_body = active_topics_match.group(1).strip()
+            if active_body and active_body != "（见上方最近操作）":
+                active_topics_section = f"## 当前活跃主题\n{active_body}"
+            else:
+                active_topics_section = "## 当前活跃主题\n<!-- 由 Agent 手动维护 -->\n（见上方最近操作）"
+
+        # Get recently modified wiki pages (top 10, exclude self + _prefix files)
+        wiki_root = root / "wiki"
+        wiki_files = []
+        try:
+            for f in sorted(
+                wiki_root.rglob("*.md"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            ):
+                if f.name.startswith("_") or f.name == "hot.md":
+                    continue
+                rel = f.relative_to(wiki_root)
+                wiki_files.append(str(rel).replace("\\", "/"))
+                if len(wiki_files) >= 10:
+                    break
+        except Exception:
+            pass
+
+        # Prune recent ops to last 4 + add session stamp
+        # Use \r?\n for Windows CRLF compatibility
+        recent_match = re.search(
+            r"## 最近操作\r?\n(.*?)(?=\r?\n## |\Z)", content, re.DOTALL
+        )
+        ops_lines = []
+        if recent_match:
+            ops_lines = [l for l in recent_match.group(1).split("\n") if l.strip().startswith("-")]
+        ops_lines = ops_lines[:4]
+
+        today = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d")
+        session_stamp = f"- {today}: Session completed — see [[log|操作日志]] for details"
+        ops_lines.insert(0, session_stamp)
+
+        # Build the hot.md content
+        recent_files = "\n".join(f"- `{f}`" for f in wiki_files[:10])
+
+        new_hot = f"""---
+created: {today}
+updated: {today}
+tags: [meta, cache, auto-generated]
+type: system
+---
+
+# Hot Cache
+
+> 最近上下文摘要。每次会话开始先读此文件（~500 tok）。
+> 会话结束自动刷新。
+
+## 最近操作
+{chr(10).join(ops_lines)}
+
+{active_topics_section}
+
+## 最近变更的文件
+{recent_files}
+
+---
+
+> 自动生成。控制在 ~500 words 以内。
+"""
+
+        if new_hot.strip() != content.strip():
+            # Atomic write: tmp → rename to avoid truncated file on timeout/crash
+            tmp = hot_path.with_suffix(".md.tmp")
+            tmp.write_text(new_hot, encoding="utf-8", errors="replace")
+            tmp.replace(hot_path)
+            ok("wiki/hot.md auto-refreshed")
+    except Exception:
+        pass  # Non-fatal — never block exit
 
 
 def touch_active_task():
@@ -174,6 +278,9 @@ def main():
 
     # Touch active task timestamp (non-fatal)
     touch_active_task()
+
+    # Refresh hot.md cache (non-fatal)
+    refresh_hot_md()
 
     print_session_summary()
     return 0

@@ -24,6 +24,7 @@ Safety:
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -282,6 +283,70 @@ def filter_by_risk(entries: list[dict], enable_risky: bool) -> tuple:
 
 # -- Installation Operations ------------------------------------------
 
+def rewrite_global_paths(vendor_dir: Path, target: Path) -> int:
+    """Rewrite ~/.claude/skills/ references to local vendor paths.
+
+    Many vendor SKILL.md files hardcode ~/.claude/skills/<name>/ paths
+    for scripts and references. Since we install to skills/_vendor/<id>/,
+    these paths need to be rewritten to relative project paths.
+
+    Returns the number of files modified.
+    """
+    modified_count = 0
+    for md_file in vendor_dir.rglob("*.md"):
+        try:
+            content = md_file.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            continue
+
+        if "~/.claude/skills/" not in content:
+            continue
+
+        new_content = content
+        file_modified = False
+
+        # Find all ~/.claude/skills/<name>/ references
+        for match in re.finditer(r'~/.claude/skills/([^/\s)`"\']+)', content):
+            skill_name = match.group(1)
+            full_match = match.group(0)
+
+            # Check if this skill exists in the vendor directory
+            skill_path = target / "skills" / "_vendor" / skill_name
+            if skill_path.is_dir():
+                # Calculate relative path from the .md file to the skill directory
+                try:
+                    rel = os.path.relpath(skill_path, md_file.parent)
+                    rel_str = str(rel).replace("\\", "/")
+                    new_content = new_content.replace(full_match, rel_str)
+                    file_modified = True
+                except ValueError:
+                    pass  # Can't compute relative path (different drives)
+
+            # Also check if the path refers to the current vendor skill
+            # e.g., skill_id is "deep-research-skills" but path references "deep-research"
+            # Try common pattern: check skills/_vendor/<skill_name>/
+            alt_path = target / "skills" / "_vendor"
+            for child in alt_path.iterdir() if alt_path.is_dir() else []:
+                if child.is_dir() and (child / skill_name).is_dir():
+                    try:
+                        rel = os.path.relpath(child / skill_name, md_file.parent)
+                        rel_str = str(rel).replace("\\", "/")
+                        new_content = new_content.replace(full_match, rel_str)
+                        file_modified = True
+                        break
+                    except ValueError:
+                        pass
+
+        if file_modified:
+            try:
+                md_file.write_text(new_content, encoding="utf-8")
+                modified_count += 1
+            except Exception:
+                pass
+
+    return modified_count
+
+
 def install_skill(entry: dict, target: Path, dry_run: bool = False) -> dict:
     """
     Install a skill based on its install_method.
@@ -368,6 +433,10 @@ def install_skill(entry: dict, target: Path, dry_run: bool = False) -> dict:
         )
         if proc.returncode == 0:
             result["status"] = "installed"
+            # Rewrite hardcoded ~/.claude/skills/ paths for vendor skills
+            rewritten = rewrite_global_paths(vendor_dir, target)
+            if rewritten > 0:
+                result["paths_rewritten"] = rewritten
         else:
             result["status"] = "failed"
             result["error"] = proc.stderr.strip()[:500]

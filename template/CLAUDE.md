@@ -6,43 +6,55 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
-项目版本：`v0.6.14-alpha` | 组件：`web_pack v3.1` | `scansci_bridge v1.0` | 🆕 全局知识库查询：`/ask-pkb`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
+**公开模板版本：`v0.6.14-starter`**（基于 PKB v0.6.14-alpha）| 内置：全局知识库查询 `/ask-pkb` + 对话捕获 `/pkb-capture`。上游项目：[PKB](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
 ```
 .mcp.json            项目 MCP 配置（chrome-devtools，Claude Code 标准位置）
-pkb.ps1              统一启动器（start/status/cnki/doctor/resume）
-raw/webpacks/        网页素材包（web_pack.py v3.1 产出，Playwright 动态渲染）
-raw/papers/          论文 PDF + manifest.json
-.pkb-cache/          文档转换缓存（MarkItDown 预提取）
-.pkb-local/          本地运行时状态（任务、Chrome profile、日志 — 不提交）
-wiki/concepts/       原子化概念笔记
-wiki/sources/        知识来源索引（含文献地图）
-wiki/projects/       项目笔记
-.claude/skills/      Agent Skills（39+，含全局 `/ask-pkb`）
-.claude/commands/    Slash Commands（35+）
+pkb.ps1              统一启动器（PKB 项目级，clone 完整 PKB 后可用）
+raw/                 原始资料（不可变，只增不删）
+wiki/                LLM 维护的结构化知识
+.claude/skills/      Agent Skills（2 built-in：ask-pkb + pkb-capture，可扩展至 39+）
+.claude/commands/    Slash Commands
 .claude/hooks/       Harness Hooks（6 个自动化钩子）
-tools/               Python 工具脚本（14+）
-examples/            示例文件（任务状态模板等）
+tools/               Python 工具脚本
+.pkb-cache/          文档转换缓存（MarkItDown 预提取）
+.pkb-local/          本地运行时状态（不提交）
 ```
+
+## 自动 Skill 检测规则
+
+> ⚠️ **最高优先级**：收到用户输入后，必须先检查 Skill 路由表，匹配则立即调用对应 Skill。
+> 不要直接回答问题 — 优先使用 Skill 工具。详细路由规则见 [AGENTS.md](AGENTS.md)。
 
 ## Skill 路由速查
 
+### 核心（built-in 可用）
 | 用户意图 | 调用 |
 |---------|------|
+| 全局知识库查询 | `/ask-pkb`（任意窗口可用） |
+| 全局对话捕获 | `/pkb-capture`（任意窗口可用） |
 | 丢任何东西入库 | `/pkb <anything>` |
-| 知网论文搜索/下载 | `/pkb-cnki search\|fill-gaps\|download` |
+| 网页采集 | `/web <url>` |
+| 本地文件导入 | `/pkb <path>` |
+
+### 学术研究（安装完整 PKB skill set 后可用）
+| 用户意图 | 调用 |
+|---------|------|
 | 英文论文多源下载 | `python tools/scansci_bridge.py download <DOI>` |
 | 学术研究（论文/综述/引用） | `/research` `/paper` `/literature-*` |
+| 文献搜索/综述 | `/literature-search` `/literature-review` |
+| 知网论文 | `/pkb-cnki`（需 Chrome MCP + 知网登录） |
+
+### 工具与格式（安装后可用）
+| 用户意图 | 调用 |
+|---------|------|
 | 文档格式转换 | `/doc` `/ocr` |
-| Excel/Markdown 表格 | `/z-excel-editor` `/z-md-excel` |
 | 隐私清理 | `/sanitize` |
 | 看板管理 | `/kanban` |
-| 全局知识库查询 | `/ask-pkb`（任意窗口可用） |
-| 代码审查/简化 | `/simplify` |
-| 创建新 Skill | `/make-skill` |
-| 美化技术栈一键安装 | `/setup-beauty-stack` |
+| 文档更新 | `/docs-update` |
+| 保存/提交 | `/save` |
 
 ## 编码约定
 
@@ -55,38 +67,37 @@ examples/            示例文件（任务状态模板等）
 
 ## 工具速查
 
+### 内置工具（模板自带）
 | 工具 | 用途 |
 |------|------|
-| `tools/pkb_task.py` | 🆕 活动任务状态管理（show/start/update/block/complete/clear） |
-| `tools/pkb_doctor.py` | 🆕 运行时诊断（18 项 PASS/WARN/FAIL/SKIP 检查） |
-| `tools/web_pack.py` | 网页完整采集 v3.1（readability + Playwright DOM + Network + yt-dlp + GitHub Collector） |
-| `tools/content_quality.py` | 正文质量评分（Playwright 动态渲染触发判定） |
-| `tools/playwright_renderer.py` | Playwright DOM 渲染 fallback（Chromium 浏览器自动化） |
-| `tools/network_capture.py` | XHR/Fetch 网络响应捕获 |
-| `tools/network_content.py` | 网络正文候选提取 + 去重 |
-| `tools/selection_engine.py` | HTTP / Playwright DOM / Playwright Network 三方选择 |
+| `tools/pkb_bridge.py` | 🆕 全局桥接引擎 v1.0（跨项目 capture/query/status/install） |
 | `tools/pkb_auto.py` | 全自动入库 + 健康检查 |
-| `tools/pkb_ingest.py` | 本地文件入库编排器（import→markitdown→cache→wiki，正文在 .pkb-cache/）（Phase 1.5） |
-| `tools/markitdown_convert.py` | 本地文档→MD 预提取引擎（PDF/DOCX/PPTX/XLSX/XLS，动态版本）（Phase 1.5） |
-| `tools/docs_update.py` | 文档新鲜度检测（`--json`/`--summary`） |
-| `tools/cnki_setup.py` | CNKI 基础设施一键诊断 + 修复 |
-| `tools/download_papers.py` | 批量论文下载协调器 |
-| `tools/download_papers_r2.py` | R2 学术源论文下载 |
-| `tools/download_papers_r3.py` | R3 学术源论文下载 |
-| `tools/scihub_fetch.py` | 论文获取（scansci-pdf 13源并行 → Sci-Hub fallback） |
+| `tools/pkb_ingest.py` | 本地文件入库编排器（import→markitdown→cache→wiki） |
+| `tools/markitdown_convert.py` | 本地文档→MD 预提取引擎（PDF/DOCX/PPTX/XLSX/XLS） |
+| `tools/web_pack.py` | 网页完整采集 v3.1（readability + Playwright DOM + Network + yt-dlp） |
 | `tools/scansci_bridge.py` | 🆕 scansci-pdf 桥接层（download/search/--check，多源赛马） |
-| `tools/scholarly_enrich.py` | 学术元数据增强 CLI（DOI 查询 + 批量扫描 + 写入）（Phase 1B） |
-| `tools/filter_literature.py` | 结构化文献筛选器（按期刊等级/年份/被引/DOI 过滤）（Phase 1B） |
+| `tools/scihub_fetch.py` | 论文获取（scansci-pdf 13源并行 → Sci-Hub fallback） |
+| `tools/pkb_retrieve.py` | 🆕 混合检索引擎（BM25 + 向量 RRF + Cross-encoder） |
+| `tools/pkb_task.py` | 活动任务状态管理（show/start/update/block/complete/clear） |
+| `tools/pkb_doctor.py` | 运行时诊断（18 项 PASS/WARN/FAIL/SKIP 检查） |
+| `tools/docs_update.py` | 文档新鲜度检测 |
+| `tools/scholarly_enrich.py` | 学术元数据增强 CLI（DOI 查询 + 批量扫描 + 写入） |
+| `tools/filter_literature.py` | 结构化文献筛选器（按期刊等级/年份/被引/DOI 过滤） |
 | `tools/import_journal_rankings.py` | 期刊目录导入（CSSCI/北大核心/AMI/CSCD/自定义） |
 | `tools/import_to_inbox.py` | 文件导入 _INBOX |
-| `tools/sync_to_starter.py` | PKB → pkb-starter 系统同步（dev-only） |
-| `tools/check_collectors.py` | 采集器健康检查 + z-web-pack bridge 支持 |
-| `tools/zskill_bridge.py` | Z-Skills 兼容桥接层 |
-| `tools/setup_beauty_stack.py` | 🆕 美化技术栈一键安装（Tailwind + shadcn/ui + Motion + Magic UI 等） |
-| `tools/pkb_retrieve.py` | 🆕 混合检索引擎（BM25 + 向量 RRF + Cross-encoder 三阶段 pipeline） |
-| `tools/batch_english_papers.py` | 批量英文论文元数据查询（DOI → Crossref/OpenAlex/SemanticScholar） |
+
+### 可选扩展（安装完整 PKB 后可用）
+| 工具 | 用途 |
+|------|------|
+| `tools/cnki_setup.py` | CNKI 基础设施一键诊断 + 修复 |
+| `tools/batch_english_papers.py` | 批量英文论文元数据查询 |
 | `tools/cnki_batch_download.py` | CNKI 批量下载协调器（MCP 驱动） |
-| `tools/cnki_webvpn.py` | CNKI WebVPN 代理访问（机构身份认证） |
+| `tools/cnki_webvpn.py` | CNKI WebVPN 代理访问 |
+| `tools/setup_beauty_stack.py` | 美化技术栈一键安装 |
+| `tools/content_quality.py` | 正文质量评分 |
+| `tools/playwright_renderer.py` | Playwright DOM 渲染 fallback |
+| `tools/network_capture.py` | XHR/Fetch 网络响应捕获 |
+| `tools/selection_engine.py` | HTTP / Playwright DOM / Playwright Network 三方选择 |
 
 ## Hooks 速查
 
@@ -110,15 +121,6 @@ examples/            示例文件（任务状态模板等）
 ```
 全自动：采集 → 编译 wiki → 归档 → 健康检查 → commit。不询问。
 
-### 统一启动器（🆕 v0.6.9）
-```powershell
-.\pkb.ps1              # 默认：环境检查 + 状态摘要
-.\pkb.ps1 status       # 完整状态
-.\pkb.ps1 cnki         # CNKI 工作流（Chrome + MCP）
-.\pkb.ps1 doctor       # 18 项诊断
-.\pkb.ps1 resume       # 恢复 Claude Code 会话 + 加载 MCP
-```
-
 ### 保存
 ```
 /save "提交信息"
@@ -130,14 +132,6 @@ examples/            示例文件（任务状态模板等）
 /docs-update
 ```
 诊断 + 修复项目文档，不 commit。`/save` 内含此步骤。
-
-### CNKI 论文
-```
-.\pkb.ps1 cnki             # 一键启动 Chrome + MCP
-.\pkb.ps1 resume           # 恢复会话（claude --continue --mcp-config .mcp.json）
-/pkb-cnki fill-gaps        # 补齐缺失 PDF
-```
-⚠️ 需 Chrome DevTools MCP 连接 + 知网登录。MCP 仅会话启动时加载。
 
 ### 英文论文下载（🆕 scansci-pdf 多源管线）
 ```
@@ -170,4 +164,4 @@ python tools/scihub_fetch.py                    # 兼容旧接口（自动走多
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-24 (v0.6.14 / web_pack v3.1 / scansci_bridge v1.0 / pkb_retrieve v3.0)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-24 (v0.6.14-starter / pkb_bridge v1.0 / scansci_bridge v1.0)*

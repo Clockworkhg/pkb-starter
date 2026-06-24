@@ -8,6 +8,8 @@ Routes to the appropriate check based on tool and target:
   - Write/Edit on wiki/*.md  → fast frontmatter-only check (lightweight)
   - Write/Edit on other files → skip (not in PKB scope)
   - Bash(git commit)         → full health check via pkb_auto.py --check
+                               (NOTE: requires separate Bash matcher in settings.json
+                               to be reachable; current matcher is only Write|Edit)
 
 Always returns 0 — failures are warnings, not blocks.
 The PreToolUse hook handles blocking for safety violations.
@@ -23,7 +25,9 @@ Usage:
 """
 
 import os
+import re
 import sys
+import time
 import json
 import subprocess
 from pathlib import Path
@@ -40,9 +44,13 @@ def check_frontmatter(filepath: str) -> dict:
         p = Path(filepath)
         if not p.exists():
             return {"ok": True, "issues": []}
-        content = p.read_text(encoding="utf-8", errors="ignore")
+        content = p.read_text(encoding="utf-8", errors="replace")
     except Exception:
         return {"ok": True, "issues": []}
+
+    # Strip UTF-8 BOM if present (Windows Notepad adds ﻿)
+    if content.startswith("﻿"):
+        content = content[1:]
 
     issues = []
     # Check for frontmatter delimiters
@@ -55,8 +63,8 @@ def check_frontmatter(filepath: str) -> dict:
             issues.append("Unclosed frontmatter (missing closing ---)")
         else:
             fm = content[3:end].strip()
-            # Check required keys
-            for key in ["created", "type"]:
+            # Check required keys (per CLAUDE.md: created/updated/tags/type)
+            for key in ["created", "updated", "tags", "type"]:
                 if f"{key}:" not in fm:
                     issues.append(f"Missing frontmatter key: {key}")
 
@@ -127,6 +135,102 @@ def _rebuild_index() -> None:
         warn(f"Index rebuild error: {e}")
 
 
+# ── File-based write counter for subdomain index rebuild ──
+# Persisted to _INBOX/.hook_state/ to survive across subprocess invocations.
+# (Contrast with _rebuild_index which uses time-based cooldown.)
+
+def _get_write_count(root: Path) -> int:
+    """Read persisted wiki write count from hook state."""
+    state_file = root / "_INBOX" / ".hook_state" / "wiki_write_count.json"
+    try:
+        if state_file.exists():
+            data = json.loads(state_file.read_text(encoding="utf-8"))
+            return data.get("count", 0)
+    except Exception:
+        pass
+    return 0
+
+
+def _increment_write_count(root: Path) -> int:
+    """Increment and persist wiki write count. Returns new count."""
+    count = _get_write_count(root) + 1
+    state_file = root / "_INBOX" / ".hook_state" / "wiki_write_count.json"
+    try:
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text(
+            json.dumps({"count": count, "last_write": time.time()}),
+            encoding="utf-8",
+        )
+    except Exception:
+        pass  # Non-fatal — counter lapse is acceptable
+    return count
+
+
+def _maybe_rebuild_subdomain_indexes() -> None:
+    """Every 10th wiki write, rebuild relevant subdomain _index.md.
+
+    Counter is file-persisted so it survives across subprocess invocations.
+    At 10 writes: rebuild concepts, sources, projects _index.md.
+    At 50 writes: also suggest full /lint.
+    """
+    root = get_root()
+    count = _increment_write_count(root)
+
+    # Lint suggestion at 50-write milestones (do NOT return — still rebuild)
+    if count % 50 == 0:
+        info(
+            f"📊 {count} wiki writes — consider running /lint "
+            f"for full health check"
+        )
+
+    # Rebuild every 10 writes
+    if count % 10 != 0:
+        return
+
+    info(f"📝 Rebuilding subdomain indexes (write #{count})…")
+
+    for subdir_name in ("concepts", "sources", "projects"):
+        subdir = root / "wiki" / subdir_name
+        if subdir.exists():
+            _rebuild_single_subdomain_index(subdir, subdir_name)
+
+
+def _rebuild_single_subdomain_index(subdir: Path, name: str) -> None:
+    """Rebuild one subdomain _index.md — update '最近更新' section with 5 most recent pages."""
+    index_path = subdir / "_index.md"
+    if not index_path.exists():
+        return
+
+    try:
+        md_files = sorted(
+            [f for f in subdir.glob("*.md") if f.name != "_index.md"],
+            key=lambda f: f.stat().st_mtime, reverse=True,
+        )
+    except Exception:
+        return
+
+    existing = index_path.read_text(encoding="utf-8", errors="replace")
+    recent = md_files[:5]
+    recent_links = "\n".join(f"- [[{f.stem}]]" for f in recent)
+
+    # Use \r?\n for Windows CRLF compatibility
+    new_content = re.sub(
+        r"## 最近更新\r?\n(?:<!--.*?-->\r?\n)?(?:- \[\[.*?\]\]\r?\n)*",
+        f"## 最近更新\n{recent_links}\n",
+        existing,
+        count=1,
+    )
+
+    if new_content != existing:
+        # Atomic write: tmp → rename (avoids truncated file on crash)
+        tmp = index_path.with_suffix(".md.tmp")
+        tmp.write_text(new_content, encoding="utf-8", errors="replace")
+        tmp.replace(index_path)
+        ok(f"{name}/_index.md updated ({len(md_files)} pages)")
+    else:
+        ok(f"{name}/_index.md unchanged")
+
+
 def handle_write(tool_input: dict) -> int:
     """Fast-path: check only the written file if it's a wiki page."""
     filepath = tool_input.get("file_path", "")
@@ -144,6 +248,8 @@ def handle_write(tool_input: dict) -> int:
             ok()  # Silent pass
         # Phase 3: Auto-rebuild retrieval index (30s cooldown)
         _rebuild_index()
+        # Phase 4: Periodic subdomain index rebuild (every 10 writes)
+        _maybe_rebuild_subdomain_indexes()
     # Non-wiki files (index.md, log.md, CLAUDE.md, etc.) — skip fast path
     return 0
 

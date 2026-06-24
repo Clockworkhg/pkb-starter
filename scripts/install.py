@@ -564,6 +564,7 @@ def main():
     interactive_skills = "--interactive-skills" in sys.argv
     dry_run = "--dry-run" in sys.argv
     no_verify = "--no-verify" in sys.argv
+    no_global = "--no-global" in sys.argv
     verify = "--verify" in sys.argv
 
     # --verify is on by default (unless --dry-run or --no-verify)
@@ -702,6 +703,8 @@ def main():
 
         # Install dependencies
         total_steps = 7 if not skip_skills else 6
+        if not no_global:
+            total_steps += 1
         if not skip_deps:
             print(f"[6/{total_steps}] Installing Python dependencies...")
             install_requirements(target)
@@ -761,6 +764,38 @@ def main():
         doctor_result = _run_doctor(target)
         manual_checks = _verify_install_manually(target) if not doctor_result.get("success") else []
         _print_verify_report(doctor_result, manual_checks, target)
+
+    # ── Global Bridge Installation ──
+    bridge_script = target / "tools" / "pkb_bridge.py"
+    if not no_global and bridge_script.exists():
+        step_num = total_steps
+        print(f"[{step_num}/{total_steps}] Global Bridge: installing global skills...")
+        if dry_run:
+            print(f"  [DRY RUN] Would run: python tools/pkb_bridge.py install --all")
+        else:
+            try:
+                bridge_result = subprocess.run(
+                    [sys.executable, str(bridge_script), "install", "--all"],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace",
+                    cwd=str(target), timeout=30,
+                )
+                if bridge_result.returncode == 0:
+                    for line in bridge_result.stdout.strip().split("\n"):
+                        if line.strip():
+                            print(f"  {line.strip()}")
+                else:
+                    print(f"  [WARN] Bridge install returned non-zero (may need manual setup)")
+                    if bridge_result.stderr:
+                        print(f"    {bridge_result.stderr.strip()[:200]}")
+            except subprocess.TimeoutExpired:
+                print(f"  [WARN] Bridge install timed out — run manually:")
+                print(f"    cd \"{target}\" && python tools/pkb_bridge.py install --all")
+            except Exception as e:
+                print(f"  [WARN] Bridge install failed: {e}")
+                print(f"    Run manually: cd \"{target}\" && python tools/pkb_bridge.py install --all")
+    elif not no_global and not bridge_script.exists():
+        print(f"  [WARN] pkb_bridge.py not found in target — global skills not installed")
+        print(f"    Run manually after syncing: cd \"{target}\" && python tools/pkb_bridge.py install --all")
 
     if repo_url and "<your-username>" in repo_url:
         print(f"  [NOTE] starter_repo_url still contains '<your-username>' placeholder.")
