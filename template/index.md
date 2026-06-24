@@ -1,11 +1,12 @@
-﻿---
+---
 created: 2026-06-11
-updated: 2026-06-18
+updated: 2026-06-24
 tags: [home, index]
 ---
 
 # PKB 个人知识库
 
+> ⚡ **DEVELOPER EDITION** — pkb-starter 开发源 | [`/sync-to-starter`](COMMANDS.md) 同步系统变更到模板
 
 > 🏠 **项目级首页** — PKB 系统的导航入口。知识内容目录请见 [[wiki/index]]。
 
@@ -16,7 +17,7 @@ tags: [home, index]
 ### 📥 入口
 - `/pkb <任何东西>` — 🚀 唯一入口，全自动入库
 - `raw/webpacks/` — 网页素材包（6 个活跃包）
-- `raw/imported_processed/` — 已处理归档（6 文件）
+- `raw/imported_processed/` — 已处理归档（10 文件）
 - `raw/papers/` — 论文 PDF（11 篇，16 MB）
 
 ### 🧠 核心概念（AI/Agent 技术栈）
@@ -26,6 +27,7 @@ tags: [home, index]
 - [[agent-runtime]] — Agent 运行时概念（CLI/IDE/桌面/聊天）
 - [[coding-agent-selection]] — Coding Agent 选择方法论
 - [[claude-code-workflows]] — Claude Code 工作流与方法论（TDD/SDD/BDD + Agent Teams + 安全）
+- [[CogVideo-视频生成大模型]] — 智谱自研视频生成大模型（文生视频/图生视频）
 - [[ai-factory]] — AI Factory spec-driven 开发流水线
 - [[skills-compatible-runtime]] — Skills 兼容运行时标准
 - [[web-pack]] — 网页素材包概念
@@ -80,10 +82,14 @@ tags: [home, index]
 - `tools/network_content.py` — 网络正文候选提取与去重
 - `tools/selection_engine.py` — HTTP/Playwright DOM/Playwright Network 三方选择引擎
 - `tools/pkb_auto.py` — 全自动入库 + 健康检查
+- `tools/pkb_retrieve.py` — 🆕 混合检索引擎（BM25 + 向量 RRF + Cross-encoder 三阶段 pipeline）
 - `tools/pkb_ingest.py` — 本地文件入库编排器（import→markitdown→cache→wiki）
 - `tools/markitdown_convert.py` — 本地文档→MD 预提取引擎（PDF/DOCX/PPTX/XLSX/XLS）
 - `tools/docs_update.py` — 项目文档自动更新
 - `tools/cnki_setup.py` — CNKI 基础设施一键诊断 + 自动修复
+- `tools/cnki_batch_download.py` — CNKI 批量下载协调器（MCP 驱动）
+- `tools/cnki_webvpn.py` — CNKI WebVPN 代理访问（机构身份认证）
+- `tools/batch_english_papers.py` — 批量英文论文元数据查询（DOI → 多源元数据）
 - `tools/launch_chrome.ps1` — Chrome 远程调试智能启动器
 - `tools/download_papers.py` — 批量论文下载协调器
 - `tools/download_papers_r2.py` — R2 学术源论文下载
@@ -100,7 +106,8 @@ tags: [home, index]
 - `tools/pkb_task.py` — 活动任务状态管理（show/start/update/block/complete/clear）
 - `tools/check_collectors.py` — 采集器健康检查 + z-web-pack bridge
 - `tools/zskill_bridge.py` — Z-Skills 兼容桥接层
+- `tools/kaoshibao_export.py` — 🆕 考试宝Word导入格式转换器 — 三册题库→纯文本
 
 ---
 
-*由 PKB 系统维护。最后更新: 2026-06-20 (v0.6.13 / web_pack v3.1 / scansci_bridge v1.0)*
+*由 PKB 系统维护。最后更新: 2026-06-24 (v0.6.14 / web_pack v3.1 / scansci_bridge v1.0 / pkb_retrieve v3.0 / kaoshibao_export v1.0)*

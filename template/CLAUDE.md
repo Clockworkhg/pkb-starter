@@ -1,4 +1,4 @@
-﻿# CLAUDE.md — PKB 快速参考
+# CLAUDE.md — PKB 快速参考
 
 > 每次 Claude Code 会话自动加载。详细规则见 [AGENTS.md](AGENTS.md)。
 
@@ -6,7 +6,7 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
-项目版本：`v0.6.13-alpha` | 组件：`web_pack v3.1` | `scansci_bridge v1.0` | 🆕 `/install` 引导式安装 | `/ask-pkb` 全局查询。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
+项目版本：`v0.6.14-alpha` | 组件：`web_pack v3.1` | `scansci_bridge v1.0` | 🆕 全局知识库查询：`/ask-pkb`。公开模板：[pkb-starter](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
@@ -83,6 +83,11 @@ examples/            示例文件（任务状态模板等）
 | `tools/check_collectors.py` | 采集器健康检查 + z-web-pack bridge 支持 |
 | `tools/zskill_bridge.py` | Z-Skills 兼容桥接层 |
 | `tools/setup_beauty_stack.py` | 🆕 美化技术栈一键安装（Tailwind + shadcn/ui + Motion + Magic UI 等） |
+| `tools/pkb_retrieve.py` | 🆕 混合检索引擎（BM25 + 向量 RRF + Cross-encoder 三阶段 pipeline） |
+| `tools/batch_english_papers.py` | 批量英文论文元数据查询（DOI → Crossref/OpenAlex/SemanticScholar） |
+| `tools/cnki_batch_download.py` | CNKI 批量下载协调器（MCP 驱动） |
+| `tools/cnki_webvpn.py` | CNKI WebVPN 代理访问（机构身份认证） |
+| `tools/kaoshibao_export.py` | 🆕 考试宝Word导入格式转换器 — 三册题库→纯文本 |
 
 ## Hooks 速查
 
@@ -90,7 +95,7 @@ examples/            示例文件（任务状态模板等）
 |------|------|------|
 | `01_session_start` | SessionStart | 环境验证 + 上下文卡片 + 文档新鲜度 |
 | `02_pre_tool_use` | PreToolUse | 🛡️ 安全门控（拦截 secret commit / raw 删除 / 敏感文件写入） |
-| `03_post_tool_use` | PostToolUse (Write\|Edit) | wiki 快速 frontmatter 检查 + commit 后全量健康检查 |
+| `03_post_tool_use` | PostToolUse (Write\|Edit) | wiki frontmatter 检查 + 检索索引自动重建（30s冷却） + commit 后全量健康检查 |
 | `04_post_tool_use_failure` | PostToolUseFailure | 错误分类（11 类）+ 恢复建议 |
 | `05_stop` | Stop | 未提交提醒 + INBOX 过期预警 + 会话摘要 |
 | `06_user_prompt_submit` | UserPromptSubmit | 智能路由建议（URL/路径/CNKI/论文） |
@@ -166,4 +171,4 @@ python tools/scihub_fetch.py                    # 兼容旧接口（自动走多
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-20 (v0.6.13 / web_pack v3.1 / scansci_bridge v1.0)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-24 (v0.6.14 / web_pack v3.1 / scansci_bridge v1.0 / pkb_retrieve v3.0 / kaoshibao_export v1.0)*

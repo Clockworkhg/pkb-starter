@@ -1,6 +1,27 @@
-# pkb-starter root .gitignore
+# PKB .gitignore — 个人知识库 Git 忽略规则
 
-# Python
+# === 敏感文件 ===
+.env
+.env.*
+*credentials*
+*serviceAccount*
+*.pem
+*.p12
+*.pfx
+*.key
+*.keystore
+*.jks
+id_rsa*
+*_rsa
+*.ppk
+
+# === Claude Code 本地配置 ===
+.claude/settings.local.json
+
+# === 收件箱（待处理，不入版本控制） ===
+_INBOX/
+
+# === Python ===
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -8,35 +29,130 @@ dist/
 build/
 .venv/
 venv/
+.env/
 
-# OS
-Thumbs.db
-.DS_Store
-Desktop.ini
+# === Node ===
+node_modules/
 
-# IDE
+# === IDE ===
 .idea/
 .vscode/
 .vs/
-
-# Temp
-*.tmp
-*.temp
-*.bak
-*.log
 *.swp
 *.swo
 *~
 
-# Generated artifacts
-.pkb_backup/
-.pkb_system/
+# === OS ===
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# === 临时文件 ===
+*.tmp
+*.temp
+*.bak
+*.log
+
+# === PKB 缓存目录（Playwright Profile, Network Debug 等） ===
+.pkbcache/
+
+# === PKB Auto Ingest 运行时产物 ===
+auto_ingest_plan.json
+auto_ingest_report.md
+
+# === Obsidian ===
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.trash/
+
+# === 第三方 Skill 仓库（vendor） ===
+# 忽略 clone 的完整仓库内容
+skills/_vendor/deep-research-skills/**
+# 但保留审核报告（可追踪）
+!skills/_vendor/deep-research-skills/AUDIT.md
+skills/_vendor/agent-research-skills/**
+!skills/_vendor/agent-research-skills/AUDIT.md
+skills/_vendor/tjxj-z-skills/**
+!skills/_vendor/tjxj-z-skills/AUDIT.md
+!skills/_vendor/tjxj-z-skills/z-web-pack/AUDIT.md
+
+# Phase 2 vendor repos (pre-declared)
+skills/_vendor/anthropic-skills/**
+!skills/_vendor/anthropic-skills/AUDIT.md
+skills/_vendor/tapestry-skills/**
+!skills/_vendor/tapestry-skills/AUDIT.md
+skills/_vendor/youtube-skills/**
+!skills/_vendor/youtube-skills/AUDIT.md
+skills/_vendor/kanban-skill/**
+!skills/_vendor/kanban-skill/AUDIT.md
+skills/_vendor/sanitize-skill/**
+!skills/_vendor/sanitize-skill/AUDIT.md
+skills/_vendor/qmd/**
+!skills/_vendor/qmd/AUDIT.md
+
+.claude/marketplace-cache/
+
+# === 临时下载和缓存 ===
+*.download
+*.crdownload
+tmp/
+temp/
+downloads/
+.cache/
+.pkb-cache/
+
+# === 隐私 raw 文件（按模式排除） ===
+# 包含个人身份信息的文件
+raw/personal/*id_card*
+raw/personal/*passport*
+raw/personal/*bank*
+raw/personal/*medical*
+# 私钥和证书
+*.pem
+*.p12
+*.pfx
+*.key
+*.keystore
+*.jks
+id_rsa*
+*_rsa
+*.ppk
+
+# === 大文件（>50MB 提醒，不直接忽略） ===
+# 如需要，取消注释以下行：
+# raw/media/video/*
+# raw/media/audio/*
+
+# === Zotero 数据库 ===
+zotero.sqlite
+zotero.sqlite-journal
+zotero.sqlite.bak
+
+# === 同步报告（自动生成） ===
 update_report.md
-update_client_report.md
-RELEASE_CHECK*.md
 
-# User data (never git-tracked)
-.pkb_local/
+# === MCP 服务器本地配置 ===
+.claude/mcp.local.json
 
-# Local test directories
-test-pkb-*/
+# === PKB 本地运行时状态（不提交） ===
+.pkb-local/
+# .pkb-local/state/active-task.json   — 活动任务状态
+# .pkb-local/chrome-profile/          — Chrome 专用配置 + 登录态
+# .pkb-local/logs/                    — 运行时日志
+
+# === 会话交接文件（临时，不提交） ===
+.claude/handoff_*.md
+
+# === 实验性版本标记（不入库） ===
+=*
+
+# === PKB Scholarly Metadata (user data, not committed) ===
+.pkb_local/scholarly/rankings/*.csv
+.pkb_local/scholarly/rankings/*.sqlite3
+.pkb_local/scholarly/cache.sqlite3
+.pkb_local/scholarly/styles/*.csl
+.pkb_local/scholarly/jobs/
+
+# === API keys and secrets (reinforced) ===
+OPENALEX_API_KEY
+CROSSREF_EMAIL

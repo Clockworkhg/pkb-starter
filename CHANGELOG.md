@@ -1,9 +1,29 @@
-﻿# PKB Changelog
+# PKB Changelog
 
 All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<patch>-<stage>`.
 
 ---
 
+## v0.6.14-alpha (2026-06-24) — Exam Export + Retrieval Engine + Paper Pipeline
+
+### ✨ New Features
+
+- **kaoshibao_export v1.0** (`tools/kaoshibao_export.py`): Exam question bank → Word import format converter
+- **pkb_retrieve v3.0** (`tools/pkb_retrieve.py`): BM25 + vector RRF + Cross-encoder 3-stage hybrid retrieval pipeline
+- **batch_english_papers.py**: Batch English paper metadata query (DOI → Crossref/OpenAlex/SemanticScholar)
+- **cnki_batch_download.py**: CNKI batch download coordinator (MCP driven)
+- **cnki_webvpn.py**: CNKI WebVPN proxy access (institutional identity auth)
+- **agent-skills-catalog v2**: ~132 callable + ~120 vendor reference skills
+
+### 📝 Changes
+
+- CLAUDE.md: version bump to v0.6.14-alpha, tool table expanded (30 tools)
+- AGENTS.md: version bump to 1.3.2 (2026-06-24), hooks v1.1, pkb_retrieve v3.0
+- hooks/03_post_tool_use.py: retrieval index auto-rebuild (30s cooldown) + full health check post-commit
+- .gitignore: expanded with vendor skill repos, Zotero DB, scholarly metadata, privacy raw files
+- template/sync: ask-pkb/SKILL.md, index.md, 03_post_tool_use.py, AGENTS.md synced
+
+---
 
 ## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
 
@@ -14,12 +34,13 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ### 🔧 Changes
 
-- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
+- **install_skills.py → v0.4.0**: `template_bundled` skills now report as built-in SKIP instead of FAIL
 - **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
-- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
+- **install.py**: Enhanced completion message with CNKI/Zotero optional install box
 - CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
 
 ---
+
 ## v0.6.12-alpha (2026-06-20) — Multi-Source Paper Download Engine
 
 ### ✨ New Features
@@ -39,27 +60,9 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 - AGENTS.md: version bump to 1.3.1, scansci_bridge v1.0 marker
 - COMMANDS.md: added `/setup-beauty-stack`, scansci_bridge usage examples
 - README.md / README.zh-CN.md: version bump, scansci_bridge feature highlight
-- template/tools/scansci_bridge.py: new 546-line bridge layer
-- template/tools/scihub_fetch.py: new 405-line upgraded fetch module
 
 ---
 
-
-## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
-
-### ✨ New Features
-
-- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
-- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
-
-### 🔧 Changes
-
-- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
-- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
-- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
-- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
-
----
 ## v0.6.11-alpha (2026-06-18) — Global Knowledge Bridge
 
 ### ✨ New Features
@@ -67,12 +70,11 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 - **`/ask-pkb` Global Skill**: Query PKB wiki from ANY project
   - Intelligent path detection (env var → auto-detect → config file → prompt)
   - Uses `PKB_ROOT` env var (same convention as `pkb.ps1`)
-  - Falls back to walking up from cwd looking for PKB markers (`pkb.ps1` + `CLAUDE.md` + `wiki/` + `raw/`)
+  - Falls back to walking up from cwd looking for PKB markers
   - Supports `~/.pkb/config.json` as explicit config
   - Anti-pattern coding: "guess mode", "skip index", "dump all", "hallucination"
   - Structured 6-step execution with checkpoints
 - **Path-agnostic design**: Sync-safe for pkb-starter distribution
-  - Existing `sanitize_patterns` cover `D:\PKB_个人知识库 → <PKB_ROOT>` replacement
 
 ### 📝 Changes
 
@@ -81,22 +83,6 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
-
-## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
-
-### ✨ New Features
-
-- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
-- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
-
-### 🔧 Changes
-
-- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
-- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
-- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
-- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
-
----
 ## v0.6.9-alpha (2026-06-13) — Session Continuity & MCP Bootstrap
 
 ### ✨ New Features
@@ -108,88 +94,35 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
   - `.\pkb.ps1 doctor` — Comprehensive diagnostics (18 checks)
   - `.\pkb.ps1 resume` — Resume session with MCP reload
 - **MCP Configuration Standardization**: `.mcp.json` at project root (Claude Code standard)
-  - Environment variable override: `CHROME_DEBUG_URL`
-  - Default: `http://127.0.0.1:9222`
-  - Legacy `.claude/mcp.json` still supported by tools
-- **Active Task State System** (`.pkb-local/state/active-task.json`)
-  - `tools/pkb_task.py` — Atomic task state manager
-  - Commands: `show`, `start`, `update`, `block`, `complete`, `clear`, `inject`
-  - Corrupt file auto-backup + recovery
-  - Schema versioning (v1)
-  - Automatic timestamp updates
-- **MCP Doctor / Pre-Flight** (`tools/pkb_doctor.py`)
-  - 18 diagnostic checks: Python, Node, npx, Bun, Chrome, MCP, hooks, gitignore, privacy
-  - Clear PASS/WARN/FAIL/SKIP output
-  - `--json` for machine-readable output
-  - `--quiet` for exit-code-only mode
+- **Active Task State System** (`tools/pkb_task.py`): Atomic task state manager
+- **MCP Doctor / Pre-Flight** (`tools/pkb_doctor.py`): 18 diagnostic checks
 - **SessionStart Task Context Injection**: Active task automatically shown at session start
-- **CNKI Skill Capability Declarations**: `required_capabilities` in SKILL.md frontmatter
-  - Honest degradation: never substitutes WebSearch for CNKI without disclosure
-  - Automatic task blocking when capabilities missing
+- **CNKI Skill Capability Declarations**: Honest degradation, never substitutes WebSearch without disclosure
 
 ### 🔧 Improvements
 
-- **Chrome Launcher** (`tools/launch_chrome.ps1`):
-  - PKB-specific profile in `.pkb-local/chrome-profile/`
-  - Preserves CNKI login state across sessions
-  - Detects non-PKB Chrome instances on debug port
-  - Paths with spaces, Chinese characters handled
-  - Environment variable overrides (`CHROME_DEBUG_HOST`, `CHROME_DEBUG_PORT`)
-- **Stop Hook**: Now touches active task timestamp on exit; `.mcp.json` added to critical file watch list
-- **cnki_setup.py**: Now reads from both `.mcp.json` (standard) and `.claude/mcp.json` (legacy)
-- **SessionStart Hook**: Injects active task context from `.pkb-local/state/active-task.json`
+- **Chrome Launcher** (`tools/launch_chrome.ps1`): PKB-specific profile, preserves CNKI login state
+- **Stop Hook**: Touches active task timestamp on exit
+- **cnki_setup.py**: Reads from both `.mcp.json` and `.claude/mcp.json`
 
 ### 🛡️ Privacy & Security
 
 - `.pkb-local/` directory added to `.gitignore`
 - Chrome profile, task state, logs all kept local — never committed
 - `.claude/handoff_*.md` added to `.gitignore`
-- Experimental version markers (`=*`) ignored
-- Private path leakage check in doctor
-- Example task file at `examples/active-task.example.json`
 
 ### 📚 Documentation
 
-- New: `docs/MCP.md` — MCP configuration and troubleshooting
-- New: `docs/SESSION_CONTINUITY.md` — Session resume and task continuity
-- Updated: `docs/UPDATING.md` — v0.6.9 migration notes
-- Updated: `docs/CNKI.md` — CNKI workflow with new launcher
-- Updated: `README.md` — Version bump, new commands
-- Updated: `CLAUDE.md` — Version bump, new paths
+- New: `docs/MCP.md`, `docs/SESSION_CONTINUITY.md`
+- Updated: `docs/UPDATING.md`, `docs/CNKI.md`, `README.md`
 - New: `CHANGELOG.md` (this file)
 
 ### 🧪 Testing
 
-- New: `tests/test_pkb_task.py` — Task state management (12 tests)
-- New: `tests/test_pkb_doctor.py` — Doctor diagnostics (14 tests)
-- New: `tests/test_hooks_v069.py` — Hook updates with task injection
-- Updated: `tests/test_cnki_skill_capabilities.py` — Skill capability validation
-
-### ⬆️ Migration from v0.6.7
-
-1. `.mcp.json` now at project root (updates will place it there)
-2. Existing `.claude/mcp.json` is **not deleted** — tools read both locations
-3. `.pkb-local/` directory auto-created on first use
-4. No breaking changes to existing workflows
+- New: `tests/test_pkb_task.py` (12 tests), `tests/test_pkb_doctor.py` (14 tests)
 
 ---
 
-
-## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
-
-### ✨ New Features
-
-- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
-- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
-
-### 🔧 Changes
-
-- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
-- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
-- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
-- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
-
----
 ## v0.6.7-alpha (2026-06-12)
 
 ### ✨ New Features
@@ -209,25 +142,13 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
-
-## v0.6.13-alpha (2026-06-20) — Guided Installation + Installer UX Fixes
-
-### ✨ New Features
-
-- **`/install` guided installation flow** (`.claude/commands/install.md`): 10-step interactive install ensuring AI presents all options, dry-runs first, confirms high-risk skills separately, pre-warns about network failures (CN region), categorizes results, and suggests CNKI/Zotero after install
-- **Post-install verification**: `--verify` flag (default: on) runs `pkb_doctor.py` after install with manual fallback checks; `--no-verify` to skip
-
-### 🔧 Changes
-
-- **install_skills.py → v0.4.0**: `template_bundled` skills (document-converter, ocr-helper, web-clipper-helper, prompt-library, song-archive, script-breakdown) now report as built-in SKIP instead of FAIL "No repo_url"
-- **Categorized install reports**: Results grouped as ✅ installed / ⚠️ built-in / ⚠️ plugin marketplace / ⚠️ MCP config / ❌ failed
-- **install.py**: Enhanced completion message with CNKI/Zotero optional install box (commands + prerequisites)
-- CLAUDE.md: version bump to v0.6.13-alpha, added `/install` mention
-
----
 ## Version History
 
 | Version | Date | Theme |
 |---------|------|-------|
+| v0.6.14-alpha | 2026-06-24 | Exam Export + Retrieval Engine + Paper Pipeline |
+| v0.6.13-alpha | 2026-06-20 | Guided Installation + Installer UX Fixes |
+| v0.6.12-alpha | 2026-06-20 | Multi-Source Paper Download Engine |
+| v0.6.11-alpha | 2026-06-18 | Global Knowledge Bridge |
 | v0.6.9-alpha | 2026-06-13 | Session Continuity & MCP Bootstrap |
 | v0.6.7-alpha | 2026-06-12 | Scholarly Metadata Enrichment |

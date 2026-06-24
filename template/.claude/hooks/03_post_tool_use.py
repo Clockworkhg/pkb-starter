@@ -24,12 +24,13 @@ Usage:
 
 import os
 import sys
+import json
 import subprocess
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hook_lib import (
-    warn, info, ok, is_dry_run, parse_tool_input, get_root,
+    warn, info, ok, is_dry_run, parse_tool_input, get_root, is_safe_to_run,
 )
 
 
@@ -86,6 +87,46 @@ def run_full_health_check() -> dict:
         return {"ok": True, "issues": [str(e)], "skipped": True}
 
 
+def _rebuild_index() -> None:
+    """Auto-rebuild retrieval index after wiki changes (BM25 + embeddings + reranker).
+
+    Uses a 30-second cooldown to avoid thrashing when multiple wiki pages
+    are written in quick succession.
+    """
+    if not is_safe_to_run("pkb_retrieve_rebuild", cooldown_secs=30):
+        return  # within cooldown, skip
+
+    root = get_root()
+    script = root / "tools" / "pkb_retrieve.py"
+    if not script.exists():
+        return
+
+    dry = is_dry_run()
+    if dry:
+        info("[DRY RUN] Would rebuild retrieval index via pkb_retrieve.py --build")
+        return
+
+    try:
+        result = subprocess.run(
+            [sys.executable, str(script), "--build", "--json"],
+            capture_output=True, text=True, cwd=str(root), timeout=30,
+        )
+        if result.returncode == 0:
+            # Parse JSON to get doc count for the message
+            try:
+                data = json.loads(result.stdout.strip())
+                doc_count = data.get("bm25", {}).get("doc_count", "?")
+                ok(f"Retrieval index auto-updated ({doc_count} docs)")
+            except Exception:
+                ok("Retrieval index auto-updated")
+        else:
+            warn(f"Index rebuild failed (exit {result.returncode})")
+    except subprocess.TimeoutExpired:
+        warn("Index rebuild timed out (30s) — skipped")
+    except Exception as e:
+        warn(f"Index rebuild error: {e}")
+
+
 def handle_write(tool_input: dict) -> int:
     """Fast-path: check only the written file if it's a wiki page."""
     filepath = tool_input.get("file_path", "")
@@ -101,6 +142,8 @@ def handle_write(tool_input: dict) -> int:
                 warn(f"{result['file']}: {issue}")
         else:
             ok()  # Silent pass
+        # Phase 3: Auto-rebuild retrieval index (30s cooldown)
+        _rebuild_index()
     # Non-wiki files (index.md, log.md, CLAUDE.md, etc.) — skip fast path
     return 0
 
