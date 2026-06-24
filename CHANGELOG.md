@@ -8,7 +8,6 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ### ✨ New Features
 
-- **kaoshibao_export v1.0** (`tools/kaoshibao_export.py`): Exam question bank → Word import format converter
 - **pkb_retrieve v3.0** (`tools/pkb_retrieve.py`): BM25 + vector RRF + Cross-encoder 3-stage hybrid retrieval pipeline
 - **batch_english_papers.py**: Batch English paper metadata query (DOI → Crossref/OpenAlex/SemanticScholar)
 - **cnki_batch_download.py**: CNKI batch download coordinator (MCP driven)

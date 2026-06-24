@@ -87,7 +87,6 @@ examples/            示例文件（任务状态模板等）
 | `tools/batch_english_papers.py` | 批量英文论文元数据查询（DOI → Crossref/OpenAlex/SemanticScholar） |
 | `tools/cnki_batch_download.py` | CNKI 批量下载协调器（MCP 驱动） |
 | `tools/cnki_webvpn.py` | CNKI WebVPN 代理访问（机构身份认证） |
-| `tools/kaoshibao_export.py` | 🆕 考试宝Word导入格式转换器 — 三册题库→纯文本 |
 
 ## Hooks 速查
 
@@ -171,4 +170,4 @@ python tools/scihub_fetch.py                    # 兼容旧接口（自动走多
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-24 (v0.6.14 / web_pack v3.1 / scansci_bridge v1.0 / pkb_retrieve v3.0 / kaoshibao_export v1.0)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-24 (v0.6.14 / web_pack v3.1 / scansci_bridge v1.0 / pkb_retrieve v3.0)*

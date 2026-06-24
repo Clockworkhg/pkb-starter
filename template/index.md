@@ -67,7 +67,6 @@ tags: [home, index]
 
 ### 🚀 扩展工具（`/install` 可选安装）
 - `tools/pkb_retrieve.py` — 🆕 混合检索引擎（BM25 + 向量 RRF + Cross-encoder）
-- `tools/kaoshibao_export.py` — 考试宝 Word 导入格式转换器
 - `tools/cnki_batch_download.py` — CNKI 批量下载协调器（MCP 驱动）
 - `tools/cnki_webvpn.py` — CNKI WebVPN 代理访问
 - `tools/batch_english_papers.py` — 批量英文论文元数据查询
