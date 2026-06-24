@@ -6,7 +6,7 @@
 
 **PKB** = 编译式个人知识库，遵循 Karpathy LLM Wiki 模式。
 三层架构：`raw/`（不可变原始资料） → `wiki/`（LLM 维护的结构化知识） → `skills/`（Agent 自动化规则）。
-**公开模板版本：`v0.6.14-starter`**（基于 PKB v0.6.14-alpha）| 内置：全局知识库查询 `/ask-pkb` + 对话捕获 `/pkb-capture`。上游项目：[PKB](https://github.com/Clockworkhg/pkb-starter)。
+**公开模板版本：`v0.6.15-starter`**（基于 PKB v0.6.15-alpha）| 内置：全局知识库查询 `/ask-pkb` + 对话捕获 `/pkb-capture`。上游项目：[PKB](https://github.com/Clockworkhg/pkb-starter)。
 
 ## 关键路径
 
@@ -164,4 +164,4 @@ python tools/scihub_fetch.py                    # 兼容旧接口（自动走多
 
 ---
 
-*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-24 (v0.6.14-starter / pkb_bridge v1.0 / scansci_bridge v1.0)*
+*与 [AGENTS.md](AGENTS.md) 保持同步。最后更新: 2026-06-24 (v0.6.15-starter / pkb_bridge v1.0 / scansci_bridge v1.0)*

@@ -4,6 +4,49 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 ---
 
+## v0.6.15-starter (2026-06-24) — Anti-Degradation + Global Bridge + Sync Pipeline Hardening
+
+### 🛡️ Anti-Degradation System v1.0
+
+- **15 bug fixes** in hook pipeline (03_post_tool_use + 05_stop), validated by `test_e2e_antidegradation.py` (582 lines)
+- File-persistent write counter (`_INBOX/.hook_state/`) for index rebuild scheduling
+- 4-field frontmatter validation (created/updated/tags/type) vs previous 2-field
+- CRLF regex compatibility for Windows (`\r\n`)
+- Atomic file writes (tempfile + rename) for hot.md
+- UTF-8 BOM handling for Windows Notepad compatibility
+- Active topics regex merge (preserve existing) instead of overwrite
+- hot.md auto-refresh with session summary card in 05_stop hook
+- Smart routing patterns expanded 11→26 in 06_user_prompt_submit hook
+
+### 🌐 Global Bridge Engine v1.0
+
+- `pkb_bridge.py` (1030 lines): cross-project `/ask-pkb` + `/pkb-capture` entry point
+- 4-layer PKB_ROOT discovery: env var → auto-detect → `~/.pkb/config.json` → user prompt
+- 9 BLOCK_PATTERNS (API keys, private keys, JWT) + 4 WARN_PATTERNS (Chinese ID, phone, email, internal IP)
+- Graceful degradation: subprocess calls with timeout + fallback
+
+### 🔧 Sync Pipeline Hardening
+
+- **Critical**: binary file handling — BINARY_EXTENSIONS detection with read_bytes/write_bytes for 7 fixture formats
+- **Critical**: sanitize_patterns double-backslash bug fix — 3 residual PKB paths now properly replaced with `<PKB_ROOT>`
+- Manifest: 120 mappings / 0 duplicates / 0 dead entries (removed 1 dead conftest, added 6 test entries)
+- `sync_to_starter.py`: 3× `errors='replace'` for Windows GBK safety
+- pkb-starter: deleted stale root-level CLAUDE.md (v0.6.13-alpha orphan)
+
+### 📁 Obsidian Vault Migration
+
+- Root `.obsidian/` → `wiki/.obsidian/` (single active vault)
+- Dataview plugin installed + pkb-colors CSS snippet + dashboard-dataview.md
+- Wiki templates (concept/paper/project/source) added
+
+### 📝 Documentation
+
+- All version badges unified to v0.6.15-starter
+- README skills count corrected: 7→3 built-in
+- COMMANDS.md, index.md, AGENTS.md: optional tools properly qualified
+
+---
+
 ## v0.6.14-starter (2026-06-24) — Exam Export + Retrieval Engine + Paper Pipeline
 
 ### ✨ New Features
@@ -156,6 +199,7 @@ All notable changes to the PKB system. Versioning follows `v<major>.<minor>.<pat
 
 | Version | Date | Theme |
 |---------|------|-------|
+| v0.6.15-starter | 2026-06-24 | Anti-Degradation + Global Bridge + Sync Hardening |
 | v0.6.14-starter | 2026-06-24 | Exam Export + Retrieval Engine + Paper Pipeline |
 | v0.6.13-alpha | 2026-06-20 | Guided Installation + Installer UX Fixes |
 | v0.6.12-alpha | 2026-06-20 | Multi-Source Paper Download Engine |
