@@ -1,4 +1,4 @@
-# PKB .gitignore — 个人知识库 Git 忽略规则
+# pkb-starter .gitignore — PKB 模板 Git 忽略规则
 
 # === 敏感文件 ===
 .env
